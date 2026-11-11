@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:weightSum="1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:gravity="center_horizontal" android:layout_gravity="center_vertical" android:id="@id/relativeLayout1" android:background="@drawable/tq_startbg" android:layout_width="match_parent" android:layout_height="match_parent">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/ap_copymessage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="37.0dp" android:text="@string/copyfilesalert" android:layout_above="@id/ap_cancelbutton" android:layout_alignParentLeft="true" />
+        <TextView android:id="@id/ap_copyprogressTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="42.0dp" android:text="" android:layout_below="@id/ap_cancelbutton" android:layout_alignParentLeft="true" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/totalPercent" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/copypercent" android:layout_below="@id/ap_cancelbutton" android:layout_centerHorizontal="true" />
+        <Button android:id="@id/ap_cancelbutton" android:visibility="invisible" android:layout_width="90.0dp" android:layout_height="45.0dp" android:text="@string/cancelbutton" android:layout_centerHorizontal="true" android:layout_centerVertical="true" />
+        <ProgressBar android:id="@id/ap_copyprogressBar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/totalPercent" android:layout_alignParentLeft="true" style="?android:attr/progressBarStyleHorizontal" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/detailPercent" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/copypercent" android:layout_below="@id/ap_copyprogressBar" android:layout_centerHorizontal="true" />
+        <ProgressBar android:id="@id/ap_copyprogressDetailBar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/detailPercent" android:layout_alignParentLeft="true" style="?android:attr/progressBarStyleHorizontal" />
+    </RelativeLayout>
+</LinearLayout>

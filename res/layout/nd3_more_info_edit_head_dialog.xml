@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dp" android:layout_marginBottom="10.0dp"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <Button android:textColor="@color/nd3_black" android:id="@id/nd3_local_album_btn" android:background="@drawable/nd3_button_278" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_local_album" />
+    <Button android:textColor="@color/nd3_black" android:id="@id/nd3_pz_btn" android:background="@drawable/nd3_button_278" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_pz" />
+    <Button android:textColor="@color/nd3_black" android:id="@id/nd3_cancel_btn" android:background="@drawable/nd3_button_278" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_cancel_share_photo" />
+    <Button android:textColor="@color/nd3_black" android:id="@id/nd3_return" android:background="@drawable/nd3_button_278" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_return_str" />
+</LinearLayout>

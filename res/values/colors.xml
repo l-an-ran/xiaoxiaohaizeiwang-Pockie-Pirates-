@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="nd3_white">#ffffff</color>
+    <color name="nd3_black">#000000</color>
+    <color name="nd3_background">#ebebeb</color>
+    <color name="nd3_blue">#0000ff</color>
+    <color name="nd3_dark_blue">#415f91</color>
+    <color name="nd3_user_setting_hint_color">#898989</color>
+    <color name="nd3_recharge_pay_record_bg_color">#b0b0b0</color>
+    <color name="nd_font_color">#333333</color>
+    <color name="nd_btn_font_color">#ffffff</color>
+    <color name="nd3_red">#ff0000</color>
+    <color name="nd3_list_view_divider">#898989</color>
+    <color name="nd3_balance_color">#ffff8000</color>
+    <color name="nd3_hint">#b3b3b3</color>
+    <color name="nd_green">#52e297</color>
+    <color name="nd3_list_view_item_bg_1">#ffb8b8b8</color>
+    <color name="nd3_list_view_item_bg_2">#ffd9d9d9</color>
+    <color name="nd3_account_register_agreement_color">#ff777777</color>
+    <color name="nd3_regist_greement_bg">#f3f3f3</color>
+    <color name="nd3_btn_font_color">#ffffff</color>
+    <color name="nd3_font_color">#333333</color>
+    <color name="nd3_conform_pay_font_color">#000000</color>
+    <color name="nd3_dark_color">#ff515151</color>
+    <color name="nd3_pay_color">#ffebedec</color>
+    <color name="nd3_network_error_color">#ff4f4f4f</color>
+    <color name="nd3_portrait_add_color">#ff525252</color>
+    <color name="nd3_records_title_color">#ff000000</color>
+    <color name="nd3_records_time_color">#ff515151</color>
+    <color name="nd3_records_time_bg_color_1">#ffb7b7b7</color>
+    <color name="nd3_records_time_bg_color_2">#ffd8d8df</color>
+    <color name="nd3_orchid_color">#ff9dc4ed</color>
+    <color name="transparent">#1000</color>
+</resources>

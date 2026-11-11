@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:weightSum="1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:gravity="center_horizontal" android:id="@id/relativeLayout1" android:background="@drawable/tq_startbg" android:layout_width="match_parent" android:layout_height="match_parent">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="#ffff00" android:id="@id/ap_message" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="80.0dp" android:text="@string/respackexpire" android:layout_alignParentLeft="true" />
+        <Button android:textColor="#ffffff" android:id="@id/ap_updownbutton" android:background="@drawable/tq_button" android:layout_width="99.0dp" android:layout_height="34.0dp" android:layout_marginTop="86.0dp" android:layout_marginRight="63.0dp" android:text="@string/downbutton" android:layout_below="@id/ap_message" android:layout_alignParentRight="true" />
+        <Button android:textColor="#ffffff" android:id="@id/ap_upcancelbutton" android:background="@drawable/tq_button" android:layout_width="99.0dp" android:layout_height="34.0dp" android:layout_marginRight="14.0dp" android:text="@string/closebutton" android:layout_toLeftOf="@id/ap_updownbutton" android:layout_alignBaseline="@id/ap_updownbutton" android:layout_alignBottom="@id/ap_updownbutton" />
+        <TextView android:textSize="25.0px" android:textColor="#ff0000" android:id="@id/ap_progressTextView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="17.0dp" android:text="@string/progresstip" android:layout_below="@id/ap_message" android:layout_alignParentLeft="true" />
+        <TextView android:textSize="25.0px" android:textColor="#ff0000" android:id="@id/ap_pchecknewver" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/checknewver" android:layout_toRightOf="@id/ap_progressTextView" android:layout_below="@id/ap_message" />
+        <ProgressBar android:id="@id/tq_progressBar1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" />
+        <TextView android:textSize="25.0px" android:textColor="#ff0000" android:id="@id/ap_progressrateview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/rateview" android:layout_below="@id/ap_progressTextView" android:layout_alignLeft="@id/ap_progressTextView" />
+    </RelativeLayout>
+    <AbsoluteLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <ImageView android:id="@id/tq_imageview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ship" />
+    </AbsoluteLayout>
+</AbsoluteLayout>

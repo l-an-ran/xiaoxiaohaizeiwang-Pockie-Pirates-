@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:layout_width="match_parent" android:layout_height="1.0dp" android:layout_weight="144.0">
+        <ImageView android:layout_gravity="center" android:id="@id/nd_logo" android:layout_width="198.0dp" android:layout_height="144.0dp" android:src="@drawable/nd_direct_logo" android:scaleType="centerInside" />
+    </FrameLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="1.0dp" android:layout_weight="40.0">
+        <Button android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_white" android:gravity="center" android:layout_gravity="center|top" android:id="@id/nd_goto_login" android:background="@drawable/nd_direct_login" android:layout_width="160.0dp" android:layout_height="40.0dp" android:text="@string/nd3_account_login_title" />
+    </FrameLayout>
+</LinearLayout>

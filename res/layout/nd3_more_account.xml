@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_more_account_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_white" android:gravity="left" android:id="@id/nd3_more_account_account_id" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" android:text="@string/nd3_more_account_account_format" style="@style/nd3_option_margin_style" />
+    <LinearLayout android:orientation="vertical" android:id="@id/nd3_more_more_layout_list" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_account_password" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:id="@id/nd3_more_account_password_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_more_account_password" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:id="@id/nd3_more_account_other_bind" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_account_other" android:visibility="visible" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <ImageView android:id="@id/nd3_more_account_other_icon" android:layout_width="@dimen/nd3_platform_image_size" android:layout_height="@dimen/nd3_platform_image_size" android:src="@drawable/nd3_3rd_platform_icon" />
+            <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_account_bind_layout" android:visibility="visible" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                    <TextView android:id="@id/nd3_more_account_other_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_more_account_other_login" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+                    <TextView android:id="@id/nd3_more_account_other_binded_title" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_more_account_other_login" style="@style/nd3_option_textview_style" />
+                    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" />
+                </LinearLayout>
+                <LinearLayout android:orientation="vertical" android:id="@id/nd3_more_account_cannot_bind_layout" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                    <TextView android:id="@id/nd3_more_account_cannot_bind_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_more_account_other_login" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_more_account_cannot_bind" style="@style/nd3_option_textview_style" />
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_account_bind_phonenumber_new" android:background="@drawable/nd3_bk1" android:paddingLeft="@dimen/nd3_option_margin_top" android:paddingRight="@dimen/nd3_option_margin_top" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_more06" />
+        <TextView android:id="@id/nd3_more_account_bind_phonenumber_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        <TextView android:gravity="right" android:id="@id/nd3_more_account_bind_phonenumber_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_option_item_marginLeft" style="@style/nd3_option_textview_style" />
+        <ImageView android:id="@id/nd_more_account_bind_switch" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" />
+    </LinearLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@drawable/nd3_bk1" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_padding_style">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_more_account_autologin" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        <CheckBox android:id="@id/nd3_more_account_is_autologin" android:background="@drawable/nd3_checkbox_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" />
+    </LinearLayout>
+</LinearLayout>

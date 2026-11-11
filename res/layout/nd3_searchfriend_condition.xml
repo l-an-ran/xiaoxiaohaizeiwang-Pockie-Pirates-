@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_sex" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_sex" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_no_constrait_tip" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_age" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_date" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_no_constrait_tip" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_address" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_address" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_no_constrait_tip" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

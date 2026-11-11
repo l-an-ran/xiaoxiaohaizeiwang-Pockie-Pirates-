@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/nd3_more_permission_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="@dimen/nd3_btn_text_size" android:textStyle="bold" android:textColor="@color/nd3_white" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" android:layout_marginBottom="5.0dp" android:text="@string/nd_more_permission_friend" style="@style/nd3_option_margin_style" />
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="0.0dp" android:layout_marginBottom="0.0dp" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_permission_check" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_more_permission_check" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+            <ImageView android:id="@id/nd3_more_permission_check_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_07" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_permission_yes" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_more_permission_yes" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+            <ImageView android:id="@id/nd3_more_permission_yes_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_07" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_more_permission_no" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_more_permission_no" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+            <ImageView android:id="@id/nd3_more_permission_no_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_07" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView android:textSize="@dimen/nd3_btn_text_size" android:textStyle="bold" android:textColor="@color/nd3_white" android:visibility="visible" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" android:layout_marginBottom="5.0dp" android:text="@string/nd_more_permission_pay_pwd" style="@style/nd3_option_margin_style" />
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@drawable/nd3_bk1" android:visibility="visible" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="0.0dp" style="@style/nd3_option_margin_padding_style">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd_more_permission_pay_pwd_tip" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        <com.nd.commplatform.widget.NdCheckBox android:id="@id/nd_more_permission_pay_pwd_check" android:background="@drawable/nd3_checkbox_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" />
+    </LinearLayout>
+    <TextView android:textSize="@dimen/nd3_pay_tip_text_size" android:textStyle="bold" android:textColor="@color/nd3_white" android:visibility="visible" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dp" android:text="@string/nd_more_permission_pay_pwd_content" style="@style/nd3_option_margin_style" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:ellipsize="end" android:id="@id/nd3_share_account_txt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toLeftOf="@id/nd3_unbind_tip_txt" android:layout_alignParentLeft="true" android:layout_centerVertical="true" style="@style/nd3_option_textview_style" />
+    <TextView android:textSize="14.0sp" android:textColor="#ff0000ff" android:id="@id/nd3_unbind_tip_txt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_unbind_account_tip" android:layout_toLeftOf="@id/nd3_share_account_switch" android:layout_centerVertical="true" />
+    <ImageView android:id="@id/nd3_share_account_switch" android:background="@drawable/nd3_switch_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+</RelativeLayout>

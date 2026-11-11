@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/nd3_pay_template_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:id="@id/nd3_pay_template_order_list" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_pay_template_recharges" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_pay_label_product" style="@style/nd3_option_textview_style" />
+            <TextView android:id="@id/nd3_pay_template_product" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_pay_template_recharges" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_pay_label_count" style="@style/nd3_option_textview_style" />
+            <TextView android:id="@id/nd3_pay_template_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_pay_label_money" style="@style/nd3_option_textview_style" />
+            <TextView android:id="@id/nd3_pay_template_money" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_padding_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_curren_account" style="@style/nd3_option_textview_style" />
+            <TextView android:id="@id/nd3_curren_account" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_pay_label_current_balance" style="@style/nd3_option_textview_style" />
+            <TextView android:id="@id/nd3_pay_template_current_balance" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+    </LinearLayout>
+    <Button android:textSize="@dimen/nd3_pay_tip_text_size" android:textStyle="bold" android:textColor="@color/nd3_white" android:layout_gravity="center" android:id="@id/nd3_confirm_pay" android:background="@drawable/nd_blue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" android:text="@string/nd3_confrim_pay" />
+</LinearLayout>

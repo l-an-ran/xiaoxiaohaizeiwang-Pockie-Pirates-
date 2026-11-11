@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_person_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_head_image" android:layout_width="57.0dp" android:layout_height="57.0dp" android:src="@drawable/nd3_head_bg" android:layout_centerVertical="true" />
+        <RelativeLayout android:id="@id/nd3_person_info_layout" android:background="@drawable/nd3_mood_bg" android:layout_width="match_parent" android:layout_height="57.0dp" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_toRightOf="@id/nd3_head_image" android:layout_centerInParent="true">
+            <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:ellipsize="end" android:gravity="center_vertical" android:id="@id/nd3_mood" android:layout_width="match_parent" android:layout_height="match_parent" android:maxLines="2" android:layout_toLeftOf="@id/nd3_switch_image" android:layout_alignParentLeft="true" />
+            <ImageView android:id="@id/nd3_switch_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:scaleType="centerInside" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_marginRight="@dimen/nd3_margin_size">
+        <LinearLayout android:gravity="center_vertical" android:id="@id/nd3_top_layout" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <ImageView android:id="@id/nd3_app_image" android:background="@drawable/nd3_game_head" android:layout_width="57.0dp" android:layout_height="57.0dp" android:layout_marginRight="@dimen/nd3_margin_size" />
+            <ImageView android:background="@drawable/nd3_vertical_line" android:layout_width="wrap_content" android:layout_height="match_parent" />
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <include android:id="@id/nd3_achieve_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_margin_size" layout="@layout/nd3_app_property" />
+                <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="match_parent" />
+                <include android:id="@id/nd3_rank_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_marginTop="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_margin_size" layout="@layout/nd3_app_property" />
+            </LinearLayout>
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <RelativeLayout android:id="@id/nd3_bbs_detail_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size">
+            <ImageView android:id="@id/nd3_bbs_image_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:src="@drawable/nd3_bbs_icon" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+            <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_bbs_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_show_bbs_detail" android:layout_toRightOf="@id/nd3_bbs_image_id" android:layout_centerVertical="true" />
+            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+    </LinearLayout>
+    <RelativeLayout android:id="@id/nd3_bizarre_layout" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_marginTop="@dimen/nd3_margin_size" android:layout_marginRight="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_bizarre_image_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:src="@drawable/nd3_bizarre_image" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_bizarre_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_bizarre_friend" android:layout_toRightOf="@id/nd3_bizarre_image_id" android:layout_centerVertical="true" />
+        <ImageView android:id="@id/nd3_bizarre_jump_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/nd3_show_player_layout" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_show_image_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:src="@drawable/nd3_showplayer" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_show_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_show_player" android:layout_toRightOf="@id/nd3_show_image_id" android:layout_centerVertical="true" />
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/nd3_invite_layout" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_marginRight="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_invite_image_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:src="@drawable/nd3_invite_image" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_invite_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_invite_friend" android:layout_toRightOf="@id/nd3_invite_image_id" android:layout_centerVertical="true" />
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+</LinearLayout>

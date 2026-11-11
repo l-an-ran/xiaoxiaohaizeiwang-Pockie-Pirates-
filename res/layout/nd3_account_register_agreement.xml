@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_account_register_agreement_layout" android:background="@color/nd3_white" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" android:src="@drawable/nd3_agreement_logo" style="@style/nd3_option_margin_style" />
+    <TextView android:textColor="@color/nd3_account_register_agreement_color" android:id="@id/nd3_account_register_agreement_content" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style" />
+</LinearLayout>

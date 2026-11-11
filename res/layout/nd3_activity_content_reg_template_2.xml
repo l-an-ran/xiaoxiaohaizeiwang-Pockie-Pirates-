@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.uap.widget.NdActivityDescriptionView android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_activity_content_reg_1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true" />
+    <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_activity_content_reg_3" android:paddingTop="@dimen/nd3_margin_size" android:paddingBottom="@dimen/nd3_margin_size" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_activity_content_reg_1" android:layout_alignWithParentIfMissing="true" />
+</com.nd.commplatform.uap.widget.NdActivityDescriptionView>

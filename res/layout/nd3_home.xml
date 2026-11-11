@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/nd3_title_bar" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1.0">
+        <ViewStub android:id="@id/nd3_home_portrait_stub" android:layout="@layout/nd3_home_portrait" android:inflatedId="@id/nd3_home_portrait" android:layout_width="match_parent" android:layout_height="match_parent" />
+        <ViewStub android:id="@id/nd3_home_land_stub" android:layout="@layout/nd3_home_land" android:inflatedId="@id/nd3_home_land" android:layout_width="match_parent" android:layout_height="match_parent" />
+    </FrameLayout>
+</LinearLayout>

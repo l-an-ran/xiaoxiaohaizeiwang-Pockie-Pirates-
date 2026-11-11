@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_background_xml" android:layout_width="match_parent" android:layout_height="0.0dp" android:layout_weight="1.0">
+        <com.nd.commplatform.widget.NdTopBar android:id="@id/nd3_topbar" android:layout_width="match_parent" android:layout_height="24.0dp" />
+        <com.nd.commplatform.widget.NdTitleBar android:id="@id/nd3_titlepanel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_topbar" />
+        <RelativeLayout android:id="@id/nd3_content" android:layout_width="match_parent" android:layout_height="0.0dp" android:layout_weight="1.0" />
+    </LinearLayout>
+    <com.nd.commplatform.widget.NdBottomBar android:id="@id/nd3_bottombar" android:layout_width="match_parent" android:layout_height="wrap_content" />
+</LinearLayout>

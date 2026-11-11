@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/nd3_white" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_receiver_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_option_item_marginLeft" android:layout_alignParentTop="true">
+        <TextView android:textSize="16.0dp" android:textColor="@color/nd3_black" android:id="@id/nd3_receiver_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_receiver" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <EditText android:id="@id/nd3_receiver" android:background="@null" android:layout_width="match_parent" android:layout_height="wrap_content" android:cursorVisible="false" android:editable="false" android:layout_toLeftOf="@id/nd3_add_receiver" android:layout_toRightOf="@id/nd3_receiver_label" android:layout_centerInParent="true" android:layout_centerVertical="true" />
+        <ImageView android:id="@id/nd3_add_receiver" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_add" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <ImageView android:id="@id/nd3_line" android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_receiver_layout" />
+    <EditText android:gravity="top" android:id="@id/nd3_message" android:background="@null" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_margin="@dimen/nd3_item_divider" android:hint="@string/nd3_send_message_sendhint_str" android:layout_below="@id/nd3_line" />
+</RelativeLayout>

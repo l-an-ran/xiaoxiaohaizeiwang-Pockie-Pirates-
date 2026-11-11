@@ -1,0 +1,80 @@
+version: 3.0.2
+apkFileName: xiaoxiaohaizei_2265.com.apk
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: 10
+versionInfo:
+  versionCode: 1005
+  versionName: 1.9.0
+resourcesInfo:
+  packageId: 127
+doNotCompress:
+- arsc
+- mp3
+- png
+- assets/Env/TqUpdate.ver
+- assets/Env/conf/session.ini
+- assets/Env/data.tpd.1
+- assets/Env/data.tpd.10
+- assets/Env/data.tpd.11
+- assets/Env/data.tpd.12
+- assets/Env/data.tpd.13
+- assets/Env/data.tpd.14
+- assets/Env/data.tpd.15
+- assets/Env/data.tpd.16
+- assets/Env/data.tpd.17
+- assets/Env/data.tpd.18
+- assets/Env/data.tpd.19
+- assets/Env/data.tpd.2
+- assets/Env/data.tpd.20
+- assets/Env/data.tpd.21
+- assets/Env/data.tpd.22
+- assets/Env/data.tpd.23
+- assets/Env/data.tpd.24
+- assets/Env/data.tpd.25
+- assets/Env/data.tpd.26
+- assets/Env/data.tpd.27
+- assets/Env/data.tpd.28
+- assets/Env/data.tpd.29
+- assets/Env/data.tpd.3
+- assets/Env/data.tpd.30
+- assets/Env/data.tpd.31
+- assets/Env/data.tpd.32
+- assets/Env/data.tpd.33
+- assets/Env/data.tpd.34
+- assets/Env/data.tpd.35
+- assets/Env/data.tpd.36
+- assets/Env/data.tpd.38
+- assets/Env/data.tpd.39
+- assets/Env/data.tpd.4
+- assets/Env/data.tpd.40
+- assets/Env/data.tpd.41
+- assets/Env/data.tpd.42
+- assets/Env/data.tpd.43
+- assets/Env/data.tpd.44
+- assets/Env/data.tpd.45
+- assets/Env/data.tpd.46
+- assets/Env/data.tpd.47
+- assets/Env/data.tpd.48
+- assets/Env/data.tpd.49
+- assets/Env/data.tpd.5
+- assets/Env/data.tpd.50
+- assets/Env/data.tpd.51
+- assets/Env/data.tpd.52
+- assets/Env/data.tpd.53
+- assets/Env/data.tpd.54
+- assets/Env/data.tpd.55
+- assets/Env/data.tpd.56
+- assets/Env/data.tpd.6
+- assets/Env/data.tpd.7
+- assets/Env/data.tpd.8
+- assets/Env/data.tpd.9
+- assets/Env/ini/font.ini
+- assets/Env/ini/languageGuide_en.ini
+- assets/Env/ini/languageGuide_zh.ini
+- assets/Env/ini/strings_en.ini
+- assets/Env/ini/strings_zh.ini
+- assets/tqApkVer.ver
+- res/raw/nd_res.zip

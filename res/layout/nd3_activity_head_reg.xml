@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.uap.widget.NdActivityUserView android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_activity_head_rl" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_option_item_marginLeft">
+        <ImageView android:id="@id/nd3_activity_head_image" android:layout_width="57.0dp" android:layout_height="57.0dp" android:layout_marginRight="@dimen/nd3_option_item_marginLeft" android:src="@drawable/nd3_head_bg" android:layout_alignParentLeft="true" />
+        <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_white" android:ellipsize="end" android:id="@id/nd3_activity_user_nickname" android:layout_width="0.0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_toLeftOf="@id/nd3_activity_head_switch_image" android:layout_toRightOf="@id/nd3_activity_head_image" />
+        <ImageView android:id="@id/nd3_activity_head_switch_image" android:background="@drawable/nd3_switch_image_white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignTop="@id/nd3_activity_user_nickname" android:layout_alignParentRight="true" />
+        <TextView android:textColor="@color/nd3_white" android:ellipsize="end" android:id="@id/nd3_activity_user_mood" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="5" android:layout_toRightOf="@id/nd3_activity_head_image" android:layout_below="@id/nd3_activity_user_nickname" />
+    </RelativeLayout>
+    <ImageView android:background="@drawable/nd3_line" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_activity_head_rl" />
+</com.nd.commplatform.uap.widget.NdActivityUserView>

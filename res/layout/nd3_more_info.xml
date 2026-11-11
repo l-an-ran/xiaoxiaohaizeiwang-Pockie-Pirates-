@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/nd3_more_info_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:id="@id/nd3_more_info_portrait_layout" android:background="@drawable/nd3_default_portrait" android:layout_width="57.0dp" android:layout_height="57.0dp" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_style">
+        <TextView android:textSize="@dimen/nd3_portrait_add_text_size" android:textColor="@color/nd3_portrait_add_color" android:gravity="center" android:layout_gravity="center" android:id="@id/nd3_more_info_portrait_add" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_portrait_add" />
+        <ImageView android:id="@id/nd3_more_info_portrait" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="centerInside" />
+        <TextView android:textColor="@color/nd3_white" android:gravity="center|bottom" android:layout_gravity="center|bottom" android:id="@id/nd3_more_info_portrait_edit" android:background="@drawable/nd3_portrait_edit_bg" android:visibility="visible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/nd3_more_info_portrait_edit" />
+    </FrameLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_real_name" android:maxLength="24" style="@style/nd3_option_textview_style" />
+            <EditText android:id="@id/nd3_more_info_real_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_more_info_hint_real_name" android:singleLine="true" android:maxLength="24" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_nickname" style="@style/nd3_option_textview_style" />
+            <EditText android:id="@id/nd3_more_info_nickname" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_more_info_hint_nickname" android:singleLine="true" android:maxLength="10" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_sex" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_sex" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_more_info_hint_sex" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_date" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_date" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_more_info_hint_date" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_address" style="@style/nd3_option_textview_style" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_more_info_address" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_more_info_hint_address" android:singleLine="true" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

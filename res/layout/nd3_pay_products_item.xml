@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="horizontal" android:id="@id/nd3_records_item_id" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="@color/nd3_font_color" android:ellipsize="none" android:gravity="center" android:id="@id/nd3_frist_id" android:paddingLeft="5.0dp" android:layout_width="86.0dp" android:layout_height="wrap_content" />
+    <TextView android:textColor="@color/nd3_font_color" android:ellipsize="none" android:gravity="center" android:id="@id/nd3_second_id" android:paddingLeft="5.0dp" android:layout_width="105.0dp" android:layout_height="wrap_content" />
+    <TextView android:textColor="@color/nd3_font_color" android:ellipsize="none" android:gravity="center" android:id="@id/nd3_third_id" android:paddingLeft="5.0dp" android:layout_width="50.0dp" android:layout_height="wrap_content" />
+    <TextView android:textColor="@color/nd3_font_color" android:ellipsize="none" android:gravity="center" android:id="@id/nd3_fourth_id" android:paddingLeft="5.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+</LinearLayout>

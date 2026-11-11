@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="left" android:orientation="horizontal" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_padding_style">
+        <ImageView android:layout_gravity="center_vertical" android:id="@id/nd_app_image" android:layout_width="48.0dp" android:layout_height="48.0dp" android:layout_marginRight="20.0dp" android:scaleType="centerInside" />
+        <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <TextView android:gravity="left" android:id="@id/nd3_appname" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_textview_style" />
+            <TextView android:gravity="left" android:id="@id/nd3_appversion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_about_size" style="@style/nd3_option_textview_style" />
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_about_size">
+                <TextView android:gravity="left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_company_title" style="@style/nd3_option_textview_style" />
+                <TextView android:gravity="left" android:id="@id/nd3_company" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" style="@style/nd3_option_textview_style" />
+            </LinearLayout>
+            <TextView android:gravity="left" android:id="@id/nd3_debug" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_about_size" android:text="@string/nd_debug_model" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:gravity="left" android:orientation="horizontal" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_padding_style">
+        <ImageView android:layout_gravity="center_vertical" android:layout_width="48.0dp" android:layout_height="48.0dp" android:layout_marginRight="20.0dp" android:src="@drawable/nd_logo48" android:scaleType="centerInside" />
+        <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <TextView android:gravity="left" android:id="@id/nd3_sdkname" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_textview_style" />
+            <TextView android:gravity="left" android:id="@id/nd3_sdkversion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_about_size" style="@style/nd3_option_textview_style" />
+            <TextView android:gravity="left" android:id="@id/nd3_sdkcompany" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_about_size" style="@style/nd3_option_textview_style" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

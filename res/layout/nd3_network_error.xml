@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@drawable/nd3_game_error_bg" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/nd3_error_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_game_face" android:layout_centerInParent="true" />
+    <TextView android:textColor="@color/nd3_white" android:gravity="center_horizontal" android:id="@id/nd3_error_desc" android:paddingTop="30.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_error_image" />
+</RelativeLayout>

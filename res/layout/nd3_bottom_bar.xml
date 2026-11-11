@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/nd3_bottom_layout" android:background="@drawable/nd3_bottom_bar_bg" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_home_layout" android:layout_width="55.0dp" android:layout_height="55.0dp" android:layout_marginTop="5.0dp" android:layout_weight="1.0">
+        <ImageView android:gravity="center|bottom" android:id="@id/nd3_home_image" android:layout_width="35.0dp" android:layout_height="35.0dp" android:src="@drawable/nd3_mainpage_1" />
+        <TextView android:textColor="@color/nd3_white" android:gravity="center|top" android:id="@id/nd3_home_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_category_home" />
+    </LinearLayout>
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_friend_layout" android:layout_width="55.0dp" android:layout_height="55.0dp" android:layout_marginTop="5.0dp" android:layout_weight="1.0">
+        <ImageView android:gravity="center|bottom" android:layout_gravity="center_horizontal" android:id="@id/nd3_friend_image" android:layout_width="35.0dp" android:layout_height="35.0dp" android:src="@drawable/nd3_mainfriend_1" />
+        <TextView android:textColor="@color/nd3_white" android:gravity="center|top" android:id="@id/nd3_friend_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_category_friend" />
+    </LinearLayout>
+    <RelativeLayout android:id="@id/nd3_message_layout" android:layout_width="55.0dp" android:layout_height="55.0dp" android:layout_marginTop="5.0dp" android:layout_weight="1.0">
+        <RelativeLayout android:id="@id/nd3_message_image_layout" android:layout_width="55.0dp" android:layout_height="35.0dp" android:layout_centerHorizontal="true">
+            <ImageView android:gravity="center|bottom" android:id="@id/nd3_message_image" android:layout_width="35.0dp" android:layout_height="35.0dp" android:src="@drawable/nd3_mainmessage_1" android:layout_centerHorizontal="true" />
+            <TextView android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd3_message_count" android:background="@drawable/nd3_new_message" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="20.0dp" android:layout_alignParentTop="true" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+        <TextView android:textColor="@color/nd3_white" android:id="@id/nd3_message_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_category_message" android:layout_below="@id/nd3_message_image_layout" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/nd3_game_layout" android:layout_width="55.0dp" android:layout_height="55.0dp" android:layout_marginTop="5.0dp" android:layout_weight="1.0">
+        <RelativeLayout android:id="@id/nd3_game_image_layout" android:layout_width="55.0dp" android:layout_height="35.0dp" android:layout_centerHorizontal="true">
+            <ImageView android:gravity="center|bottom" android:id="@id/nd3_game_image" android:layout_width="35.0dp" android:layout_height="35.0dp" android:src="@drawable/nd3_maingame_1" android:layout_centerHorizontal="true" />
+            <TextView android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd3_game_count" android:background="@drawable/nd3_new_message" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="20.0dp" android:layout_alignParentTop="true" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+        <TextView android:textColor="@color/nd3_white" android:id="@id/nd3_game_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_category_game" android:layout_below="@id/nd3_game_image_layout" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_more_layout" android:layout_width="55.0dp" android:layout_height="55.0dp" android:layout_marginTop="5.0dp" android:layout_weight="1.0">
+        <ImageView android:gravity="center|bottom" android:id="@id/nd3_more_image" android:layout_width="35.0dp" android:layout_height="35.0dp" android:src="@drawable/nd3_mainmore_1" />
+        <TextView android:textColor="@color/nd3_white" android:gravity="center|top" android:id="@id/nd3_more_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_category_more" />
+    </LinearLayout>
+</LinearLayout>

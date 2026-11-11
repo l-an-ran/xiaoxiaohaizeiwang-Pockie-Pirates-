@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_item_divider">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="@dimen/nd3_item_height">
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_nickname_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_nickname" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_nickname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_item_divider" android:hint="@string/nd3_secret" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="@dimen/nd3_item_height">
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_name_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_real_name" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_item_divider" android:hint="@string/nd3_secret" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="@dimen/nd3_item_height">
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_sex_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_sex" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_sex" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_item_divider" android:hint="@string/nd3_secret" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="@dimen/nd3_item_height">
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_borndata_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_date" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_borndata" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_item_divider" android:hint="@string/nd3_secret" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="@dimen/nd3_item_height">
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_address_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_more_info_tip_address" />
+            <TextView android:textColor="@color/nd3_black" android:id="@id/nd3_address" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_item_divider" android:hint="@string/nd3_secret" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/nd3_account_sina_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_style">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_sina_tip_account" style="@style/nd3_option_textview_style" />
+            <AutoCompleteTextView android:id="@id/nd3_account_sina_account" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_account_sina_hint_account" android:singleLine="true" android:layout_weight="1.0" android:inputType="textEmailAddress" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_sina_tip_password" style="@style/nd3_option_textview_style" />
+            <EditText android:id="@id/nd3_account_sina_password" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_account_sina_hint_password" android:singleLine="true" android:layout_weight="1.0" android:inputType="textPassword" style="@style/nd3_option_edittext_style" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd3_account_sina_content" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_account_bind_bind_content_format" style="@style/nd3_option_margin_style" />
+</LinearLayout>

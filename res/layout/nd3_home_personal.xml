@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_person_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_head_image" android:layout_width="57.0dp" android:layout_height="57.0dp" android:src="@drawable/nd3_head_bg" android:layout_centerVertical="true" />
+        <RelativeLayout android:orientation="vertical" android:id="@id/nd3_person_info_layout" android:background="@drawable/nd3_mood_bg" android:layout_width="match_parent" android:layout_height="57.0dp" android:layout_marginLeft="@dimen/nd3_margin_size" android:layout_toRightOf="@id/nd3_head_image" android:layout_centerInParent="true">
+            <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:ellipsize="end" android:gravity="center_vertical" android:id="@id/nd3_mood" android:layout_width="match_parent" android:layout_height="match_parent" android:maxLines="2" android:layout_toLeftOf="@id/nd3_switch_image" android:layout_alignParentLeft="true" />
+            <ImageView android:id="@id/nd3_switch_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:scaleType="centerInside" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/nd3_info_layout" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_info_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="vertical" android:id="@id/nd3_top_layout" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <include android:id="@id/nd3_achieve_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_item_divider" layout="@layout/nd3_app_property" />
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <include android:id="@id/nd3_rank_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_item_divider" android:layout_marginRight="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_item_divider" layout="@layout/nd3_app_property" />
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <RelativeLayout android:id="@id/nd3_game_detail_layout" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_item_divider" android:layout_marginRight="@dimen/nd3_margin_size">
+            <ImageView android:id="@id/nd3_game_image_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/nd3_item_divider" android:src="@drawable/nd3_game_detail" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+            <TextView android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_game_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_game" android:layout_toRightOf="@id/nd3_game_image_id" android:layout_centerVertical="true" />
+            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+    </LinearLayout>
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <Button android:textStyle="bold" android:textColor="@color/nd3_black" android:id="@id/nd3_bizarre_button" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_bizarre_friend" android:layout_toLeftOf="@id/nd3_hint_button" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <Button android:id="@id/nd3_hint_button" android:visibility="invisible" android:layout_width="30.0dp" android:layout_height="wrap_content" android:layout_centerInParent="true" />
+        <Button android:textStyle="bold" android:textColor="@color/nd3_black" android:gravity="center" android:id="@id/nd3_friend_button" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd3_friend_count" android:layout_toRightOf="@id/nd3_hint_button" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <Button android:textStyle="bold" android:textColor="@color/nd3_white" android:id="@id/nd3_delete_friend_button" android:background="@drawable/nd3_friend_del_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size" android:text="@string/nd3_delete_friend" />
+</LinearLayout>

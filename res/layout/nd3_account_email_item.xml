@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:textAppearance="?android:textAppearanceInverse" android:ellipsize="marquee" android:id="@id/nd3_account_email_item_title" android:padding="5.0dp" android:layout_width="match_parent" android:layout_height="?android:listPreferredItemHeight" android:singleLine="true" style="?android:attr/dropDownItemStyle"
+  xmlns:android="http://schemas.android.com/apk/res/android" />

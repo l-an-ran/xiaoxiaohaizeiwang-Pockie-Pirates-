@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="horizontal" android:id="@id/nd3_records_item_id" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_padding_style"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:textSize="@dimen/nd3_records_title_text_size" android:textColor="@color/nd3_records_title_color" android:ellipsize="end" android:gravity="left" android:id="@id/nd3_type_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="3.0dp" android:text="type" android:singleLine="true" />
+            <TextView android:textSize="@dimen/nd3_records_title_text_size" android:textColor="@color/nd3_records_title_color" android:ellipsize="end" android:gravity="left" android:id="@id/nd3_count_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="3.0dp" android:text="count" android:singleLine="true" />
+        </LinearLayout>
+        <TextView android:textSize="@dimen/nd3_records_title_text_size" android:textColor="@color/nd3_records_time_color" android:ellipsize="end" android:gravity="left" android:id="@id/nd3_money_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="3.0dp" android:text="money" android:singleLine="true" />
+    </LinearLayout>
+    <TextView android:textSize="@dimen/nd3_records_time_text_size" android:textColor="@color/nd3_records_time_color" android:ellipsize="end" android:gravity="right" android:id="@id/nd3_time_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="3.0dp" android:text="time" android:maxLines="2" android:lines="2" />
+</LinearLayout>

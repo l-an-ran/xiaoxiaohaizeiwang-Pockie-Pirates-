@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.widget.NdCategoryItem android:id="@id/nd3_category_item_rl" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:id="@id/nd3_category_name" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size" android:layout_toLeftOf="@id/nd3_category_flag" android:layout_alignParentLeft="true" android:layout_centerVertical="true" style="@style/nd3_textview_1" />
+    <ImageView android:id="@id/nd3_category_flag" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_switch_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+</com.nd.commplatform.widget.NdCategoryItem>

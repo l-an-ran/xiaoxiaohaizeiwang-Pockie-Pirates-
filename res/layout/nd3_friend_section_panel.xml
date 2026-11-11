@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.friend.NdFriendSectionPanel android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/nd3_friend_empty_txt" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" layout="@layout/nd3_blank_listview" />
+    <com.nd.commplatform.friend.FriendHeaderListView android:id="@id/nd3_friend_list" android:fadingEdge="none" android:layout_width="match_parent" android:layout_height="match_parent" android:cacheColorHint="#00000000" android:divider="@drawable/nd3_horizontal_line" android:headerDividersEnabled="false" android:footerDividersEnabled="false" />
+    <com.nd.commplatform.friend.FriendSectionSwitcher android:id="@id/nd3_friend_switcher" android:layout_width="wrap_content" android:layout_height="0.0dp" android:layout_margin="@dimen/nd3_margin_size" android:layout_alignTop="@id/nd3_friend_list" android:layout_alignRight="@id/nd3_friend_list" android:layout_alignBottom="@id/nd3_friend_list" />
+</com.nd.commplatform.friend.NdFriendSectionPanel>

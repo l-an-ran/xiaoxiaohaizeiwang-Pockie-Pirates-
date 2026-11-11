@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.widget.NdListViewFooter android:background="@color/nd3_list_view_divider" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="@color/nd3_black" android:gravity="center" android:id="@id/nd3_listview_footer_txt" android:layout_width="wrap_content" android:layout_height="40.0dp" android:layout_margin="@dimen/nd3_margin_size" android:text="@string/nd3_list_view_more_record" android:layout_centerInParent="true" />
+    <ProgressBar android:id="@id/nd3_footer_more_loading" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size" android:layout_alignParentRight="true" android:layout_centerVertical="true" style="?android:progressBarStyleSmall" />
+</com.nd.commplatform.widget.NdListViewFooter>

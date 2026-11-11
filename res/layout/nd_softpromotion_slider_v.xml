@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nd.commplatform.widget.NdWrappingSlidingDrawer android:orientation="horizontal" android:id="@id/nd_slidingdrawer" android:layout_width="wrap_content" android:layout_height="match_parent" android:handle="@id/nd_handle" android:content="@id/nd_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/nd_handle" android:background="@drawable/nd_slider_handle_v_expand" android:layout_width="wrap_content" android:layout_height="match_parent" />
+    <RelativeLayout android:id="@id/nd_content" android:background="@drawable/nd_slider_content_v" android:layout_width="wrap_content" android:layout_height="match_parent">
+        <ImageView android:id="@id/nd_pre" android:background="@drawable/nd_slider_pre_v" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10.0dp" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" />
+        <ScrollView android:scrollbars="vertical" android:fadingEdge="none" android:layout_width="wrap_content" android:layout_height="0.0dp" android:layout_above="@id/nd_next" android:layout_below="@id/nd_pre" android:layout_centerHorizontal="true">
+            <LinearLayout android:orientation="vertical" android:id="@id/nd_apps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dp" android:layout_marginRight="5.0dp" />
+        </ScrollView>
+        <ImageView android:id="@id/nd_next" android:background="@drawable/nd_slider_next_v" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10.0dp" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+</com.nd.commplatform.widget.NdWrappingSlidingDrawer>

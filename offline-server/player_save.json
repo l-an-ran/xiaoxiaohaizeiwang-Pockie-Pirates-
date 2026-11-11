@@ -1,0 +1,150 @@
+{
+  "role": {
+    "role_id": 100001,
+    "name": "cici",
+    "level": 3,
+    "face": 1007,
+    "figure": 1007,
+    "nation": 0,
+    "gold": 99999,
+    "copper": 1149499,
+    "action_point": 100,
+    "ap_max": 100,
+    "scene_id": 2001,
+    "scene_x": 952,
+    "scene_y": 123,
+    "current_task": 100007,
+    "completed_tasks": [
+      100001,
+      100002,
+      100003,
+      100004,
+      100005,
+      100006
+    ],
+    "battle_wins": {
+      "10101": 3,
+      "10102": 1,
+      "10103": 1
+    },
+    "login_days": 1,
+    "created": true,
+    "officium": 3,
+    "skill_point": 1,
+    "job": 10004,
+    "items": [
+      {
+        "item_id": 1001,
+        "cfg_item_id": 200327,
+        "amount": 1,
+        "level": 2,
+        "star": 2,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 1
+      },
+      {
+        "item_id": 1002,
+        "cfg_item_id": 200328,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 1,
+        "general_id": 1007,
+        "part": 1
+      },
+      {
+        "item_id": 1003,
+        "cfg_item_id": 200329,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 1,
+        "general_id": 1007,
+        "part": 2
+      },
+      {
+        "item_id": 1004,
+        "cfg_item_id": 200330,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 1,
+        "general_id": 1007,
+        "part": 3
+      },
+      {
+        "item_id": 1005,
+        "cfg_item_id": 200331,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 1,
+        "general_id": 1007,
+        "part": 4
+      },
+      {
+        "item_id": 1006,
+        "cfg_item_id": 200332,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 1,
+        "general_id": 1007,
+        "part": 5
+      },
+      {
+        "item_id": 1007,
+        "cfg_item_id": 300063,
+        "amount": 11,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 0
+      },
+      {
+        "item_id": 1008,
+        "cfg_item_id": 200001,
+        "amount": 20,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 0
+      }
+    ],
+    "equipments": {
+      "weapon": 1002,
+      "armor": 1003,
+      "horse": 1004,
+      "cloak": 1005,
+      "amulet": 0,
+      "misc": 1006
+    },
+    "exp": 1500,
+    "task_accepted": true,
+    "task_completed": true,
+    "camp_stars": {
+      "10101": 3,
+      "10102": 3,
+      "10103": 3
+    },
+    "awakened_skills": {
+      "1007": {
+        "2": {
+          "cfg_skill_id": 14069,
+          "level": 1
+        }
+      }
+    }
+  }
+}

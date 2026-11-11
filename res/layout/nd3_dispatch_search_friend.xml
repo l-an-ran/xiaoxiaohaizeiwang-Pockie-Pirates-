@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_may_known_category_rl_ext" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <include android:id="@id/nd3_may_known_category_rl" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/nd3_category_item" />
+    </RelativeLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size" android:layout_below="@id/nd3_may_known_category_rl_ext">
+        <include android:id="@id/nd3_account_search_rl" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/nd3_category_item" />
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_margin_size" />
+        <include android:id="@id/nd3_nickname_search_rl" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/nd3_category_item" />
+        <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_margin_size" />
+        <include android:id="@id/nd3_advance_search_rl" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/nd3_category_item" />
+    </LinearLayout>>
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:background="@drawable/nd3_white_bg" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size">
+        <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_black" android:id="@id/nd3_appname_txt" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dp" android:text="" android:singleLine="true" />
+        <ImageView android:layout_width="match_parent" android:layout_height="wrap_content" android:src="@drawable/nd3_horizontal_line" android:scaleType="fitXY" />
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_black" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dp" android:text="@string/nd3_app_feedback_service_phone" />
+            <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_blue" android:id="@id/nd3_servicephone_txt" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dp" android:text="" android:singleLine="true" android:layout_below="@id/nd3_appname_txt" android:layout_alignLeft="@id/nd3_appname_txt" />
+        </LinearLayout>
+        <ImageView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="5.0dp" android:src="@drawable/nd3_horizontal_line" android:scaleType="fitXY" />
+        <RadioGroup android:gravity="center_horizontal" android:orientation="horizontal" android:id="@id/nd3_feedback_type_group" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <RadioButton android:textColor="@color/nd3_black" android:id="@id/nd3_enhance_advice_btn" android:paddingRight="15.0dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:button="@drawable/nd3_regist_checked" android:text="@string/nd3_app_feedback_sub_type_1" />
+            <RadioButton android:textColor="@color/nd3_black" android:id="@id/nd3_problem_feedback_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="7.0dp" android:button="@drawable/nd3_regist_checked" android:text="@string/nd3_app_feedback_sub_type_2" />
+        </RadioGroup>
+    </LinearLayout>
+    <EditText android:gravity="left|top" android:id="@id/nd3_feedback_edit" android:background="@drawable/nd3_white_bg" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="7.0dp" android:hint="@string/nd3_app_feedback_input_hide" android:minLines="7" android:maxLength="500" android:inputType="textShortMessage|textCapSentences|textAutoCorrect|textMultiLine" />
+    <EditText android:gravity="left|top" android:id="@id/nd3_tel_number_edit" android:background="@drawable/nd3_white_bg" android:visibility="gone" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="7.0dp" android:hint="@string/nd3_feedback_tel_tip" android:inputType="phone" />
+</LinearLayout>

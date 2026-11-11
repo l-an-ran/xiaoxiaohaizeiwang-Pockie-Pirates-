@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/nd3_account_register_titlebar" android:background="@drawable/nd3_title_bar_bg" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:textSize="16.0sp" android:textColor="#ffffffff" android:gravity="center" android:id="@id/nd3_title_bar_button_left" android:background="@drawable/nd3_title_bar_return_btn_xml" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dp" android:text="@string/nd3_topbar_ret" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_register_title" android:layout_centerInParent="true" style="@style/nd3_textview_0" />
+    </RelativeLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1.0">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+            <TextView android:textSize="@dimen/nd3_register_agreement_text_size" android:textColor="@color/nd3_white" android:gravity="left" android:id="@id/nd_tips" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dp" android:layout_marginTop="@dimen/nd3_option_margin_top" android:layout_marginRight="10.0dp" android:text="@string/nd_guest_regist_tips" />
+            <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_margin_style">
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_register_tip_account" style="@style/nd3_option_textview_style" />
+                    <AutoCompleteTextView android:id="@id/nd3_account_register_account" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_account_register_hint_account" android:singleLine="true" android:maxLength="70" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+                </LinearLayout>
+                <ImageView android:background="@drawable/nd3_horizontal_line" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_register_tip_nickname" style="@style/nd3_option_textview_style" />
+                    <EditText android:id="@id/nd3_account_register_nickname" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_account_register_hint_nickname" android:singleLine="true" android:maxLength="10" style="@style/nd3_option_edittext_style" />
+                </LinearLayout>
+                <ImageView android:background="@drawable/nd3_horizontal_line" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_margin_style">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd3_account_register_tip_password" style="@style/nd3_option_textview_style" />
+                    <EditText android:id="@id/nd3_account_register_password" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/nd3_account_register_hint_password" android:singleLine="true" android:maxLength="12" android:layout_weight="1.0" style="@style/nd3_option_edittext_style" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+                <CheckBox android:id="@id/nd3_account_register_is_agree" android:background="@drawable/nd3_square_checkbox_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:button="@null" />
+                <TextView android:textSize="@dimen/nd3_register_agreement_text_size" android:textColor="@color/nd3_white" android:id="@id/nd3_account_register_agreement" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_account_register_agreement" />
+            </LinearLayout>
+            <Button android:textSize="18.0dp" android:textColor="@color/nd3_white" android:layout_gravity="center" android:id="@id/nd_guest_regist" android:background="@drawable/nd_green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_20" android:text="@string/nd_guest_regist" style="@style/nd3_option_margin_style" />
+            <Button android:textSize="18.0dp" android:textColor="@color/nd3_white" android:layout_gravity="center" android:id="@id/nd_login" android:background="@drawable/nd_blue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dp" android:text="@string/nd_has_account" style="@style/nd3_option_margin_style" />
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_margin_style">
+                <TextView android:textSize="18.0dp" android:textStyle="bold" android:textColor="@color/nd3_white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd_guest_official_tips" />
+                <TextView android:textColor="@color/nd3_white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd_guest_official_tips0" />
+                <TextView android:textColor="@color/nd3_white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd_guest_official_tips1" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

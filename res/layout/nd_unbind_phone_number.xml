@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/nd_unbind_phone_number_layout" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="18.0dp" android:textStyle="bold" android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd_unbind_phone_number_tips" android:paddingTop="10.0dp" android:paddingBottom="10.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd_unbind_phone_tips" />
+    <LinearLayout android:id="@id/nd_bind_group_code" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_photo_margin_style">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0.8">
+            <TextView android:textSize="@dimen/nd3_register_agreement_text_size" android:textColor="@color/nd3_white" android:gravity="left" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd_unbind_phone_number_enter_number_tip" />
+            <EditText android:textSize="16.0sp" android:textColor="@color/nd3_white" android:id="@id/nd_unbind_phone_number_bind_edit_phone_number" android:background="@drawable/nd3_input_gray" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:singleLine="true" android:inputType="phone" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <TextView android:textSize="@dimen/nd3_register_agreement_text_size" android:textColor="@color/nd3_balance_color" android:gravity="right" android:id="@id/nd_unbind_phone_number_gain_text" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <Button android:textColor="@color/nd3_font_color" android:id="@id/nd_unbind_phone_number_gain" android:background="@drawable/nd_white_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:text="@string/nd_bind_phone_number_gain_code" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_20" style="@style/nd3_photo_margin_style">
+        <TextView android:textSize="@dimen/nd3_register_agreement_text_size" android:textColor="@color/nd3_white" android:gravity="left" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/nd_bind_phone_number_enter_code_tip" />
+        <EditText android:textSize="16.0sp" android:textColor="@color/nd3_white" android:id="@id/nd_unbind_phone_number_bind_edit_code" android:background="@drawable/nd3_input_gray" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:singleLine="true" android:layout_weight="1.0" />
+    </LinearLayout>
+    <Button android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd_unbind_phone_number_bind" android:background="@drawable/nd_blue" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_20" android:text="@string/nd_unbind_phone_number_bind" style="@style/nd3_text_margin_style_25" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/nd3_account_login_item_layout" android:paddingLeft="0.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/nd3_option_item_padding_style"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/nd3_account_login_item_delete" android:paddingLeft="10.0dp" android:paddingRight="@dimen/nd3_option_item_marginLeft" android:layout_width="wrap_content" android:layout_height="match_parent" android:src="@drawable/nd3_icon_08" />
+    <TextView android:textAppearance="?android:textAppearanceMediumInverse" android:id="@id/nd3_account_login_item_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Account" android:layout_weight="1.0" />
+    <ImageView android:id="@id/nd3_account_login_item_checked" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_07" />
+</LinearLayout>

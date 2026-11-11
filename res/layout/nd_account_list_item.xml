@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:padding="6.0dp" android:paddingLeft="0.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?android:listPreferredItemHeight"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageButton android:id="@id/nd_iv_delete" android:background="@null" android:paddingLeft="6.0dp" android:paddingRight="6.0dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:src="@drawable/nd3_icon_08" />
+    <TextView android:textSize="@dimen/nd3_btn_text_size" android:textColor="@color/nd3_black" android:ellipsize="marquee" android:id="@id/nd_tv_account" android:paddingLeft="6.0dp" android:paddingRight="6.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Medium Text" android:singleLine="true" android:layout_weight="1.0" />
+    <FrameLayout android:layout_gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <Button android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_white" android:layout_gravity="center" android:id="@id/nd_btn_login" android:background="@drawable/nd3_button1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd_btn_login" />
+        <Button android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_white" android:layout_gravity="center" android:id="@id/nd_btn_delete" android:background="@drawable/nd_list_btn_delete_selector" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/nd_btn_delete" />
+        <ImageView android:layout_gravity="center" android:id="@id/nd_iv_check" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/nd3_icon_07" />
+    </FrameLayout>
+</LinearLayout>

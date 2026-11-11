@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RadioGroup android:orientation="horizontal" android:id="@id/nd_rank_time_type_group_portrait" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <RadioButton android:textColor="@color/nd3_btn_font_color" android:gravity="center" android:id="@id/nd_rank_time_type_today_btn" android:background="@drawable/nd3_rank_choice_left_btn_bg" android:layout_width="0.0dp" android:layout_height="wrap_content" android:button="@null" android:text="@string/nd_leaderboard_scope_time_today" android:layout_weight="1.0" />
+        <RadioButton android:textColor="@color/nd3_btn_font_color" android:gravity="center" android:id="@id/nd_rank_time_type_week_btn" android:background="@drawable/nd3_rank_choice_middle_btn_bg" android:layout_width="0.0dp" android:layout_height="wrap_content" android:button="@null" android:text="@string/nd_leaderboard_scope_time_week" android:layout_weight="1.0" />
+        <RadioButton android:textColor="@color/nd3_btn_font_color" android:gravity="center" android:id="@id/nd_rank_time_type_all_btn" android:background="@drawable/nd3_rank_choice_right_btn_bg" android:layout_width="0.0dp" android:layout_height="wrap_content" android:button="@null" android:text="@string/nd_leaderboard_scope_time_all" android:layout_weight="1.0" />
+    </RadioGroup>
+    <RelativeLayout android:id="@id/nd3_leaderboard_self" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_margin_size" android:layout_marginBottom="@dimen/nd3_margin_size">
+        <ImageView android:id="@id/nd3_user_image" android:layout_width="@dimen/nd3_image_size" android:layout_height="@dimen/nd3_image_size" android:layout_margin="@dimen/nd3_margin_size" android:scaleType="fitXY" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_toRightOf="@id/nd3_user_image" android:layout_alignParentTop="true">
+            <TextView android:id="@id/nd3_user_name_txt" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" style="@style/nd3_textview_1" />
+            <TextView android:id="@id/nd3_user_content" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_toLeftOf="@id/nd_rank_user_type_group_landscape" android:layout_below="@id/nd3_user_name_txt" android:layout_alignParentLeft="true" android:layout_alignWithParentIfMissing="true" style="@style/nd3_textview_2" />
+            <RadioGroup android:orientation="horizontal" android:id="@id/nd_rank_user_type_group_landscape" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_margin_size" android:layout_alignTop="@id/nd3_user_content" android:layout_alignParentRight="true">
+                <RadioButton android:textColor="@color/nd3_black" android:gravity="center" android:id="@id/nd3_all_rank_btn_landscape" android:background="@drawable/nd_leaderboard_left_btn_bg" android:layout_width="60.0dp" android:layout_height="30.0dp" android:button="@null" android:text="@string/nd_leaderboard_all_player" />
+                <RadioButton android:textColor="@color/nd3_black" android:gravity="center" android:id="@id/nd3_friend_rank_btn_landscape" android:background="@drawable/nd_leaderboard_right_btn_bg" android:layout_width="60.0dp" android:layout_height="30.0dp" android:button="@null" android:text="@string/nd_leaderboard_friend_player" />
+            </RadioGroup>
+        </RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@color/nd3_list_view_item_bg_1" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/nd3_activity_action_above_bg" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_option_item_marginLeft">
+            <ImageView android:id="@id/nd3_achieve_image" android:layout_width="57.0dp" android:layout_height="57.0dp" android:src="@drawable/nd3_leaderboard_default" android:scaleType="fitXY" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+            <TextView android:id="@id/nd3_achieve_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:layout_toRightOf="@id/nd3_achieve_image" android:layout_alignParentTop="true" style="@style/nd3_textview_1" />
+            <TextView android:id="@id/nd3_achieve_remarks" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/nd3_achieve_name" android:layout_alignLeft="@id/nd3_achieve_name" style="@style/nd3_textview_2" />
+        </RelativeLayout>
+        <TextView android:id="@id/nd3_achieve_desc" android:paddingBottom="@dimen/nd3_option_item_marginLeft" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/nd3_option_item_marginLeft" android:layout_marginRight="@dimen/nd3_option_item_marginLeft" style="@style/nd3_textview_2" />
+    </LinearLayout>
+    <Button android:gravity="center" android:id="@id/nd3_share_my_achieve" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/nd3_option_item_marginLeft" android:text="@string/nd3_share_my_achieve" />
+</LinearLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="nd3_margin_size">5.0dp</dimen>
+    <dimen name="nd3_btn_text_size">18.0sp</dimen>
+    <dimen name="nd3_divider_height">2.0dp</dimen>
+    <dimen name="nd3_option_item_marginLeft">10.0dp</dimen>
+    <dimen name="nd3_item_divider">8.0dp</dimen>
+    <dimen name="nd3_item_height">45.0dp</dimen>
+    <dimen name="nd3_logout_text_size">23.0sp</dimen>
+    <dimen name="nd3_bind_phonenumber_paddingTop">23.0dp</dimen>
+    <dimen name="nd3_image_size">48.0dp</dimen>
+    <dimen name="nd3_platform_image_size">30.0dp</dimen>
+    <dimen name="nd3_platform_padding_size">3.0dp</dimen>
+    <dimen name="nd3_platform_image_size_large">48.0dp</dimen>
+    <dimen name="nd3_pay_tip_text_size">16.0sp</dimen>
+    <dimen name="nd3_pay_service_text_size">12.0sp</dimen>
+    <dimen name="nd3_pay_password_tip_text_size">18.0sp</dimen>
+    <dimen name="nd3_network_error_tip_text_size">16.0sp</dimen>
+    <dimen name="nd3_network_error_content_text_size">12.0sp</dimen>
+    <dimen name="nd3_portrait_add_text_size">14.0sp</dimen>
+    <dimen name="nd3_register_agreement_text_size">16.0sp</dimen>
+    <dimen name="nd3_register_sendsms_text_size">12.0sp</dimen>
+    <dimen name="nd3_records_title_text_size">14.0sp</dimen>
+    <dimen name="nd3_records_time_text_size">12.0sp</dimen>
+    <dimen name="nd3_option_margin_top">15.0dp</dimen>
+    <dimen name="nd_goods_flag_w">68.0dp</dimen>
+    <dimen name="nd_goods_flag_h">25.0dp</dimen>
+    <dimen name="nd_goods_detail_size">85.0dp</dimen>
+    <dimen name="nd_about_size">3.0dp</dimen>
+    <dimen name="nd_20">20.0dp</dimen>
+    <dimen name="nd_50">50.0dp</dimen>
+    <dimen name="nd_10">10.0dp</dimen>
+</resources>

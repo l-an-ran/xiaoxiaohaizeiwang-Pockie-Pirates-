@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:id="@id/nd3_pay_pass_layout" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/nd3_title_bar" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+            <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:background="@drawable/nd3_bk1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" style="@style/nd3_option_item_margin_style">
+                <TextView android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_black" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_platform_image_size" android:text="@string/nd3_pay_label_buy_success" android:drawableLeft="@drawable/nd_true" style="@style/nd3_option_margin_style" />
+                <ImageView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_20" android:layout_marginBottom="@dimen/nd_20" android:src="@drawable/nd_xline" />
+                <TextView android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd3_pay_pass_goto_consumes" android:background="@drawable/nd_green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd_20" android:text="@string/nd3_pay_button_view_consumes" style="@style/nd3_option_margin_style" />
+                <TextView android:textSize="@dimen/nd3_pay_tip_text_size" android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd3_pay_pass_exit" android:background="@drawable/nd_blue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dp" android:text="@string/nd3_pay_pass_exit" style="@style/nd3_option_margin_style" />
+            </LinearLayout>
+            <TextView android:textColor="@color/nd3_white" android:gravity="center" android:id="@id/nd_pay_success_tips" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/nd3_option_margin_top" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
