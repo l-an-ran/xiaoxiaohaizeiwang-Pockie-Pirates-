@@ -1873,7 +1873,13 @@ def _build_camp_by_scene_response(correlation_id: str, scene_id: int = 2001) -> 
     elite_list = []
     try:
         conn = sqlite3.connect(DB_PATH)
-        camp_rows = conn.execute("SELECT cfg_camp_id, require_camp_id, last_order FROM cfg_camp WHERE scene_id = ? OR CAST(scene_id AS INT) = ? ORDER BY cfg_camp_id", (scene_id, scene_id)).fetchall()
+        # Normal camps must have cfg_camp_id < 2000 and idx > 0 to prevent UI out-of-bounds crash
+        camp_rows = conn.execute(
+            "SELECT cfg_camp_id, require_camp_id, last_order FROM cfg_camp "
+            "WHERE (scene_id = ? OR CAST(scene_id AS INT) = ?) AND cfg_camp_id < 2000 AND idx > 0 "
+            "ORDER BY cfg_camp_id",
+            (scene_id, scene_id)
+        ).fetchall()
         for cid, req_cid, last_order in camp_rows:
             cid = int(cid)
             req_cid = int(req_cid)
@@ -1883,25 +1889,33 @@ def _build_camp_by_scene_response(correlation_id: str, scene_id: int = 2001) -> 
             total_count = len(army_rows) if army_rows else last_order
             is_finish = 1 if (defeated_count >= total_count and total_count > 0) else 0
 
-            is_open = 1
-            if req_cid > 0:
-                req_armies = conn.execute("SELECT cfg_army_id FROM cfg_army WHERE cfg_camp_id = ? OR CAST(cfg_camp_id AS INT) = ?", (req_cid, req_cid)).fetchall()
-                if req_armies:
-                    req_defeated = sum(1 for (aid,) in req_armies if camp_stars.get(str(aid), 0) > 0)
-                    is_open = 1 if req_defeated >= len(req_armies) else 0
-            if cid in (1001, 1004):
-                is_open = 1
-
             camps.append(_amf3_object([
                 ("cfg_camp_id",   _amf3_int(cid)),
                 ("camp_score",    _amf3_int(defeated_count)),
                 ("memcamp_score", _amf3_int(defeated_count)),
                 ("is_finish",     _amf3_int(is_finish)),
             ]))
+
+        # Elite camps (cfg_camp_id >= 2000) go into elite_list only
+        elite_rows = conn.execute(
+            "SELECT cfg_camp_id, require_camp_id FROM cfg_camp "
+            "WHERE (scene_id = ? OR CAST(scene_id AS INT) = ?) AND cfg_camp_id >= 2000 "
+            "ORDER BY cfg_camp_id",
+            (scene_id, scene_id)
+        ).fetchall()
+        for e_cid, req_cid in elite_rows:
+            e_cid = int(e_cid)
+            req_cid = int(req_cid)
+            is_open = 0
+            if req_cid > 0:
+                req_armies = conn.execute("SELECT cfg_army_id FROM cfg_army WHERE cfg_camp_id = ? OR CAST(cfg_camp_id AS INT) = ?", (req_cid, req_cid)).fetchall()
+                if req_armies:
+                    req_defeated = sum(1 for (aid,) in req_armies if camp_stars.get(str(aid), 0) > 0)
+                    is_open = 1 if req_defeated >= len(req_armies) else 0
             elite_list.append(_amf3_object([
-                ("elite_cfg_camp_id", _amf3_int(cid)),
+                ("elite_cfg_camp_id", _amf3_int(e_cid)),
                 ("is_open",           _amf3_int(is_open)),
-                ("is_finish",         _amf3_int(is_finish)),
+                ("is_finish",         _amf3_int(0)),
             ]))
         conn.close()
     except Exception as e:
@@ -2282,35 +2296,20 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     proto_lvl = int(role.get("level", 1))
     proto_stats = _calc_general_stats(True, cfg["job"], proto_lvl)
     proto_hp = proto_stats["hp"]
-    atk_skill = _amf3_object([
-        ("cfg_skill_id", _amf3_int(cfg["skill"])),
-        ("idx",          _amf3_int(1)),
-        ("level",        _amf3_int(1)),
-    ])
     atk_gen = _amf3_object([
         ("position",         _amf3_int(proto_pos)),
-        ("pos",              _amf3_int(proto_pos)),
-        ("grid",             _amf3_int(proto_pos)),
-        ("id",               _amf3_int(cfg["figure"])),
-        ("cfg_general_id",   _amf3_int(cfg["cfg_id"])),
-        ("proto_id",         _amf3_int(cfg["cfg_id"])),
-        ("model_id",         _amf3_int(cfg["figure"])),
-        ("name",             _amf3_string(role["name"])),
-        ("face",             _amf3_int(cfg["face"])),
-        ("figure",           _amf3_int(cfg["figure"])),
-        ("avatar",           _amf3_int(cfg["figure"])),
-        ("quality",          _amf3_int(3)),
-        ("level",            _amf3_int(proto_lvl)),
         ("health_point",     _amf3_int(proto_hp)),
-        ("health_point_max", _amf3_int(proto_hp)),
+        ("face",             _amf3_int(cfg["face"])),
         ("morale",           _amf3_int(50)),
-        ("morale_max",       _amf3_int(100)),
-        ("max_morale",       _amf3_int(100)),
-        ("init_morale",      _amf3_int(50)),
-        ("is_show_morale",   _amf3_int(1)),
+        ("id",               _amf3_int(cfg["figure"])),
+        ("health_point_max", _amf3_int(proto_hp)),
         ("category",         _amf3_int(1)),
-        ("type",             _amf3_int(1)),
-        ("skill_list",       _amf3_array([atk_skill])),
+        ("figure",           _amf3_int(cfg["figure"])),
+        ("level",            _amf3_int(proto_lvl)),
+        ("cfg_general_id",   _amf3_int(cfg["cfg_id"])),
+        ("name",             _amf3_string(role["name"])),
+        ("quality",          _amf3_int(3)),
+        ("skill_list",       _amf3_array([_amf3_int(cfg["skill"])])),
     ])
 
     attack_generals = [atk_gen]
@@ -2322,7 +2321,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         "name": role["name"],
         "morale": 50,
         "skill_id": cfg["skill"],
-        "anger_skill_id": 11003,
+        "anger_skill_id": cfg["skill"],
         "pa": proto_stats["physical_attack"],
     }]
 
@@ -2365,36 +2364,20 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
         comp_stats = _calc_general_stats(False, c_cfg_id, c_level)
         c_hp = comp_stats["hp"]
-        c_skill_obj = _amf3_object([
-            ("cfg_skill_id", _amf3_int(c_skill or 11003)),
-            ("idx",          _amf3_int(1)),
-            ("level",        _amf3_int(1)),
-        ])
         c_gen_obj = _amf3_object([
             ("position",         _amf3_int(assigned_pos)),
-            ("pos",              _amf3_int(assigned_pos)),
-            ("grid",             _amf3_int(assigned_pos)),
-            ("id",               _amf3_int(c_gid)),
-            ("general_id",       _amf3_int(c_cfg_id)),
-            ("proto_id",         _amf3_int(c_cfg_id)),
-            ("cfg_general_id",   _amf3_int(c_cfg_id)),
-            ("model_id",         _amf3_int(c_fig)),
-            ("name",             _amf3_string(c_name)),
-            ("face",             _amf3_int(c_face)),
-            ("figure",           _amf3_int(c_fig)),
-            ("avatar",           _amf3_int(c_fig)),
-            ("quality",          _amf3_int(c_qual)),
-            ("level",            _amf3_int(c_level)),
             ("health_point",     _amf3_int(c_hp)),
-            ("health_point_max", _amf3_int(c_hp)),
+            ("face",             _amf3_int(c_face)),
             ("morale",           _amf3_int(50)),
-            ("morale_max",       _amf3_int(100)),
-            ("max_morale",       _amf3_int(100)),
-            ("init_morale",      _amf3_int(50)),
-            ("is_show_morale",   _amf3_int(1)),
-            ("category",         _amf3_int(2)),  # 2 = General/Companion model
-            ("type",             _amf3_int(2)),
-            ("skill_list",       _amf3_array([c_skill_obj])),
+            ("id",               _amf3_int(c_gid)),
+            ("health_point_max", _amf3_int(c_hp)),
+            ("category",         _amf3_int(2)),
+            ("figure",           _amf3_int(c_fig)),
+            ("level",            _amf3_int(c_level)),
+            ("cfg_general_id",   _amf3_int(c_cfg_id)),
+            ("name",             _amf3_string(c_name)),
+            ("quality",          _amf3_int(c_qual)),
+            ("skill_list",       _amf3_array([_amf3_int(c_skill or 51001)])),
         ])
         attack_generals.append(c_gen_obj)
         atk_units.append({
@@ -2404,8 +2387,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             "face": c_face,
             "name": c_name,
             "morale": 50,
-            "skill_id": c_skill or 11003,
-            "anger_skill_id": c_skill or 11003,
+            "skill_id": c_skill or 51001,
+            "anger_skill_id": c_skill or 51001,
             "pa": comp_stats["physical_attack"],
         })
         if len(attack_generals) >= 5:
@@ -2459,33 +2442,20 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 m_hp = int(m_row[5] or m_hp)
                 m_skill_id = int(m_row[6] or 11003)
 
-            m_skill = _amf3_object([
-                ("cfg_skill_id", _amf3_int(m_skill_id)),
-                ("idx",          _amf3_int(1)),
-                ("level",        _amf3_int(1)),
-            ])
             def_gen_elem = _amf3_object([
                 ("position",         _amf3_int(p_slot)),
-                ("pos",              _amf3_int(p_slot)),
-                ("grid",             _amf3_int(p_slot)),
+                ("health_point",     _amf3_int(m_hp)),
+                ("face",             _amf3_int(m_face)),
+                ("morale",           _amf3_int(50)),
                 ("id",               _amf3_int(1000 + p_slot)),
+                ("health_point_max", _amf3_int(m_hp)),
+                ("category",         _amf3_int(2)),
+                ("figure",           _amf3_int(m_fig)),
+                ("level",            _amf3_int(army_level)),
                 ("cfg_general_id",   _amf3_int(100000 + p_slot)),
                 ("name",             _amf3_string(m_name)),
-                ("face",             _amf3_int(m_face)),
-                ("figure",           _amf3_int(m_fig)),
-                ("avatar",           _amf3_int(m_fig)),
                 ("quality",          _amf3_int(m_qual)),
-                ("level",            _amf3_int(army_level)),
-                ("health_point",     _amf3_int(m_hp)),
-                ("health_point_max", _amf3_int(m_hp)),
-                ("morale",           _amf3_int(50)),
-                ("morale_max",       _amf3_int(100)),
-                ("max_morale",       _amf3_int(100)),
-                ("init_morale",      _amf3_int(50)),
-                ("is_show_morale",   _amf3_int(1)),
-                ("category",         _amf3_int(2)),
-                ("type",             _amf3_int(2)),
-                ("skill_list",       _amf3_array([m_skill])),
+                ("skill_list",       _amf3_array([_amf3_int(m_skill_id)])),
             ])
             defend_generals.append(def_gen_elem)
             def_units.append({
@@ -2502,33 +2472,20 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             total_enemy_damage += m_hp
     else:
         # Fallback single enemy
-        def_skill = _amf3_object([
-            ("cfg_skill_id", _amf3_int(11003)),
-            ("idx",          _amf3_int(1)),
-            ("level",        _amf3_int(1)),
-        ])
         def_gen = _amf3_object([
             ("position",         _amf3_int(1)),
-            ("pos",              _amf3_int(1)),
-            ("grid",             _amf3_int(1)),
+            ("health_point",     _amf3_int(224)),
+            ("face",             _amf3_int(def_face)),
+            ("morale",           _amf3_int(50)),
             ("id",               _amf3_int(2)),
+            ("health_point_max", _amf3_int(224)),
+            ("category",         _amf3_int(2)),
+            ("figure",           _amf3_int(def_figure)),
+            ("level",            _amf3_int(army_level)),
             ("cfg_general_id",   _amf3_int(100001)),
             ("name",             _amf3_string(def_name)),
-            ("face",             _amf3_int(def_face)),
-            ("figure",           _amf3_int(def_figure)),
-            ("avatar",           _amf3_int(def_figure)),
             ("quality",          _amf3_int(1)),
-            ("level",            _amf3_int(army_level)),
-            ("health_point",     _amf3_int(224)),
-            ("health_point_max", _amf3_int(224)),
-            ("morale",           _amf3_int(50)),
-            ("morale_max",       _amf3_int(100)),
-            ("max_morale",       _amf3_int(100)),
-            ("init_morale",      _amf3_int(50)),
-            ("is_show_morale",   _amf3_int(1)),
-            ("category",         _amf3_int(2)),
-            ("type",             _amf3_int(2)),
-            ("skill_list",       _amf3_array([def_skill])),
+            ("skill_list",       _amf3_array([_amf3_int(11003)])),
         ])
         defend_generals.append(def_gen)
         def_units.append({
@@ -2564,6 +2521,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     ])
 
     # 3. Combat rounds: Alternating attack rounds between player and enemy
+    # In libOnePiece.so: action_type MUST be 1 (regular attack/skill).
+    # Setting action_type to 2 causes action callback chain disconnect and battle freeze!
     combat_rounds = []
     alive_enemies = [u for u in def_units]
     alive_players = [u for u in atk_units]
@@ -2580,63 +2539,48 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
             is_skill = (atk.get("morale", 50) >= 100)
             if is_skill:
-                action_type = 2  # 2: 怒气大招技能
-                cur_skill_id = atk.get("anger_skill_id", atk.get("skill_id", 11003))
-                atk["morale"] = 0  # 释放大招后怒气归零
+                atk["morale"] = 0  # 满怒释放大招后重置为 0
                 dmg_mult = 1.8
             else:
-                action_type = 1  # 1: 普通攻击
-                cur_skill_id = 11003
-                atk["morale"] = min(100, atk.get("morale", 50) + 25)  # 攻击者出手普攻回复 25 怒气
+                atk["morale"] = min(100, atk.get("morale", 50) + 25)  # 攻击者普攻回复 25 怒气
                 dmg_mult = 1.0
 
             # 受击者受击增加 25 怒气
             target["morale"] = min(100, target.get("morale", 50) + 25)
 
-            # Deal realistic damage: 2-3 hits to defeat an enemy unit
+            # Deal realistic damage
             base_dmg = max(50, int(atk.get("pa", 150) * 0.8))
             dmg = min(target["hp"], max(80, int(base_dmg * dmg_mult)))
             target["hp"] -= dmg
 
             effect_target = _amf3_object([
-                ("target_side",           _amf3_int(2)),
+                ("target_accident_status",_amf3_int(0)),
+                ("counter_skill_id",      _amf3_int(0)),
                 ("target_position",       _amf3_int(target["pos"])),
+                ("target_side",           _amf3_int(2)),
                 ("target_health_point",   _amf3_int(max(0, target["hp"]))),
                 ("target_morale",         _amf3_int(target["morale"])),
-                ("action_value",          _amf3_int(dmg)),
-                ("action_type",           _amf3_int(action_type)),
+                ("target_buff_list",      _amf3_array([])),
             ])
             round_action = _amf3_object([
-                ("action_type",           _amf3_int(action_type)),
-                ("skill_id",              _amf3_int(cur_skill_id)),
-                ("is_skill",              _amf3_int(1 if is_skill else 0)),
                 ("action_value",          _amf3_int(dmg)),
                 ("action_target_side",    _amf3_int(2)),
-                ("action_target_position",_amf3_int(target["pos"])),
+                ("action_type",           _amf3_int(1)),
                 ("action_target_morale",  _amf3_int(target["morale"])),
-                ("target_morale",         _amf3_int(target["morale"])),
-                ("attacker_morale",       _amf3_int(atk["morale"])),
-                ("caster_morale",         _amf3_int(atk["morale"])),
+                ("action_target_position",_amf3_int(target["pos"])),
                 ("effect_targets",        _amf3_array([effect_target])),
             ])
             c_round = _amf3_object([
+                ("face",                  _amf3_int(atk["face"])),
+                ("now_boold_point",       _amf3_int(max(0, atk["hp"]))),
+                ("max_boold_point",       _amf3_int(atk["hp_max"])),
                 ("battle_id",             _amf3_int(1)),
                 ("caster_side",           _amf3_int(1)),
                 ("caster_position",       _amf3_int(atk["pos"])),
-                ("action_type",           _amf3_int(action_type)),
-                ("skill_id",              _amf3_int(cur_skill_id)),
-                ("is_skill",              _amf3_int(1 if is_skill else 0)),
-                ("now_boold_point",       _amf3_int(atk["hp"])),
-                ("max_boold_point",       _amf3_int(atk["hp_max"])),
-                ("face",                  _amf3_int(atk["face"])),
-                ("morale",                _amf3_int(atk["morale"])),
-                ("caster_morale",         _amf3_int(atk["morale"])),
-                ("attacker_morale",       _amf3_int(atk["morale"])),
                 ("defend_pet_morale",     _amf3_int(0)),
                 ("attack_pet_morale",     _amf3_int(0)),
                 ("caster_round_action",   round_action),
                 ("caster_pre_action_buff_list", _amf3_array([])),
-                ("caster_pre_action_list",      _amf3_array([])),
                 ("caster_after_action_list",    _amf3_array([])),
             ])
             combat_rounds.append(c_round)
@@ -2651,13 +2595,9 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
             e_is_skill = (enemy.get("morale", 50) >= 100)
             if e_is_skill:
-                e_action_type = 2
-                e_skill_id = enemy.get("anger_skill_id", 11003)
                 enemy["morale"] = 0
                 e_mult = 1.5
             else:
-                e_action_type = 1
-                e_skill_id = 11003
                 enemy["morale"] = min(100, enemy.get("morale", 50) + 25)
                 e_mult = 1.0
 
@@ -2669,44 +2609,33 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             p_target["hp"] -= e_dmg
 
             e_effect = _amf3_object([
-                ("target_side",           _amf3_int(1)),
+                ("target_accident_status",_amf3_int(0)),
+                ("counter_skill_id",      _amf3_int(0)),
                 ("target_position",       _amf3_int(p_target["pos"])),
+                ("target_side",           _amf3_int(1)),
                 ("target_health_point",   _amf3_int(max(1, p_target["hp"]))),
                 ("target_morale",         _amf3_int(p_target["morale"])),
-                ("action_value",          _amf3_int(e_dmg)),
-                ("action_type",           _amf3_int(e_action_type)),
+                ("target_buff_list",      _amf3_array([])),
             ])
             e_action = _amf3_object([
-                ("action_type",           _amf3_int(e_action_type)),
-                ("skill_id",              _amf3_int(e_skill_id)),
-                ("is_skill",              _amf3_int(1 if e_is_skill else 0)),
                 ("action_value",          _amf3_int(e_dmg)),
                 ("action_target_side",    _amf3_int(1)),
-                ("action_target_position",_amf3_int(p_target["pos"])),
+                ("action_type",           _amf3_int(1)),
                 ("action_target_morale",  _amf3_int(p_target["morale"])),
-                ("target_morale",         _amf3_int(p_target["morale"])),
-                ("attacker_morale",       _amf3_int(enemy["morale"])),
-                ("caster_morale",         _amf3_int(enemy["morale"])),
+                ("action_target_position",_amf3_int(p_target["pos"])),
                 ("effect_targets",        _amf3_array([e_effect])),
             ])
             e_round = _amf3_object([
+                ("face",                  _amf3_int(enemy["face"])),
+                ("now_boold_point",       _amf3_int(enemy["hp"])),
+                ("max_boold_point",       _amf3_int(enemy["hp_max"])),
                 ("battle_id",             _amf3_int(1)),
                 ("caster_side",           _amf3_int(2)),
                 ("caster_position",       _amf3_int(enemy["pos"])),
-                ("action_type",           _amf3_int(e_action_type)),
-                ("skill_id",              _amf3_int(e_skill_id)),
-                ("is_skill",              _amf3_int(1 if e_is_skill else 0)),
-                ("now_boold_point",       _amf3_int(enemy["hp"])),
-                ("max_boold_point",       _amf3_int(enemy["hp_max"])),
-                ("face",                  _amf3_int(enemy["face"])),
-                ("morale",                _amf3_int(enemy["morale"])),
-                ("caster_morale",         _amf3_int(enemy["morale"])),
-                ("attacker_morale",       _amf3_int(enemy["morale"])),
                 ("defend_pet_morale",     _amf3_int(0)),
                 ("attack_pet_morale",     _amf3_int(0)),
                 ("caster_round_action",   e_action),
                 ("caster_pre_action_buff_list", _amf3_array([])),
-                ("caster_pre_action_list",      _amf3_array([])),
                 ("caster_after_action_list",    _amf3_array([])),
             ])
             combat_rounds.append(e_round)

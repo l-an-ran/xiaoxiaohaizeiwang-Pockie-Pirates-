@@ -7,12 +7,12 @@
     "figure": 1001,
     "nation": 0,
     "gold": 96539,
-    "copper": 2152399,
+    "copper": 2153899,
     "action_point": 100,
     "ap_max": 100,
-    "scene_id": 2002,
-    "scene_x": 1369,
-    "scene_y": 73,
+    "scene_id": 2001,
+    "scene_x": 1302,
+    "scene_y": 120,
     "current_task": 100028,
     "completed_tasks": [
       100001,
@@ -63,7 +63,8 @@
       "10307": 1,
       "10308": 1,
       "10309": 3,
-      "10310": 11
+      "10310": 13,
+      "10401": 1
     },
     "login_days": 1,
     "created": true,
@@ -465,7 +466,7 @@
       "amulet": 0,
       "misc": 1017
     },
-    "exp": 15000,
+    "exp": 15300,
     "task_accepted": true,
     "task_completed": false,
     "camp_stars": {
@@ -488,7 +489,8 @@
       "10307": 3,
       "10308": 3,
       "10309": 3,
-      "10310": 3
+      "10310": 3,
+      "10401": 3
     },
     "awakened_skills": {
       "1007": {
