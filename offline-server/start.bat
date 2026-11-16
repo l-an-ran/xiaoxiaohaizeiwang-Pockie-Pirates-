@@ -41,6 +41,6 @@ echo         URL: http://127.0.0.1:8080
 echo         Press Ctrl+C to stop.
 echo.
 
-%PY% server.py --host 127.0.0.1 --port 8080
+%PY% server.py --host 0.0.0.0 --port 8080
 
 pause

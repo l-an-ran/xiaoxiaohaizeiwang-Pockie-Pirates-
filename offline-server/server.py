@@ -946,6 +946,7 @@ def _build_generals_list() -> bytes:
 
 
 def _make_companion_general_amf3(g: dict) -> bytes:
+    role = _get_role()
     gid = int(g.get("general_id", 1002))
     cfg_id = int(g.get("cfg_general_id", gid))
     name = str(g.get("name", "船员"))
@@ -962,6 +963,34 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("level",        _amf3_int(1)),
     ])
 
+    # 动态组装伙伴副技能/被动技能槽
+    skills_list = [skill_elem]
+    awakened = role.get("awakened_skills", {})
+    aw_key = str(gid)
+    if aw_key in awakened:
+        for slot_idx, entry in sorted(awakened[aw_key].items()):
+            if isinstance(entry, dict):
+                skill_id = int(entry.get("cfg_skill_id", 0))
+                sk_level = int(entry.get("level", 1))
+            else:
+                skill_id = int(entry)
+                sk_level = 1
+            sk_level = min(sk_level, 10)
+            skills_list.append(_amf3_object([
+                ("cfg_skill_id", _amf3_int(skill_id)),
+                ("idx",          _amf3_int(int(slot_idx))),
+                ("level",        _amf3_int(sk_level)),
+            ]))
+
+    # 动态根据当前实际穿戴的装备，同步伙伴身上的装备槽位
+    items = _get_player_items()
+    c_eq = {"weapon": 0, "armor": 0, "horse": 0, "cloak": 0, "amulet": 0, "misc": 0}
+    for it in items:
+        if it.get("equiped") and it.get("general_id") == gid:
+            part = _get_item_part(it)
+            if part in SLOT_NAME_MAP:
+                c_eq[SLOT_NAME_MAP[part]] = it["item_id"]
+
     return _amf3_object([
         ("id",                _amf3_int(gid)),
         ("general_id",        _amf3_int(gid)),
@@ -977,7 +1006,7 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("quality",           _amf3_int(qual)),
         ("experience",        _amf3_int(exp)),
         ("skill_point",       _amf3_int(0)),
-        ("skills",            _amf3_array([skill_elem])),
+        ("skills",            _amf3_array(skills_list)),
         ("strength",          _amf3_double(85.0)),
         ("agile",             _amf3_double(80.0)),
         ("intelligence",      _amf3_double(60.0)),
@@ -999,12 +1028,12 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("anti_critic",       _amf3_int(5)),
         ("parry",             _amf3_int(10)),
         ("anti_parry",        _amf3_int(5)),
-        ("weapon",            _amf3_int(0)),
-        ("armor",             _amf3_int(0)),
-        ("horse",             _amf3_int(0)),
-        ("cloak",             _amf3_int(0)),
-        ("amulet",            _amf3_int(0)),
-        ("misc",              _amf3_int(0)),
+        ("weapon",            _amf3_int(c_eq.get("weapon", 0))),
+        ("armor",             _amf3_int(c_eq.get("armor", 0))),
+        ("horse",             _amf3_int(c_eq.get("horse", 0))),
+        ("cloak",             _amf3_int(c_eq.get("cloak", 0))),
+        ("amulet",            _amf3_int(c_eq.get("amulet", 0))),
+        ("misc",              _amf3_int(c_eq.get("misc", 0))),
         ("weapon_hole",       _amf3_int(0)),
         ("armor_hole",        _amf3_int(0)),
         ("horse_hole",        _amf3_int(0)),
@@ -2586,7 +2615,7 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         slot = max(0, min(open_idx, 4))
         if round_state["open_generals"][slot] == 0:
             revealed = round_state["cfg_ids"][slot]
-            round_state["open_generals"][slot] = revealed
+            round_state["open_generals"][slot] = 1
             round_state["open_count"] += 1
             print(f"  [TAVERN OPEN] Flipped slot {slot + 1} -> {revealed} (open_count={round_state['open_count']})", flush=True)
             _save()
@@ -2625,7 +2654,27 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         _amf3_object([("talent_id", _amf3_int(102)), ("level", _amf3_int(1))]),
     ]
 
-    # Exactly match all 22 required fields in OPDataManager::onTreat in libOnePiece.so
+    # recruit 必须是一个完整的 AMF3 对象结构（包含 scene_id=1、5张卡牌ID与翻牌状态），
+    # 否则 OPDataManager::onTreat 会跳过解析，导致 tavernData->scene_id 保持为 -1，
+    # CDlgTavern::UpdateRecruitListEv 检测到 -1 会直接终止卡牌渲染造成画面空白！
+    recruit_dict = [
+        ("scene_id",        _amf3_int(1)),
+        ("type",            _amf3_int(current_type)),
+        ("open_count",      _amf3_int(open_cnt)),
+        ("cfg_general_id1", _amf3_int(cfg_ids[0])),
+        ("open_general1",   _amf3_int(1 if open_gens[0] else 0)),
+        ("cfg_general_id2", _amf3_int(cfg_ids[1])),
+        ("open_general2",   _amf3_int(1 if open_gens[1] else 0)),
+        ("cfg_general_id3", _amf3_int(cfg_ids[2])),
+        ("open_general3",   _amf3_int(1 if open_gens[2] else 0)),
+        ("cfg_general_id4", _amf3_int(cfg_ids[3])),
+        ("open_general4",   _amf3_int(1 if open_gens[3] else 0)),
+        ("cfg_general_id5", _amf3_int(cfg_ids[4])),
+        ("open_general5",   _amf3_int(1 if open_gens[4] else 0)),
+    ]
+    recruit_obj = _amf3_object(recruit_dict)
+
+    # Exactly match all required fields in OPDataManager::onTreat in libOnePiece.so
     fields = [
         ("gold",            _amf3_int(int(role.get("gold", 5000)))),
         ("copper",          _amf3_double(float(role.get("copper", 100000)))),
@@ -2633,8 +2682,8 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         ("middle_token",    _amf3_int(5)),
         ("advance_token",   _amf3_int(2)),
         ("free_token",      _amf3_int(1)),
-        ("scene_id",        _amf3_int(int(role.get("scene_id", 2002)))),
-        ("recruit",         _amf3_int(1 if open_cnt > 0 else 0)),
+        ("scene_id",        _amf3_int(1)),
+        ("recruit",         recruit_obj),
         ("type",            _amf3_int(current_type)),
         ("open_count",      _amf3_int(open_cnt)),
         ("cfg_general_id1", _amf3_int(cfg_ids[0])),
@@ -2642,11 +2691,11 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         ("cfg_general_id3", _amf3_int(cfg_ids[2])),
         ("cfg_general_id4", _amf3_int(cfg_ids[3])),
         ("cfg_general_id5", _amf3_int(cfg_ids[4])),
-        ("open_general1",   _amf3_int(open_gens[0])),
-        ("open_general2",   _amf3_int(open_gens[1])),
-        ("open_general3",   _amf3_int(open_gens[2])),
-        ("open_general4",   _amf3_int(open_gens[3])),
-        ("open_general5",   _amf3_int(open_gens[4])),
+        ("open_general1",   _amf3_int(1 if open_gens[0] else 0)),
+        ("open_general2",   _amf3_int(1 if open_gens[1] else 0)),
+        ("open_general3",   _amf3_int(1 if open_gens[2] else 0)),
+        ("open_general4",   _amf3_int(1 if open_gens[3] else 0)),
+        ("open_general5",   _amf3_int(1 if open_gens[4] else 0)),
         ("tavern_epic",     tavern_epic_arr),
         ("tavern_generals", tavern_generals_arr),
         ("generals",        _build_generals_list()),
