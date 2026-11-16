@@ -779,8 +779,10 @@ def _build_generals_list() -> bytes:
     # 动态根据当前实际穿戴的装备，同步将军身上的六大装备槽位
     items = _get_player_items()
     active_eq = {"weapon": 0, "armor": 0, "horse": 0, "cloak": 0, "amulet": 0, "misc": 0}
+    proto_fig_val = cfg["figure"]
+    proto_ids = {proto_fig_val, role.get("figure", 1001), 1001, 1007, 1008, 0, 1}
     for it in items:
-        if it.get("equiped"):
+        if it.get("equiped") and it.get("general_id") in proto_ids:
             part = _get_item_part(it)
             if part in SLOT_NAME_MAP:
                 active_eq[SLOT_NAME_MAP[part]] = it["item_id"]
@@ -956,6 +958,16 @@ def _make_companion_general_amf3(g: dict) -> bytes:
     qual = int(g.get("quality", 3))
     exp = int(g.get("experience", 0))
     starter_skill_id = int(g.get("skill", 11004))
+    if starter_skill_id == 51001 and cfg_id != 10041220:
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            row = conn.execute("SELECT cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (cfg_id,)).fetchone()
+            conn.close()
+            if row and row[0]:
+                starter_skill_id = int(row[0])
+                g["skill"] = starter_skill_id
+        except Exception:
+            pass
 
     skill_elem = _amf3_object([
         ("cfg_skill_id", _amf3_int(starter_skill_id)),
@@ -1084,31 +1096,26 @@ def _build_formations_list() -> bytes:
     cfg = PROTAGONIST_CONFIG[fig]
     gen_id = cfg["figure"]
 
-    comp_pos2 = 0
-    if role.get("generals"):
-        comp_pos2 = int(role["generals"][0].get("general_id", 0))
+    gens = role.get("generals", [])
+    p1 = gen_id
+    p2 = int(gens[0].get("general_id", 0)) if len(gens) > 0 else 0
+    p3 = int(gens[1].get("general_id", 0)) if len(gens) > 1 else 0
+    p4 = int(gens[2].get("general_id", 0)) if len(gens) > 2 else 0
+    p5 = int(gens[3].get("general_id", 0)) if len(gens) > 3 else 0
+    p6 = int(gens[4].get("general_id", 0)) if len(gens) > 4 else 0
 
     fmt = _amf3_object([
         ("cfg_formation_id", _amf3_int(1001)),
         ("level",            _amf3_int(1)),
-        ("pos_1",            _amf3_int(gen_id)),
-
-        ("pos_2",            _amf3_int(comp_pos2)),
-
-        ("pos_3",            _amf3_int(0)),
-
-        ("pos_4",            _amf3_int(0)),
-
-        ("pos_5",            _amf3_int(0)),
-
-        ("pos_6",            _amf3_int(0)),
-
+        ("pos_1",            _amf3_int(p1)),
+        ("pos_2",            _amf3_int(p2)),
+        ("pos_3",            _amf3_int(p3)),
+        ("pos_4",            _amf3_int(p4)),
+        ("pos_5",            _amf3_int(p5)),
+        ("pos_6",            _amf3_int(p6)),
         ("pos_7",            _amf3_int(0)),
-
         ("pos_8",            _amf3_int(0)),
-
         ("pos_9",            _amf3_int(0)),
-
     ])
 
     return _amf3_array([fmt])
@@ -1498,10 +1505,9 @@ def _build_scenecheck_response(correlation_id: str) -> bytes:
 def _pick_skill_for_slot(general_id: int, slot_idx: int, exclude: set = None) -> int:
     """Pick a cfg_skill_id for a general's skill slot (2 or 3).
     
-    Deterministic: slot_idx 2 → passive index 0, slot_idx 3 → passive index 1.
-    Each general gets a unique skill per slot, no repeats.
+    Randomized from candidate pool, avoiding equipped skills.
     """
-    exclude = exclude or set()
+    exclude = set(exclude) if exclude else set()
     job = None
     starter_skill = None
     if general_id in PROTAGONIST_CONFIG:
@@ -1522,18 +1528,15 @@ def _pick_skill_for_slot(general_id: int, slot_idx: int, exclude: set = None) ->
 
     try:
         c = sqlite3.connect(DB_PATH).cursor()
-        c.execute("SELECT cfg_skill_id FROM cfg_skill WHERE job=? AND cfg_skill_id!=? AND rank=1 ORDER BY cfg_skill_id", (job, starter_skill or 0))
+        c.execute("SELECT cfg_skill_id FROM cfg_skill WHERE (job=? OR job=0) AND cfg_skill_id!=? AND rank=1 ORDER BY cfg_skill_id", (job, starter_skill or 0))
         all_candidates = [r[0] for r in c.fetchall()]
         c.close()
-        passive_candidates = all_candidates[-6:] if len(all_candidates) >= 6 else all_candidates
-        if passive_candidates:
-            # ★ Deterministic: slot_idx 2 -> index 0, slot_idx 3 -> index 1
-            # This guarantees no repeats and stable mapping
-            idx = (slot_idx - 2) % len(passive_candidates)
-            # But if the determined slot's skill is already excluded, skip to next
-            while passive_candidates[idx] in exclude and len(exclude) < len(passive_candidates):
-                idx = (idx + 1) % len(passive_candidates)
-            return passive_candidates[idx]
+        available = [s for s in all_candidates if s not in exclude]
+        if not available:
+            available = [s for s in all_candidates if s != starter_skill]
+        if available:
+            import random
+            return random.choice(available)
     except Exception:
         pass
     return starter_skill or 11001
@@ -2191,7 +2194,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         fig = 1008
     cfg = PROTAGONIST_CONFIG[fig]
 
-    # 1. Player team (attacker)
+    # 1. Player team (attack_generals)
+    proto_hp = 600 + role["level"] * 50
     atk_skill = _amf3_object([
         ("cfg_skill_id", _amf3_int(cfg["skill"])),
         ("idx",          _amf3_int(1)),
@@ -2206,89 +2210,211 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("figure",           _amf3_int(cfg["figure"])),
         ("quality",          _amf3_int(3)),
         ("level",            _amf3_int(role["level"])),
-        ("health_point",     _amf3_int(600)),
-        ("health_point_max", _amf3_int(600)),
+        ("health_point",     _amf3_int(proto_hp)),
+        ("health_point_max", _amf3_int(proto_hp)),
         ("morale",           _amf3_int(50)),
         ("category",         _amf3_int(1)),
         ("skill_list",       _amf3_array([atk_skill])),
     ])
 
-    # 2. Enemy team
+    attack_generals = [atk_gen]
+
+    # Add all recruited companions to the player's battle team!
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    comp_pos = 2
+    for comp in role.get("generals", []):
+        if not isinstance(comp, dict):
+            continue
+        c_gid = int(comp.get("general_id", 0))
+        c_cfg_id = int(comp.get("cfg_general_id", c_gid))
+        c_level = int(comp.get("level", 1))
+        c_name = str(comp.get("name", "船员"))
+        c_face = int(comp.get("face") or c_gid)
+        c_fig = int(comp.get("figure") or c_gid)
+        c_qual = int(comp.get("quality", 4))
+        c_skill = int(comp.get("skill", 0))
+
+        row = cur.execute("SELECT name, face, figure, quality, cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (c_cfg_id,)).fetchone()
+        if row:
+            if not c_name or c_name == "船员": c_name = row[0]
+            if not c_face: c_face = int(row[1])
+            if not c_fig: c_fig = int(row[2])
+            if not c_qual: c_qual = int(row[3])
+            if not c_skill or (c_skill == 51001 and c_cfg_id != 10041220): c_skill = int(row[4] or 51001)
+
+        c_hp = 500 + c_level * 40
+        c_skill_obj = _amf3_object([
+            ("cfg_skill_id", _amf3_int(c_skill or 11003)),
+            ("idx",          _amf3_int(1)),
+            ("level",        _amf3_int(1)),
+        ])
+        c_gen_obj = _amf3_object([
+            ("position",         _amf3_int(comp_pos)),
+            ("id",               _amf3_int(c_gid)),
+            ("cfg_general_id",   _amf3_int(c_cfg_id)),
+            ("name",             _amf3_string(c_name)),
+            ("face",             _amf3_int(c_face)),
+            ("figure",           _amf3_int(c_fig)),
+            ("quality",          _amf3_int(c_qual)),
+            ("level",            _amf3_int(c_level)),
+            ("health_point",     _amf3_int(c_hp)),
+            ("health_point_max", _amf3_int(c_hp)),
+            ("morale",           _amf3_int(50)),
+            ("category",         _amf3_int(1)),
+            ("skill_list",       _amf3_array([c_skill_obj])),
+        ])
+        attack_generals.append(c_gen_obj)
+        comp_pos += 1
+        if comp_pos > 9:
+            break
+
+    # 2. Enemy team (defend_generals) from cfg_army pos1..pos9
     def_name = "海贼部队"
     def_face = 1001
     def_figure = 1001
+    army_level = 1
+    pos_monsters = []
+
     try:
-        conn = sqlite3.connect(DB_PATH)
-        row = conn.execute("SELECT name, face, figure FROM cfg_army WHERE cfg_army_id = ?", (camp_id,)).fetchone()
-        conn.close()
+        row = cur.execute(
+            "SELECT name, face, figure, level, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, pos9 "
+            "FROM cfg_army WHERE cfg_army_id = ?", (camp_id,)
+        ).fetchone()
         if row:
             def_name = row[0]
-            def_face = int(row[1])
-            def_figure = int(row[2])
-    except Exception:
-        pass
+            def_face = int(row[1] or 1001)
+            def_figure = int(row[2] or 1001)
+            army_level = int(row[3] or 1)
+            for p_idx in range(9):
+                val = str(row[4 + p_idx] or '0')
+                if val != '0':
+                    pos_monsters.append((p_idx + 1, int(val)))
+    except Exception as e:
+        print(f"  [BATTLE] error loading cfg_army: {e}", flush=True)
 
-    def_skill = _amf3_object([
-        ("cfg_skill_id", _amf3_int(11003)),
-        ("idx",          _amf3_int(1)),
-        ("level",        _amf3_int(1)),
-    ])
-    def_gen = _amf3_object([
-        ("position",         _amf3_int(1)),
-        ("id",               _amf3_int(2)),
-        ("cfg_general_id",   _amf3_int(100001)),
-        ("name",             _amf3_string(def_name)),
-        ("face",             _amf3_int(def_face)),
-        ("figure",           _amf3_int(def_figure)),
-        ("quality",          _amf3_int(1)),
-        ("level",            _amf3_int(1)),
-        ("health_point",     _amf3_int(224)),
-        ("health_point_max", _amf3_int(224)),
-        ("morale",           _amf3_int(50)),
-        ("category",         _amf3_int(2)),
-        ("skill_list",       _amf3_array([def_skill])),
-    ])
+    defend_generals = []
+    enemy_effect_targets = []
+    total_enemy_damage = 0
+
+    if pos_monsters:
+        for p_slot, m_fig in pos_monsters:
+            m_name = def_name
+            m_face = m_fig
+            m_hp = 200 + army_level * 30
+            m_skill_id = 11003
+            m_qual = 1
+
+            m_row = cur.execute(
+                "SELECT name, face, figure, level, quality, hp, cast_skill FROM cfg_monster WHERE figure = ? ORDER BY abs(level - ?) LIMIT 1",
+                (m_fig, army_level)
+            ).fetchone()
+            if m_row:
+                m_name = m_row[0]
+                m_face = int(m_row[1] or m_fig)
+                m_qual = int(m_row[4] or 1)
+                m_hp = int(m_row[5] or m_hp)
+                m_skill_id = int(m_row[6] or 11003)
+
+            m_skill = _amf3_object([
+                ("cfg_skill_id", _amf3_int(m_skill_id)),
+                ("idx",          _amf3_int(1)),
+                ("level",        _amf3_int(1)),
+            ])
+            def_gen_elem = _amf3_object([
+                ("position",         _amf3_int(p_slot)),
+                ("id",               _amf3_int(1000 + p_slot)),
+                ("cfg_general_id",   _amf3_int(100000 + p_slot)),
+                ("name",             _amf3_string(m_name)),
+                ("face",             _amf3_int(m_face)),
+                ("figure",           _amf3_int(m_fig)),
+                ("quality",          _amf3_int(m_qual)),
+                ("level",            _amf3_int(army_level)),
+                ("health_point",     _amf3_int(m_hp)),
+                ("health_point_max", _amf3_int(m_hp)),
+                ("morale",           _amf3_int(50)),
+                ("category",         _amf3_int(2)),
+                ("skill_list",       _amf3_array([m_skill])),
+            ])
+            defend_generals.append(def_gen_elem)
+
+            enemy_effect_targets.append(_amf3_object([
+                ("target_side",           _amf3_int(2)),
+                ("target_position",       _amf3_int(p_slot)),
+                ("target_health_point",   _amf3_int(0)),
+                ("target_morale",         _amf3_int(0)),
+                ("action_value",          _amf3_int(m_hp)),
+                ("action_type",           _amf3_int(1)),
+            ]))
+            total_enemy_damage += m_hp
+    else:
+        # Fallback single enemy
+        def_skill = _amf3_object([
+            ("cfg_skill_id", _amf3_int(11003)),
+            ("idx",          _amf3_int(1)),
+            ("level",        _amf3_int(1)),
+        ])
+        def_gen = _amf3_object([
+            ("position",         _amf3_int(1)),
+            ("id",               _amf3_int(2)),
+            ("cfg_general_id",   _amf3_int(100001)),
+            ("name",             _amf3_string(def_name)),
+            ("face",             _amf3_int(def_face)),
+            ("figure",           _amf3_int(def_figure)),
+            ("quality",          _amf3_int(1)),
+            ("level",            _amf3_int(army_level)),
+            ("health_point",     _amf3_int(224)),
+            ("health_point_max", _amf3_int(224)),
+            ("morale",           _amf3_int(50)),
+            ("category",         _amf3_int(2)),
+            ("skill_list",       _amf3_array([def_skill])),
+        ])
+        defend_generals.append(def_gen)
+        enemy_effect_targets.append(_amf3_object([
+            ("target_side",           _amf3_int(2)),
+            ("target_position",       _amf3_int(1)),
+            ("target_health_point",   _amf3_int(0)),
+            ("target_morale",         _amf3_int(0)),
+            ("action_value",          _amf3_int(224)),
+            ("action_type",           _amf3_int(1)),
+        ]))
+        total_enemy_damage = 224
+
+    conn.close()
 
     prep = _amf3_object([
         ("attack_role_id",        _amf3_int(role["role_id"])),
         ("attack_role_name",      _amf3_string(role["name"])),
         ("attack_formation_shape",_amf3_int(1)),
         ("attack_formation_level",_amf3_int(1)),
-        ("attack_generals",       _amf3_array([atk_gen])),
+        ("attack_generals",       _amf3_array(attack_generals)),
         ("attack_pet",            _amf3_array([])),
         ("defend_role_id",        _amf3_int(camp_id)),
         ("defend_role_name",      _amf3_string(def_name)),
         ("defend_formation_shape",_amf3_int(1)),
         ("defend_formation_level",_amf3_int(1)),
-        ("defend_generals",       _amf3_array([def_gen])),
+        ("defend_generals",       _amf3_array(defend_generals)),
         ("defend_pet",            _amf3_array([])),
         ("background",            _amf3_int(1)),
         ("battle_id",             _amf3_int(1)),
     ])
 
-    # 3. Single-round combat (player one-shots enemy for clean offline playback)
-    effect_target = _amf3_object([
-        ("target_side",           _amf3_int(2)),
-        ("target_position",       _amf3_int(1)),
-        ("target_health_point",   _amf3_int(0)),
-        ("target_morale",         _amf3_int(0)),
-        ("action_value",          _amf3_int(224)),
-        ("action_type",           _amf3_int(1)),
-    ])
+    # 3. Combat round
+    first_target_pos = pos_monsters[0][0] if pos_monsters else 1
     round_action = _amf3_object([
         ("action_type",           _amf3_int(1)),
-        ("action_value",          _amf3_int(224)),
+        ("action_value",          _amf3_int(total_enemy_damage)),
         ("action_target_side",    _amf3_int(2)),
-        ("action_target_position",_amf3_int(1)),
+        ("action_target_position",_amf3_int(first_target_pos)),
         ("action_target_morale",  _amf3_int(0)),
-        ("effect_targets",        _amf3_array([effect_target])),
+        ("effect_targets",        _amf3_array(enemy_effect_targets)),
     ])
     combat_round = _amf3_object([
         ("battle_id",             _amf3_int(1)),
         ("caster_side",           _amf3_int(1)),
         ("caster_position",       _amf3_int(1)),
-        ("now_boold_point",       _amf3_int(600)),
-        ("max_boold_point",       _amf3_int(600)),
+        ("now_boold_point",       _amf3_int(proto_hp)),
+        ("max_boold_point",       _amf3_int(proto_hp)),
         ("face",                  _amf3_int(cfg["face"])),
         ("defend_pet_morale",     _amf3_int(0)),
         ("attack_pet_morale",     _amf3_int(0)),
@@ -2316,7 +2442,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("copper",            _amf3_double(float(role["copper"]))),
         ("boss_battle",       _amf3_int(0)),
         ("slave_battle",      _amf3_int(0)),
-        ("damage",            _amf3_int(224)),
+        ("damage",            _amf3_int(total_enemy_damage)),
         ("item_amount",       _amf3_int(0)),
         ("target_name",       _amf3_string(def_name)),
         ("attackScore",       _amf3_int(100)),
@@ -2751,6 +2877,16 @@ def _build_tavern_recruit_response(correlation_id: str, body: list) -> bytes:
     c_info = ALL_TAVERN_MAP.get(target_gid, EAST_BLUE_POOL[0])
     gid, g_name, g_job, g_qual, g_face, g_fig, cost, *_ = c_info
 
+    gen_skill = 51001
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        row = conn.execute("SELECT cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (target_gid,)).fetchone()
+        conn.close()
+        if row and row[0]:
+            gen_skill = int(row[0])
+    except Exception:
+        pass
+
     role.setdefault("generals", [])
     recruited_ids = {g.get("cfg_general_id") for g in role["generals"] if isinstance(g, dict)}
     if target_gid not in recruited_ids:
@@ -2764,10 +2900,10 @@ def _build_tavern_recruit_response(correlation_id: str, body: list) -> bytes:
             "figure": g_fig,
             "face": g_face,
             "level": 1,
-            "skill": 51001,
+            "skill": gen_skill,
             "experience": 0,
         })
-        print(f"  [TAVERN RECRUIT] Recruited new crew member: {g_name} (id={target_gid})", flush=True)
+        print(f"  [TAVERN RECRUIT] Recruited new crew member: {g_name} (id={target_gid}, skill={gen_skill})", flush=True)
 
     role["copper"] = max(role.get("copper", 100000) - cost, 0)
 
@@ -2999,10 +3135,17 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
     equipments = role.setdefault("equipments", {"weapon": 0, "armor": 0, "horse": 0, "cloak": 0, "amulet": 0, "misc": 0})
     op_lower = operation.lower()
 
+    proto_fig = role.get("figure", 1008)
+    if proto_fig < 1000:
+        proto_fig = FIGURE_MAP.get(proto_fig, 1008)
+    proto_ids = {proto_fig, 1001, 1007, 1008, 0, 1}
+    for k in PROTAGONIST_CONFIG.keys():
+        proto_ids.add(k)
+
     if "using" in op_lower or "use" in op_lower:
         # body: [role_id, code, general_id, item_id]
         item_id = None
-        target_gen_id = role.get("figure", 1008)
+        target_gen_id = proto_fig
         if isinstance(body, list) and len(body) >= 4:
             target_gen_id = body[2]
             item_id = body[3]
@@ -3023,15 +3166,24 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
             part = _get_item_part(target_item)
             if part in SLOT_NAME_MAP:
                 slot_name = SLOT_NAME_MAP[part]
+                is_proto = (target_gen_id in proto_ids)
+                
                 # 穿戴装备：卸下原本槽位中的同部位装备
                 for it in items:
-                    if _get_item_part(it) == part and it.get("equiped") and it.get("general_id") == target_gen_id:
-                        it["equiped"] = 0
-                        it["general_id"] = 0
+                    if _get_item_part(it) == part and it.get("equiped"):
+                        it_gid = it.get("general_id", 0)
+                        if (is_proto and it_gid in proto_ids) or (not is_proto and it_gid == target_gen_id):
+                            it["equiped"] = 0
+                            it["general_id"] = 0
+
                 target_item["equiped"] = 1
-                target_item["general_id"] = target_gen_id
-                equipments[slot_name] = target_item["item_id"]
-                print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on general {target_gen_id}", flush=True)
+                if is_proto:
+                    target_item["general_id"] = proto_fig
+                    equipments[slot_name] = target_item["item_id"]
+                    print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on protagonist {proto_fig}", flush=True)
+                else:
+                    target_item["general_id"] = target_gen_id
+                    print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on companion {target_gen_id}", flush=True)
             else:
                 amt = target_item.get("amount", 1) - 1
                 if amt <= 0:
@@ -3047,7 +3199,7 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
 
     elif "unequip" in op_lower:
         # body: [role_id, code, general_id, slot_or_id]
-        target_gen_id = role.get("figure", 1008)
+        target_gen_id = proto_fig
         slot_or_id = None
         if isinstance(body, list) and len(body) >= 4:
             target_gen_id = body[2]
@@ -3056,7 +3208,9 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
             target_gen_id = body.get("3_generalId") or target_gen_id
             slot_or_id = body.get("4_part") or body.get("part")
         
+        is_proto = (target_gen_id in proto_ids)
         target_item = None
+
         if isinstance(slot_or_id, int):
             if slot_or_id >= 1000:
                 for it in items:
@@ -3066,17 +3220,20 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
             else:
                 target_part = slot_or_id
                 for it in items:
-                    if _get_item_part(it) == target_part and it.get("equiped") and it.get("general_id") == target_gen_id:
-                        target_item = it
-                        break
+                    if _get_item_part(it) == target_part and it.get("equiped"):
+                        it_gid = it.get("general_id", 0)
+                        if (is_proto and it_gid in proto_ids) or (not is_proto and it_gid == target_gen_id):
+                            target_item = it
+                            break
         
         if target_item:
             target_item["equiped"] = 0
             target_item["general_id"] = 0
             part = _get_item_part(target_item)
-            if part in SLOT_NAME_MAP:
+            if is_proto and part in SLOT_NAME_MAP:
                 equipments[SLOT_NAME_MAP[part]] = 0
             print(f"  [UNEQUIP] Unequipped item {target_item.get('item_id')} (cfg {target_item.get('cfg_item_id')}, part {part}) from general {target_gen_id}", flush=True)
+        _save()
         _save()
 
     return _build_item_response(correlation_id)

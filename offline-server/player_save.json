@@ -2,25 +2,53 @@
   "role": {
     "role_id": 100001,
     "name": "船长",
-    "level": 10,
+    "level": 13,
     "face": 1001,
     "figure": 1001,
     "nation": 0,
-    "gold": 99549,
-    "copper": 1492099,
+    "gold": 98599,
+    "copper": 1825199,
     "action_point": 100,
     "ap_max": 100,
     "scene_id": 2002,
-    "scene_x": 974,
-    "scene_y": 60,
-    "current_task": 100001,
-    "completed_tasks": [],
+    "scene_x": 1473,
+    "scene_y": 87,
+    "current_task": 100028,
+    "completed_tasks": [
+      100001,
+      100002,
+      100003,
+      100004,
+      100005,
+      100006,
+      100007,
+      100008,
+      100009,
+      100010,
+      100011,
+      100012,
+      100013,
+      100014,
+      100015,
+      100016,
+      100017,
+      100018,
+      100019,
+      100020,
+      100021,
+      100022,
+      100023,
+      100024,
+      100025,
+      100026,
+      100027
+    ],
     "battle_wins": {
       "10101": 1,
       "10102": 1,
       "10103": 1,
       "10104": 1,
-      "10105": 1,
+      "10105": 2,
       "10201": 1,
       "10202": 1,
       "10203": 1,
@@ -39,16 +67,16 @@
     },
     "login_days": 1,
     "created": true,
-    "officium": 10,
-    "skill_point": 50,
+    "officium": 13,
+    "skill_point": 52,
     "job": 10001,
     "items": [
       {
         "item_id": 1001,
         "cfg_item_id": 200327,
         "amount": 1,
-        "level": 12,
-        "star": 12,
+        "level": 20,
+        "star": 20,
         "rise": 0,
         "equiped": 0,
         "general_id": 0,
@@ -61,8 +89,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 1
       },
       {
@@ -72,8 +100,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 2
       },
       {
@@ -84,7 +112,7 @@
         "star": 1,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1007,
+        "general_id": 1001,
         "part": 3
       },
       {
@@ -94,8 +122,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 4
       },
       {
@@ -139,7 +167,7 @@
         "star": 1,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1007,
+        "general_id": 1001,
         "part": 2
       },
       {
@@ -150,7 +178,7 @@
         "star": 1,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1007,
+        "general_id": 1001,
         "part": 4
       },
       {
@@ -171,8 +199,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 5
       },
       {
@@ -182,8 +210,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 1001,
         "part": 1
       },
       {
@@ -201,11 +229,11 @@
         "item_id": 1015,
         "cfg_item_id": 200328,
         "amount": 1,
-        "level": 3,
-        "star": 3,
+        "level": 4,
+        "star": 4,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1007,
+        "general_id": 1001,
         "part": 1
       },
       {
@@ -226,8 +254,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 1001,
         "part": 5
       },
       {
@@ -237,8 +265,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 3
       },
       {
@@ -249,21 +277,109 @@
         "star": 1,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1007,
+        "general_id": 1001,
+        "part": 5
+      },
+      {
+        "item_id": 1020,
+        "cfg_item_id": 200329,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 2
+      },
+      {
+        "item_id": 1021,
+        "cfg_item_id": 200331,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 4
+      },
+      {
+        "item_id": 1022,
+        "cfg_item_id": 200330,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 3
+      },
+      {
+        "item_id": 1023,
+        "cfg_item_id": 200332,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 5
+      },
+      {
+        "item_id": 1024,
+        "cfg_item_id": 200327,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 1
+      },
+      {
+        "item_id": 1025,
+        "cfg_item_id": 200328,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 1
+      },
+      {
+        "item_id": 1026,
+        "cfg_item_id": 200330,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 3
+      },
+      {
+        "item_id": 1027,
+        "cfg_item_id": 200332,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
         "part": 5
       }
     ],
     "equipments": {
       "weapon": 1015,
       "armor": 1009,
-      "horse": 1004,
+      "horse": 0,
       "cloak": 1010,
       "amulet": 0,
       "misc": 1019
     },
-    "exp": 0,
+    "exp": 9500,
     "task_accepted": true,
-    "task_completed": true,
+    "task_completed": false,
     "camp_stars": {
       "10101": 3,
       "10102": 3,
@@ -302,25 +418,45 @@
           "cfg_skill_id": 14069,
           "level": 1
         }
+      },
+      "1001": {
+        "2": {
+          "cfg_skill_id": 11010,
+          "level": 4
+        }
       }
     },
-    "generals": [],
+    "generals": [
+      {
+        "general_id": 10043235,
+        "cfg_general_id": 10043235,
+        "name": "赞高",
+        "quality": 4,
+        "star": 2,
+        "job": 10003,
+        "figure": 10083,
+        "face": 10083,
+        "level": 1,
+        "skill": 51009,
+        "experience": 0
+      }
+    ],
     "tavern_round": {
       "cfg_ids": [
         10052199,
-        10042233,
-        10041229,
         10042230,
-        10041228
+        10041234,
+        10043235,
+        10042233
       ],
       "open_generals": [
+        1,
         0,
         0,
-        0,
-        0,
-        0
+        1,
+        1
       ],
-      "open_count": 0,
+      "open_count": 3,
       "type": 2
     }
   }
