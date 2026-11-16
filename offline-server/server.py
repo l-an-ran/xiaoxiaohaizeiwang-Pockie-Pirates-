@@ -1179,9 +1179,6 @@ def _build_player_items_amf3() -> bytes:
     raw_items = _get_player_items()
     items_amf3: list[bytes] = []
     for item in raw_items:
-        # 已穿戴在角色/伙伴身上的装备，不应放入背包列表
-        if item.get("equiped") or int(item.get("general_id", 0)) > 0:
-            continue
         lvl = int(item.get("level", 1))
         # 装备强化等级必须双向对齐 level 与 star，且至少为 1（由客户端 USER_ITEM+0x10 读取展示）
         star_val = int(item.get("star", 0))
@@ -1204,8 +1201,8 @@ def _build_player_items_amf3() -> bytes:
             ("hole4",        _amf3_int(int(item.get("hole4", 0)))),
             ("hole5",        _amf3_int(int(item.get("hole5", 0)))),
             ("hole6",        _amf3_int(int(item.get("hole6", 0)))),
-            ("general_id",   _amf3_int(0)),
-            ("equiped",      _amf3_bool(False)),
+            ("general_id",   _amf3_int(int(item.get("general_id", 0)))),
+            ("equiped",      _amf3_bool(bool(item.get("equiped", False)))),
         ])
         items_amf3.append(it)
     return _amf3_array(items_amf3)
@@ -1507,7 +1504,8 @@ def _build_scenecheck_response(correlation_id: str) -> bytes:
 def _pick_skill_for_slot(general_id: int, slot_idx: int, exclude: set = None) -> int:
     """Pick a cfg_skill_id for a general's skill slot (2 or 3).
     
-    Randomized from candidate pool, avoiding equipped skills.
+    Randomized from candidate pool matching the general's job, avoiding equipped skills.
+    Only type=0 (passive skills) with rank=1 and is_open=1 are selected.
     """
     exclude = set(exclude) if exclude else set()
     job = None
@@ -1525,23 +1523,30 @@ def _pick_skill_for_slot(general_id: int, slot_idx: int, exclude: set = None) ->
             c.close()
         except Exception:
             pass
+    if job is not None and job < 100:
+        job = 10000 + job
     if job is None:
-        return 11001
+        job = 10001
 
     try:
         c = sqlite3.connect(DB_PATH).cursor()
-        c.execute("SELECT cfg_skill_id FROM cfg_skill WHERE (job=? OR job=0) AND cfg_skill_id!=? AND rank=1 ORDER BY cfg_skill_id", (job, starter_skill or 0))
+        c.execute("SELECT cfg_skill_id FROM cfg_skill WHERE job=? AND type=0 AND rank=1 AND is_open=1 ORDER BY cfg_skill_id", (job,))
         all_candidates = [r[0] for r in c.fetchall()]
+        if not all_candidates:
+            c.execute("SELECT cfg_skill_id FROM cfg_skill WHERE type=0 AND rank=1 AND is_open=1 ORDER BY cfg_skill_id")
+            all_candidates = [r[0] for r in c.fetchall()]
         c.close()
-        available = [s for s in all_candidates if s not in exclude]
+        available = [s for s in all_candidates if s not in exclude and s != starter_skill]
         if not available:
-            available = [s for s in all_candidates if s != starter_skill]
+            available = [s for s in all_candidates if s not in exclude]
+        if not available:
+            available = all_candidates
         if available:
             import random
             return random.choice(available)
     except Exception:
         pass
-    return starter_skill or 11001
+    return starter_skill or 11005
 
 
 def _build_passive_candidates() -> bytes:
@@ -2197,6 +2202,15 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     cfg = PROTAGONIST_CONFIG[fig]
 
     # 1. Player team (attack_generals)
+    fmt_dict = _get_formation_dict(role)
+    proto_fig = cfg["figure"]
+    proto_pos = 1
+    for k, v in fmt_dict.items():
+        if int(v) in (proto_fig, cfg["cfg_id"], 1001, 1007, 1008) or (0 < int(v) < 1000):
+            proto_pos = int(k)
+            break
+    used_positions = {proto_pos}
+
     proto_hp = 600 + role["level"] * 50
     atk_skill = _amf3_object([
         ("cfg_skill_id", _amf3_int(cfg["skill"])),
@@ -2204,9 +2218,12 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("level",        _amf3_int(1)),
     ])
     atk_gen = _amf3_object([
-        ("position",         _amf3_int(1)),
+        ("position",         _amf3_int(proto_pos)),
+        ("pos",              _amf3_int(proto_pos)),
+        ("grid",             _amf3_int(proto_pos)),
         ("id",               _amf3_int(cfg["figure"])),
         ("cfg_general_id",   _amf3_int(cfg["cfg_id"])),
+        ("proto_id",         _amf3_int(cfg["cfg_id"])),
         ("name",             _amf3_string(role["name"])),
         ("face",             _amf3_int(cfg["face"])),
         ("figure",           _amf3_int(cfg["figure"])),
@@ -2221,18 +2238,17 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
     attack_generals = [atk_gen]
     atk_units = [{
-        "pos": 1,
+        "pos": proto_pos,
         "hp": proto_hp,
         "hp_max": proto_hp,
         "face": cfg["face"],
         "name": role["name"],
+        "morale": 50,
     }]
 
     # Add all recruited companions to the player's battle team!
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    fmt_dict = _get_formation_dict(role)
-    used_positions = {1}
 
     for idx, comp in enumerate(role.get("generals", [])):
         if not isinstance(comp, dict):
@@ -2261,7 +2277,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 assigned_pos = int(k)
                 break
         if not assigned_pos or assigned_pos in used_positions:
-            for p in range(2, 10):
+            for p in range(1, 10):
                 if p not in used_positions:
                     assigned_pos = p
                     break
@@ -2275,17 +2291,22 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ])
         c_gen_obj = _amf3_object([
             ("position",         _amf3_int(assigned_pos)),
+            ("pos",              _amf3_int(assigned_pos)),
+            ("grid",             _amf3_int(assigned_pos)),
             ("id",               _amf3_int(c_gid)),
+            ("general_id",       _amf3_int(c_cfg_id)),
+            ("proto_id",         _amf3_int(c_cfg_id)),
             ("cfg_general_id",   _amf3_int(c_cfg_id)),
             ("name",             _amf3_string(c_name)),
             ("face",             _amf3_int(c_face)),
             ("figure",           _amf3_int(c_fig)),
+            ("avatar",           _amf3_int(c_fig)),
             ("quality",          _amf3_int(c_qual)),
             ("level",            _amf3_int(c_level)),
             ("health_point",     _amf3_int(c_hp)),
             ("health_point_max", _amf3_int(c_hp)),
             ("morale",           _amf3_int(50)),
-            ("category",         _amf3_int(2)),  # 2 = general/soldier model (loads soldierXXXX)
+            ("category",         _amf3_int(1)),  # 1 = General model from cfg_general
             ("skill_list",       _amf3_array([c_skill_obj])),
         ])
         attack_generals.append(c_gen_obj)
@@ -2295,6 +2316,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             "hp_max": c_hp,
             "face": c_face,
             "name": c_name,
+            "morale": 50,
         })
         if len(attack_generals) >= 5:
             break
@@ -2374,6 +2396,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 "hp_max": m_hp,
                 "face": m_face,
                 "name": m_name,
+                "morale": 50,
             })
             total_enemy_damage += m_hp
     else:
@@ -2405,6 +2428,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             "hp_max": 224,
             "face": def_face,
             "name": def_name,
+            "morale": 50,
         })
         total_enemy_damage = 224
 
@@ -2427,25 +2451,33 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("battle_id",             _amf3_int(1)),
     ])
 
-    # 3. Combat rounds: Multi-round sequential single-target attacks!
+    # 3. Combat rounds: Alternating attack rounds between player and enemy
     combat_rounds = []
-    alive_targets = [u for u in def_units]
+    alive_enemies = [u for u in def_units]
+    alive_players = [u for u in atk_units]
 
-    while alive_targets and len(combat_rounds) < 20:
-        for atk in atk_units:
-            if not alive_targets:
+    # Run up to 10 alternating combat exchanges
+    turn = 0
+    while alive_enemies and alive_players and turn < 10:
+        turn += 1
+        # Player side attacks
+        for atk in list(alive_players):
+            if not alive_enemies:
                 break
-            target = alive_targets[0]
-            dmg = min(target["hp"], max(150, int(target["hp_max"] * 0.7) + 50))
+            target = alive_enemies[0]
+            # Deal realistic damage: 2-3 hits to defeat an enemy unit
+            dmg = min(target["hp"], max(80, int(target["hp_max"] / 2.5)))
             target["hp"] -= dmg
-            if target["hp"] <= 0:
-                alive_targets.pop(0)
+
+            # Morale gains (+25 per attack/hit)
+            atk["morale"] = min(100, atk.get("morale", 50) + 25)
+            target["morale"] = min(100, target.get("morale", 50) + 25)
 
             effect_target = _amf3_object([
                 ("target_side",           _amf3_int(2)),
                 ("target_position",       _amf3_int(target["pos"])),
                 ("target_health_point",   _amf3_int(max(0, target["hp"]))),
-                ("target_morale",         _amf3_int(0)),
+                ("target_morale",         _amf3_int(target["morale"])),
                 ("action_value",          _amf3_int(dmg)),
                 ("action_type",           _amf3_int(1)),
             ])
@@ -2454,7 +2486,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("action_value",          _amf3_int(dmg)),
                 ("action_target_side",    _amf3_int(2)),
                 ("action_target_position",_amf3_int(target["pos"])),
-                ("action_target_morale",  _amf3_int(0)),
+                ("action_target_morale",  _amf3_int(target["morale"])),
+                ("target_morale",         _amf3_int(target["morale"])),
                 ("effect_targets",        _amf3_array([effect_target])),
             ])
             c_round = _amf3_object([
@@ -2464,6 +2497,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("now_boold_point",       _amf3_int(atk["hp"])),
                 ("max_boold_point",       _amf3_int(atk["hp_max"])),
                 ("face",                  _amf3_int(atk["face"])),
+                ("morale",                _amf3_int(atk["morale"])),
+                ("caster_morale",         _amf3_int(atk["morale"])),
                 ("defend_pet_morale",     _amf3_int(0)),
                 ("attack_pet_morale",     _amf3_int(0)),
                 ("caster_round_action",   round_action),
@@ -2472,6 +2507,56 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("caster_after_action_list",    _amf3_array([])),
             ])
             combat_rounds.append(c_round)
+            if target["hp"] <= 0:
+                alive_enemies.pop(0)
+
+        # Enemy side counter-attacks!
+        for enemy in list(alive_enemies):
+            if not alive_players:
+                break
+            p_target = alive_players[0]
+            e_dmg = min(p_target["hp"] - 1, 35)  # enemy hits back without killing player
+            if e_dmg <= 0:
+                e_dmg = 10
+            p_target["hp"] -= e_dmg
+
+            enemy["morale"] = min(100, enemy.get("morale", 50) + 25)
+            p_target["morale"] = min(100, p_target.get("morale", 50) + 25)
+
+            e_effect = _amf3_object([
+                ("target_side",           _amf3_int(1)),
+                ("target_position",       _amf3_int(p_target["pos"])),
+                ("target_health_point",   _amf3_int(max(1, p_target["hp"]))),
+                ("target_morale",         _amf3_int(p_target["morale"])),
+                ("action_value",          _amf3_int(e_dmg)),
+                ("action_type",           _amf3_int(1)),
+            ])
+            e_action = _amf3_object([
+                ("action_type",           _amf3_int(1)),
+                ("action_value",          _amf3_int(e_dmg)),
+                ("action_target_side",    _amf3_int(1)),
+                ("action_target_position",_amf3_int(p_target["pos"])),
+                ("action_target_morale",  _amf3_int(p_target["morale"])),
+                ("target_morale",         _amf3_int(p_target["morale"])),
+                ("effect_targets",        _amf3_array([e_effect])),
+            ])
+            e_round = _amf3_object([
+                ("battle_id",             _amf3_int(1)),
+                ("caster_side",           _amf3_int(2)),
+                ("caster_position",       _amf3_int(enemy["pos"])),
+                ("now_boold_point",       _amf3_int(enemy["hp"])),
+                ("max_boold_point",       _amf3_int(enemy["hp_max"])),
+                ("face",                  _amf3_int(enemy["face"])),
+                ("morale",                _amf3_int(enemy["morale"])),
+                ("caster_morale",         _amf3_int(enemy["morale"])),
+                ("defend_pet_morale",     _amf3_int(0)),
+                ("attack_pet_morale",     _amf3_int(0)),
+                ("caster_round_action",   e_action),
+                ("caster_pre_action_buff_list", _amf3_array([])),
+                ("caster_pre_action_list",      _amf3_array([])),
+                ("caster_after_action_list",    _amf3_array([])),
+            ])
+            combat_rounds.append(e_round)
 
     if not combat_rounds:
         first_t = def_units[0] if def_units else {"pos": 1, "hp": 224, "hp_max": 224, "face": 1001}
@@ -2623,13 +2708,36 @@ def _build_training_response(correlation_id: str) -> bytes:
     role = _get_role()
     now_ts = float(int(time.time()))
     training_list = []
+    need_save = False
+
     for train_entry in role.get("training_list", []):
+        t_end = float(train_entry.get("training_end", 0.0))
+        # If time has passed, settle training exp and clear CD
+        if t_end > 0.0 and now_ts >= t_end:
+            add_exp = int(train_entry.get("training_experience", 3000))
+            gid = int(train_entry.get("general_id", 0))
+            for g in role.get("generals", []):
+                if int(g.get("general_id", 0)) == gid:
+                    g["experience"] = int(g.get("experience", 0)) + add_exp
+                    g["level"] = max(int(g.get("level", 1)), min(role.get("level", 1), int(g.get("level", 1)) + 1))
+                    train_entry["experience"] = g["experience"]
+                    train_entry["level"] = g["level"]
+                    break
+            train_entry["training_end"] = 0.0
+            t_end = 0.0
+            need_save = True
+
         training_list.append(_amf3_object([
-            ("generalId",     _amf3_int(int(train_entry.get("general_id", 0)))),
-            ("training_end",  _amf3_double(float(train_entry.get("training_end", now_ts + 86400)))),
-            ("experience",    _amf3_int(int(train_entry.get("experience", 0)))),
-            ("level",         _amf3_int(int(train_entry.get("level", 1)))),
+            ("generalId",            _amf3_int(int(train_entry.get("general_id", 0)))),
+            ("training_end",         _amf3_double(t_end)),
+            ("training_experience",  _amf3_int(int(train_entry.get("training_experience", 0)))),
+            ("experience",           _amf3_int(int(train_entry.get("experience", 0)))),
+            ("level",                _amf3_int(int(train_entry.get("level", 1)))),
         ]))
+
+    if need_save:
+        _save()
+
     fields = [
         ("server_time",   _amf3_double(now_ts)),
         ("training_slot", _amf3_int(3)),
@@ -2640,7 +2748,6 @@ def _build_training_response(correlation_id: str) -> bytes:
         ("generals",      _build_generals_list()),
         ("general_data",  _build_general_data()),
         ("request_code",  _amf3_int(0)),
-        ("error_code",    _amf3_int(0)),
     ]
     return _make_ack_message(correlation_id, _amf3_object(fields))
 
@@ -3231,7 +3338,6 @@ def _build_item_response(correlation_id: str) -> bytes:
         ("item_data",    _build_item_data()),
         ("generals",     _build_generals_list()),
         ("request_code", _amf3_int(0)),
-        ("error_code",   _amf3_int(0)),
     ]
     body_amf3 = _amf3_object(fields)
     return _make_ack_message(correlation_id, body_amf3)
@@ -3297,8 +3403,21 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                     items.remove(target_item)
                 else:
                     target_item["amount"] = amt
-                role["copper"] = role.get("copper", 100000) + 1000
-                print(f"  [ITEM] Used consumable item {item_id} (cfg {cfg_id})", flush=True)
+
+                max_item_id = max([int(it.get("item_id", 0)) for it in items] + [1000])
+                if cfg_id == 300063:
+                    # 10级成长礼包：20级礼包*1、初级银币卡*10、金币*20、名刀·斩月*1
+                    role["gold"] = role.get("gold", 5000) + 20
+                    items.append({"item_id": max_item_id + 1, "cfg_item_id": 300053, "amount": 10, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
+                    items.append({"item_id": max_item_id + 2, "cfg_item_id": 300064, "amount": 1, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
+                    items.append({"item_id": max_item_id + 3, "cfg_item_id": 200002, "amount": 1, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 1})
+                    print("  [ITEM] Opened 10级成长礼包 (cfg 300063) -> awarded items & gold", flush=True)
+                elif cfg_id in (300053, 300054, 300055, 300001):
+                    role["copper"] = role.get("copper", 100000) + 50000
+                    print(f"  [ITEM] Used silver card (cfg {cfg_id}) -> copper +50000", flush=True)
+                else:
+                    role["copper"] = role.get("copper", 100000) + 10000
+                    print(f"  [ITEM] Used consumable item {item_id} (cfg {cfg_id}) -> copper +10000", flush=True)
             _save()
 
     elif any(k in op_lower for k in ["upgrade", "rise", "forge"]):
@@ -3874,7 +3993,7 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             role["skill_point"] = role.get("skill_point", 50) + freed
             _save()
             print(f"  -> skillClean OK (gen={gen_id}, slot={slot_idx}, freed {freed} skill_point, total={role['skill_point']})", flush=True)
-            return _build_general_response(correlation_id)
+            return _build_skill_awaken_response(correlation_id, gen_id or 1001, 0)
 
         if "SKILLUP" in op_name.upper():
             # 技能升级 — 正确解析 body 并更新 skill level
@@ -4126,7 +4245,7 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
         return _build_skyladder_response(correlation_id)
 
     # ── MANOR (training) / FORGE ──────────────────────────────────────────────
-    if "MANOR" in op_upper or "FORGE" in op_upper:
+    if "MANOR" in op_upper or "TRAIN" in op_upper or "FORGE" in op_upper:
         op_name = op_upper.split(".")[-1]
         op_upper_check = op_name.upper()
 
@@ -4135,47 +4254,134 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             role = _get_role()
             body = _extract_body(envelope)
             gen_id = None
+            ratio_type = 0
+            time_type = 0
+            if isinstance(body, list) and len(body) >= 3:
+                gen_id = body[2]
+                if len(body) >= 4:
+                    try: ratio_type = int(body[3] or 0)
+                    except: ratio_type = 0
+                if len(body) >= 5:
+                    try: time_type = int(body[4] or 0)
+                    except: time_type = 0
+            elif isinstance(body, dict):
+                gen_id = body.get("3_generalId") or body.get("generalId")
+                ratio_type = int(body.get("4_ratioType", 0))
+                time_type = int(body.get("5_timeType", 0))
+
+            # Ratio multipliers: 0: 100%, 1: 120%, 2: 150%, 3: 200%
+            TRAIN_RATES = {0: 1.0, 1: 1.2, 2: 1.5, 3: 2.0}
+            rate = TRAIN_RATES.get(ratio_type, 1.0)
+            duration = 28800  # 8 hours
+            now_ts = float(int(time.time()))
+            exp_awarded = int(28800 * 0.5 * rate)
+
+            train_list = role.setdefault("training_list", [])
+            for g in role.get("generals", []):
+                if gen_id and int(g.get("general_id", 0)) == int(gen_id):
+                    t_entry = None
+                    for t in train_list:
+                        if int(t.get("general_id", 0)) == int(gen_id):
+                            t_entry = t
+                            break
+                    if not t_entry:
+                        t_entry = {"general_id": int(gen_id)}
+                        train_list.append(t_entry)
+                    t_entry["start_time"] = now_ts
+                    t_entry["training_end"] = now_ts + duration
+                    t_entry["ratio_type"] = ratio_type
+                    t_entry["time_type"] = time_type
+                    t_entry["training_experience"] = exp_awarded
+                    t_entry["experience"] = int(g.get("experience", 0))
+                    t_entry["level"] = int(g.get("level", 1))
+                    break
+            _save()
+            print(f"  -> manor.trainingStart OK (gen={gen_id}, ratio={rate}, exp={exp_awarded}, end={now_ts + duration})", flush=True)
+            return _build_training_response(correlation_id)
+
+        if "STOP" in op_upper_check or "TRAININGSTOP" in op_upper_check:
+            # 停止训练船员
+            role = _get_role()
+            body = _extract_body(envelope)
+            gen_id = None
             if isinstance(body, list) and len(body) >= 3:
                 gen_id = body[2]
             elif isinstance(body, dict):
                 gen_id = body.get("3_generalId") or body.get("generalId")
-            
             now_ts = float(int(time.time()))
-            train_list = role.setdefault("training_list", [])
-            for g in role.get("generals", []):
-                if gen_id and int(g.get("general_id", 0)) == int(gen_id):
-                    g["experience"] = int(g.get("experience", 0)) + 3000
-                    g["level"] = max(int(g.get("level", 1)), min(role.get("level", 1), int(g.get("level", 1)) + 1))
-                    updated = False
-                    for t in train_list:
-                        if int(t.get("general_id", 0)) == int(gen_id):
-                            t["training_end"] = now_ts + 86400
+            for t in role.get("training_list", []):
+                if gen_id and int(t.get("general_id", 0)) == int(gen_id):
+                    start_t = float(t.get("start_time", now_ts))
+                    end_t = float(t.get("training_end", now_ts))
+                    total_dur = max(1.0, end_t - start_t)
+                    elapsed = max(0.0, min(total_dur, now_ts - start_t))
+                    earned = int(t.get("training_experience", 3000) * (elapsed / total_dur))
+                    for g in role.get("generals", []):
+                        if int(g.get("general_id", 0)) == int(gen_id):
+                            g["experience"] = int(g.get("experience", 0)) + earned
+                            g["level"] = max(int(g.get("level", 1)), min(role.get("level", 1), int(g.get("level", 1)) + 1))
                             t["experience"] = g["experience"]
                             t["level"] = g["level"]
-                            updated = True
                             break
-                    if not updated:
-                        train_list.append({
-                            "general_id": int(gen_id),
-                            "training_end": now_ts + 86400,
-                            "experience": g["experience"],
-                            "level": g["level"]
-                        })
+                    t["training_end"] = 0.0
                     break
             _save()
-            print(f"  -> manor.trainingStart OK (gen={gen_id})", flush=True)
+            print(f"  -> manor.trainingStop OK (gen={gen_id})", flush=True)
             return _build_training_response(correlation_id)
 
-        if any(k in op_upper_check for k in ["TRAININGSTATUS", "TRAININGSLOT", "TRAININGSTOP", "TRAINING"]):
-            print(f"  -> manor.trainingStatus/slot/stop OK", flush=True)
+        if "JUMP" in op_upper_check:
+            # 秒CD / 快速训练 / 训练10次
+            role = _get_role()
+            body = _extract_body(envelope)
+            gen_id = None
+            jump_type = 1
+            if isinstance(body, list) and len(body) >= 3:
+                gen_id = body[2]
+                if len(body) >= 4:
+                    try: jump_type = int(body[3] or 1)
+                    except: jump_type = 1
+            elif isinstance(body, dict):
+                gen_id = body.get("3_generalId") or body.get("generalId")
+                jump_type = int(body.get("4_type", 1))
+
+            # type 1: 快速训练 1 次 (+3000 exp)
+            # type 2: 金币训练 (+6000 exp, -5 gold)
+            # type 3: 训练 10 次 (+30000 exp, -20 gold)
+            exp_map = {1: 3000, 2: 6000, 3: 30000}
+            add_exp = exp_map.get(jump_type, 3000)
+            if jump_type == 2:
+                role["gold"] = max(0, role.get("gold", 5000) - 5)
+            elif jump_type == 3:
+                role["gold"] = max(0, role.get("gold", 5000) - 20)
+
+            for g in role.get("generals", []):
+                if gen_id and int(g.get("general_id", 0)) == int(gen_id):
+                    g["experience"] = int(g.get("experience", 0)) + add_exp
+                    g["level"] = max(int(g.get("level", 1)), min(role.get("level", 1), int(g.get("level", 1)) + 1))
+                    break
+            for t in role.get("training_list", []):
+                if gen_id and int(t.get("general_id", 0)) == int(gen_id):
+                    t["training_end"] = 0.0  # Clear cooldown / 秒CD
+                    for g in role.get("generals", []):
+                        if int(g.get("general_id", 0)) == int(gen_id):
+                            t["experience"] = g["experience"]
+                            t["level"] = g["level"]
+                            break
+                    break
+            _save()
+            print(f"  -> manor.jump OK (gen={gen_id}, type={jump_type}, added {add_exp} exp, CD cleared)", flush=True)
             return _build_training_response(correlation_id)
 
-        if "FORGE" in op_name or "MANOR" in op_upper:
-            print(f"  -> manor/forge handler: {operation}", flush=True)
+        if any(k in op_upper_check for k in ["TRAININGSTATUS", "TRAININGSLOT", "TRAINING"]):
+            print(f"  -> manor.trainingStatus/slot OK", flush=True)
+            return _build_training_response(correlation_id)
+
+        if "FORGE" in op_name:
+            print(f"  -> forge handler: {operation}", flush=True)
             return _handle_forge_request(_extract_body(envelope), correlation_id)
 
-        print(f"  -> manor generic ACK for {operation}", flush=True)
-        return _build_simple_ack(correlation_id)
+        print(f"  -> manor training response fallback for {operation}", flush=True)
+        return _build_training_response(correlation_id)
 
     # ── ITEM ───────────────────────────────────────────────────────────────────
     if "ITEM" in op_upper or any(k in op_upper for k in ["USING", "UNEQUIP", "UPGRADE", "FORGE", "RISE", "HAKI", "GEM"]):

@@ -7,42 +7,14 @@
     "figure": 1001,
     "nation": 0,
     "gold": 96799,
-    "copper": 1827899,
+    "copper": 1804899,
     "action_point": 100,
     "ap_max": 100,
     "scene_id": 2002,
-    "scene_x": 1762,
-    "scene_y": 119,
-    "current_task": 100028,
-    "completed_tasks": [
-      100001,
-      100002,
-      100003,
-      100004,
-      100005,
-      100006,
-      100007,
-      100008,
-      100009,
-      100010,
-      100011,
-      100012,
-      100013,
-      100014,
-      100015,
-      100016,
-      100017,
-      100018,
-      100019,
-      100020,
-      100021,
-      100022,
-      100023,
-      100024,
-      100025,
-      100026,
-      100027
-    ],
+    "scene_x": 995,
+    "scene_y": 103,
+    "current_task": 100001,
+    "completed_tasks": [],
     "battle_wins": {
       "10101": 2,
       "10102": 1,
@@ -63,7 +35,8 @@
       "10307": 1,
       "10308": 1,
       "10309": 3,
-      "10310": 6
+      "10310": 9,
+      "2001": 1
     },
     "login_days": 1,
     "created": true,
@@ -75,8 +48,8 @@
         "item_id": 1001,
         "cfg_item_id": 200327,
         "amount": 1,
-        "level": 21,
-        "star": 21,
+        "level": 51,
+        "star": 51,
         "rise": 0,
         "equiped": 1,
         "general_id": 1001,
@@ -111,8 +84,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10043235,
         "part": 3
       },
       {
@@ -140,7 +113,7 @@
       {
         "item_id": 1007,
         "cfg_item_id": 300063,
-        "amount": 7,
+        "amount": 1,
         "level": 1,
         "star": 1,
         "rise": 0,
@@ -188,8 +161,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 1,
-        "general_id": 10052199,
+        "equiped": 0,
+        "general_id": 0,
         "part": 3
       },
       {
@@ -200,7 +173,7 @@
         "star": 1,
         "rise": 0,
         "equiped": 1,
-        "general_id": 1001,
+        "general_id": 10043235,
         "part": 5
       },
       {
@@ -243,19 +216,19 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 10052199,
         "part": 3
       },
       {
         "item_id": 1017,
         "cfg_item_id": 200332,
         "amount": 1,
-        "level": 1,
-        "star": 1,
+        "level": 2,
+        "star": 2,
         "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
+        "equiped": 1,
+        "general_id": 1001,
         "part": 5
       },
       {
@@ -265,8 +238,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 1,
-        "general_id": 10043235,
+        "equiped": 0,
+        "general_id": 0,
         "part": 3
       },
       {
@@ -364,8 +337,8 @@
         "level": 1,
         "star": 1,
         "rise": 0,
-        "equiped": 1,
-        "general_id": 10043235,
+        "equiped": 0,
+        "general_id": 0,
         "part": 5
       }
     ],
@@ -375,11 +348,11 @@
       "horse": 1022,
       "cloak": 1010,
       "amulet": 0,
-      "misc": 1012
+      "misc": 1017
     },
-    "exp": 11700,
+    "exp": 12100,
     "task_accepted": true,
-    "task_completed": false,
+    "task_completed": true,
     "camp_stars": {
       "10101": 3,
       "10102": 3,
@@ -400,7 +373,8 @@
       "10307": 3,
       "10308": 3,
       "10309": 3,
-      "10310": 3
+      "10310": 3,
+      "2001": 3
     },
     "awakened_skills": {
       "1007": {
@@ -425,8 +399,8 @@
           "level": 4
         },
         "3": {
-          "cfg_skill_id": 11006,
-          "level": 10
+          "cfg_skill_id": 12025,
+          "level": 1
         }
       }
     },
@@ -440,9 +414,9 @@
         "job": 10003,
         "figure": 10083,
         "face": 10083,
-        "level": 1,
+        "level": 2,
         "skill": 51009,
-        "experience": 0
+        "experience": 3000
       },
       {
         "general_id": 10052199,
@@ -453,9 +427,9 @@
         "job": 10002,
         "figure": 10011,
         "face": 10011,
-        "level": 1,
+        "level": 2,
         "skill": 51006,
-        "experience": 0
+        "experience": 3000
       }
     ],
     "tavern_round": {
@@ -477,15 +451,29 @@
       "type": 2
     },
     "formation": {
-      "1": 1001,
-      "2": 10043235,
-      "3": 10052199,
+      "1": 10052199,
+      "2": 0,
+      "3": 0,
       "4": 0,
       "5": 0,
-      "6": 0,
+      "6": 10043235,
       "7": 0,
-      "8": 0,
+      "8": 1001,
       "9": 0
-    }
+    },
+    "training_list": [
+      {
+        "general_id": 10052199,
+        "training_end": 1794890327.0,
+        "experience": 3000,
+        "level": 2
+      },
+      {
+        "general_id": 10043235,
+        "training_end": 1794890336.0,
+        "experience": 3000,
+        "level": 2
+      }
+    ]
   }
 }
