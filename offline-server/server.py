@@ -648,6 +648,8 @@ def _build_role_data() -> bytes:
         ("server_time",             _amf3_double(now_ts)),
 
         ("bot_general_start",       _amf3_double(0.0)),
+        ("training_open",           _amf3_int(1)),
+        ("talent_open",             _amf3_int(1)),
 
     ]
 
@@ -1086,8 +1088,8 @@ def _make_companion_general_amf3(g: dict) -> bytes:
     ])
 
 
-def _build_formations_list() -> bytes:
-    role = _get_role()
+def _get_formation_dict(role: dict) -> dict:
+    formation = role.setdefault("formation", {})
     fig = role.get("figure", 1008)
     if fig < 1000:
         fig = FIGURE_MAP.get(fig, 1008)
@@ -1097,28 +1099,27 @@ def _build_formations_list() -> bytes:
     gen_id = cfg["figure"]
 
     gens = role.get("generals", [])
-    p1 = gen_id
-    p2 = int(gens[0].get("general_id", 0)) if len(gens) > 0 else 0
-    p3 = int(gens[1].get("general_id", 0)) if len(gens) > 1 else 0
-    p4 = int(gens[2].get("general_id", 0)) if len(gens) > 2 else 0
-    p5 = int(gens[3].get("general_id", 0)) if len(gens) > 3 else 0
-    p6 = int(gens[4].get("general_id", 0)) if len(gens) > 4 else 0
+    if not formation:
+        formation["1"] = gen_id
+        for idx, g in enumerate(gens[:8]):
+            formation[str(idx + 2)] = int(g.get("general_id", 0))
+        for p in range(len(gens) + 2, 10):
+            formation[str(p)] = 0
+    return formation
 
-    fmt = _amf3_object([
+
+def _build_formations_list() -> bytes:
+    role = _get_role()
+    fmt_dict = _get_formation_dict(role)
+    fields = [
         ("cfg_formation_id", _amf3_int(1001)),
         ("level",            _amf3_int(1)),
-        ("pos_1",            _amf3_int(p1)),
-        ("pos_2",            _amf3_int(p2)),
-        ("pos_3",            _amf3_int(p3)),
-        ("pos_4",            _amf3_int(p4)),
-        ("pos_5",            _amf3_int(p5)),
-        ("pos_6",            _amf3_int(p6)),
-        ("pos_7",            _amf3_int(0)),
-        ("pos_8",            _amf3_int(0)),
-        ("pos_9",            _amf3_int(0)),
-    ])
-
-    return _amf3_array([fmt])
+    ]
+    for i in range(1, 10):
+        val = int(fmt_dict.get(str(i), fmt_dict.get(i, 0)))
+        fields.append((f"pos_{i}", _amf3_int(val)))
+        fields.append((f"pos{i}", _amf3_int(val)))
+    return _amf3_array([_amf3_object(fields)])
 
 
 
@@ -1145,8 +1146,6 @@ def _build_general_data() -> bytes:
         ("exploit",         _amf3_int(role.get("exploit", 1000))),
 
         ("request_code",    _amf3_int(0)),
-
-        ("error_code",      _amf3_int(0)),
 
     ]
 
@@ -1180,6 +1179,9 @@ def _build_player_items_amf3() -> bytes:
     raw_items = _get_player_items()
     items_amf3: list[bytes] = []
     for item in raw_items:
+        # 已穿戴在角色/伙伴身上的装备，不应放入背包列表
+        if item.get("equiped") or int(item.get("general_id", 0)) > 0:
+            continue
         lvl = int(item.get("level", 1))
         # 装备强化等级必须双向对齐 level 与 star，且至少为 1（由客户端 USER_ITEM+0x10 读取展示）
         star_val = int(item.get("star", 0))
@@ -1202,8 +1204,8 @@ def _build_player_items_amf3() -> bytes:
             ("hole4",        _amf3_int(int(item.get("hole4", 0)))),
             ("hole5",        _amf3_int(int(item.get("hole5", 0)))),
             ("hole6",        _amf3_int(int(item.get("hole6", 0)))),
-            ("general_id",   _amf3_int(int(item.get("general_id", 0)))),
-            ("equiped",      _amf3_bool(bool(item.get("equiped", 0)))),
+            ("general_id",   _amf3_int(0)),
+            ("equiped",      _amf3_bool(False)),
         ])
         items_amf3.append(it)
     return _amf3_array(items_amf3)
@@ -2218,12 +2220,21 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     ])
 
     attack_generals = [atk_gen]
+    atk_units = [{
+        "pos": 1,
+        "hp": proto_hp,
+        "hp_max": proto_hp,
+        "face": cfg["face"],
+        "name": role["name"],
+    }]
 
     # Add all recruited companions to the player's battle team!
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
-    comp_pos = 2
-    for comp in role.get("generals", []):
+    fmt_dict = _get_formation_dict(role)
+    used_positions = {1}
+
+    for idx, comp in enumerate(role.get("generals", [])):
         if not isinstance(comp, dict):
             continue
         c_gid = int(comp.get("general_id", 0))
@@ -2243,6 +2254,19 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             if not c_qual: c_qual = int(row[3])
             if not c_skill or (c_skill == 51001 and c_cfg_id != 10041220): c_skill = int(row[4] or 51001)
 
+        # Look up assigned position in formation
+        assigned_pos = None
+        for k, v in fmt_dict.items():
+            if int(v) == c_gid:
+                assigned_pos = int(k)
+                break
+        if not assigned_pos or assigned_pos in used_positions:
+            for p in range(2, 10):
+                if p not in used_positions:
+                    assigned_pos = p
+                    break
+        used_positions.add(assigned_pos)
+
         c_hp = 500 + c_level * 40
         c_skill_obj = _amf3_object([
             ("cfg_skill_id", _amf3_int(c_skill or 11003)),
@@ -2250,7 +2274,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             ("level",        _amf3_int(1)),
         ])
         c_gen_obj = _amf3_object([
-            ("position",         _amf3_int(comp_pos)),
+            ("position",         _amf3_int(assigned_pos)),
             ("id",               _amf3_int(c_gid)),
             ("cfg_general_id",   _amf3_int(c_cfg_id)),
             ("name",             _amf3_string(c_name)),
@@ -2261,12 +2285,18 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             ("health_point",     _amf3_int(c_hp)),
             ("health_point_max", _amf3_int(c_hp)),
             ("morale",           _amf3_int(50)),
-            ("category",         _amf3_int(1)),
+            ("category",         _amf3_int(2)),  # 2 = general/soldier model (loads soldierXXXX)
             ("skill_list",       _amf3_array([c_skill_obj])),
         ])
         attack_generals.append(c_gen_obj)
-        comp_pos += 1
-        if comp_pos > 9:
+        atk_units.append({
+            "pos": assigned_pos,
+            "hp": c_hp,
+            "hp_max": c_hp,
+            "face": c_face,
+            "name": c_name,
+        })
+        if len(attack_generals) >= 5:
             break
 
     # 2. Enemy team (defend_generals) from cfg_army pos1..pos9
@@ -2279,7 +2309,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     try:
         row = cur.execute(
             "SELECT name, face, figure, level, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, pos9 "
-            "FROM cfg_army WHERE cfg_army_id = ?", (camp_id,)
+            "FROM cfg_army WHERE cfg_army_id = ? OR cfg_camp_id = ? ORDER BY cfg_army_id ASC LIMIT 1",
+            (camp_id, camp_id)
         ).fetchone()
         if row:
             def_name = row[0]
@@ -2294,7 +2325,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         print(f"  [BATTLE] error loading cfg_army: {e}", flush=True)
 
     defend_generals = []
-    enemy_effect_targets = []
+    def_units = []
     total_enemy_damage = 0
 
     if pos_monsters:
@@ -2337,15 +2368,13 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("skill_list",       _amf3_array([m_skill])),
             ])
             defend_generals.append(def_gen_elem)
-
-            enemy_effect_targets.append(_amf3_object([
-                ("target_side",           _amf3_int(2)),
-                ("target_position",       _amf3_int(p_slot)),
-                ("target_health_point",   _amf3_int(0)),
-                ("target_morale",         _amf3_int(0)),
-                ("action_value",          _amf3_int(m_hp)),
-                ("action_type",           _amf3_int(1)),
-            ]))
+            def_units.append({
+                "pos": p_slot,
+                "hp": m_hp,
+                "hp_max": m_hp,
+                "face": m_face,
+                "name": m_name,
+            })
             total_enemy_damage += m_hp
     else:
         # Fallback single enemy
@@ -2370,14 +2399,13 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             ("skill_list",       _amf3_array([def_skill])),
         ])
         defend_generals.append(def_gen)
-        enemy_effect_targets.append(_amf3_object([
-            ("target_side",           _amf3_int(2)),
-            ("target_position",       _amf3_int(1)),
-            ("target_health_point",   _amf3_int(0)),
-            ("target_morale",         _amf3_int(0)),
-            ("action_value",          _amf3_int(224)),
-            ("action_type",           _amf3_int(1)),
-        ]))
+        def_units.append({
+            "pos": 1,
+            "hp": 224,
+            "hp_max": 224,
+            "face": def_face,
+            "name": def_name,
+        })
         total_enemy_damage = 224
 
     conn.close()
@@ -2399,30 +2427,84 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("battle_id",             _amf3_int(1)),
     ])
 
-    # 3. Combat round
-    first_target_pos = pos_monsters[0][0] if pos_monsters else 1
-    round_action = _amf3_object([
-        ("action_type",           _amf3_int(1)),
-        ("action_value",          _amf3_int(total_enemy_damage)),
-        ("action_target_side",    _amf3_int(2)),
-        ("action_target_position",_amf3_int(first_target_pos)),
-        ("action_target_morale",  _amf3_int(0)),
-        ("effect_targets",        _amf3_array(enemy_effect_targets)),
-    ])
-    combat_round = _amf3_object([
-        ("battle_id",             _amf3_int(1)),
-        ("caster_side",           _amf3_int(1)),
-        ("caster_position",       _amf3_int(1)),
-        ("now_boold_point",       _amf3_int(proto_hp)),
-        ("max_boold_point",       _amf3_int(proto_hp)),
-        ("face",                  _amf3_int(cfg["face"])),
-        ("defend_pet_morale",     _amf3_int(0)),
-        ("attack_pet_morale",     _amf3_int(0)),
-        ("caster_round_action",   round_action),
-        ("caster_pre_action_buff_list", _amf3_array([])),
-        ("caster_pre_action_list",      _amf3_array([])),
-        ("caster_after_action_list",    _amf3_array([])),
-    ])
+    # 3. Combat rounds: Multi-round sequential single-target attacks!
+    combat_rounds = []
+    alive_targets = [u for u in def_units]
+
+    while alive_targets and len(combat_rounds) < 20:
+        for atk in atk_units:
+            if not alive_targets:
+                break
+            target = alive_targets[0]
+            dmg = min(target["hp"], max(150, int(target["hp_max"] * 0.7) + 50))
+            target["hp"] -= dmg
+            if target["hp"] <= 0:
+                alive_targets.pop(0)
+
+            effect_target = _amf3_object([
+                ("target_side",           _amf3_int(2)),
+                ("target_position",       _amf3_int(target["pos"])),
+                ("target_health_point",   _amf3_int(max(0, target["hp"]))),
+                ("target_morale",         _amf3_int(0)),
+                ("action_value",          _amf3_int(dmg)),
+                ("action_type",           _amf3_int(1)),
+            ])
+            round_action = _amf3_object([
+                ("action_type",           _amf3_int(1)),
+                ("action_value",          _amf3_int(dmg)),
+                ("action_target_side",    _amf3_int(2)),
+                ("action_target_position",_amf3_int(target["pos"])),
+                ("action_target_morale",  _amf3_int(0)),
+                ("effect_targets",        _amf3_array([effect_target])),
+            ])
+            c_round = _amf3_object([
+                ("battle_id",             _amf3_int(1)),
+                ("caster_side",           _amf3_int(1)),
+                ("caster_position",       _amf3_int(atk["pos"])),
+                ("now_boold_point",       _amf3_int(atk["hp"])),
+                ("max_boold_point",       _amf3_int(atk["hp_max"])),
+                ("face",                  _amf3_int(atk["face"])),
+                ("defend_pet_morale",     _amf3_int(0)),
+                ("attack_pet_morale",     _amf3_int(0)),
+                ("caster_round_action",   round_action),
+                ("caster_pre_action_buff_list", _amf3_array([])),
+                ("caster_pre_action_list",      _amf3_array([])),
+                ("caster_after_action_list",    _amf3_array([])),
+            ])
+            combat_rounds.append(c_round)
+
+    if not combat_rounds:
+        first_t = def_units[0] if def_units else {"pos": 1, "hp": 224, "hp_max": 224, "face": 1001}
+        eff = _amf3_object([
+            ("target_side", _amf3_int(2)),
+            ("target_position", _amf3_int(first_t["pos"])),
+            ("target_health_point", _amf3_int(0)),
+            ("target_morale", _amf3_int(0)),
+            ("action_value", _amf3_int(first_t["hp_max"])),
+            ("action_type", _amf3_int(1)),
+        ])
+        r_act = _amf3_object([
+            ("action_type", _amf3_int(1)),
+            ("action_value", _amf3_int(first_t["hp_max"])),
+            ("action_target_side", _amf3_int(2)),
+            ("action_target_position", _amf3_int(first_t["pos"])),
+            ("action_target_morale", _amf3_int(0)),
+            ("effect_targets", _amf3_array([eff])),
+        ])
+        combat_rounds.append(_amf3_object([
+            ("battle_id", _amf3_int(1)),
+            ("caster_side", _amf3_int(1)),
+            ("caster_position", _amf3_int(1)),
+            ("now_boold_point", _amf3_int(proto_hp)),
+            ("max_boold_point", _amf3_int(proto_hp)),
+            ("face", _amf3_int(cfg["face"])),
+            ("defend_pet_morale", _amf3_int(0)),
+            ("attack_pet_morale", _amf3_int(0)),
+            ("caster_round_action", r_act),
+            ("caster_pre_action_buff_list", _amf3_array([])),
+            ("caster_pre_action_list", _amf3_array([])),
+            ("caster_after_action_list", _amf3_array([])),
+        ]))
 
     # 4. Victory settlement — uses ACTUAL reward values computed above
     res = _amf3_object([
@@ -2453,7 +2535,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("action_point",           _amf3_int(role["action_point"])),
         ("prepare_data",           prep),
         ("result_data",            res),
-        ("round_data_list",        _amf3_array([combat_round])),
+        ("round_data_list",        _amf3_array(combat_rounds)),
         ("story_word",             _amf3_int(0)),
         ("attack_formation_level", _amf3_int(1)),
         ("attack_role_name",       _amf3_string(role["name"])),
@@ -2533,7 +2615,32 @@ def _build_skill_awaken_response(correlation_id: str, gen_id: int, skill_id: int
         ("general_data",       _build_general_data()),
         ("passive_skill_list", _build_passive_candidates()),
         ("request_code",       _amf3_int(0)),
-        ("error_code",         _amf3_int(0)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _build_training_response(correlation_id: str) -> bytes:
+    role = _get_role()
+    now_ts = float(int(time.time()))
+    training_list = []
+    for train_entry in role.get("training_list", []):
+        training_list.append(_amf3_object([
+            ("generalId",     _amf3_int(int(train_entry.get("general_id", 0)))),
+            ("training_end",  _amf3_double(float(train_entry.get("training_end", now_ts + 86400)))),
+            ("experience",    _amf3_int(int(train_entry.get("experience", 0)))),
+            ("level",         _amf3_int(int(train_entry.get("level", 1)))),
+        ]))
+    fields = [
+        ("server_time",   _amf3_double(now_ts)),
+        ("training_slot", _amf3_int(3)),
+        ("jump_wand",     _amf3_int(0)),
+        ("jump_cooldown", _amf3_double(0.0)),
+        ("jump_enable",   _amf3_bool(True)),
+        ("training_list", _amf3_array(training_list)),
+        ("generals",      _build_generals_list()),
+        ("general_data",  _build_general_data()),
+        ("request_code",  _amf3_int(0)),
+        ("error_code",    _amf3_int(0)),
     ]
     return _make_ack_message(correlation_id, _amf3_object(fields))
 
@@ -3857,8 +3964,44 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
 
         if "FORMATION" in op_name.upper():
             # 阵型设置
-            print(f"  -> formation OK", flush=True)
+            role = _get_role()
+            fmt_dict = _get_formation_dict(role)
+            # body: [role_id, code, general_id, cfg_formation_id, pos, on]
+            gen_id = 0
+            pos = 0
+            on = True
+            if isinstance(body, list) and len(body) >= 6:
+                try:
+                    gen_id = int(body[2] or 0)
+                    pos = int(body[4] or 0)
+                    on = bool(body[5])
+                except Exception:
+                    pass
+            elif isinstance(body, dict):
+                try:
+                    gen_id = int(body.get("3_generalId") or body.get("generalId") or 0)
+                    pos = int(body.get("5_pos") or body.get("pos") or 0)
+                    on = bool(body.get("6_on", True))
+                except Exception:
+                    pass
+
+            if pos in range(1, 10):
+                if on:
+                    for k in list(fmt_dict.keys()):
+                        if int(fmt_dict[k]) == gen_id:
+                            fmt_dict[k] = 0
+                    fmt_dict[str(pos)] = gen_id
+                else:
+                    if int(fmt_dict.get(str(pos), 0)) == gen_id:
+                        fmt_dict[str(pos)] = 0
+                role["formation"] = fmt_dict
+                _save()
+                print(f"  [FORMATION] Updated pos {pos} -> {gen_id} (on={on})", flush=True)
             return _build_general_response(correlation_id)
+
+        if "TRAINING" in op_name.upper():
+            print(f"  -> general.training handler: {operation} body={body}", flush=True)
+            return _build_training_response(correlation_id)
 
         if "FIRE" in op_upper or "FIRE" in op_name.upper():
             role = _get_role()
@@ -3987,19 +4130,45 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
         op_name = op_upper.split(".")[-1]
         op_upper_check = op_name.upper()
 
-        if "TRAININGSTART" in op_upper_check or "TRAINING" in op_upper_check:
-            # 开始训练船员 — 离线服直接成功 + 给一点经验
+        if "TRAININGSTART" in op_upper_check:
+            # 开始训练船员
             role = _get_role()
-            role.setdefault("exp", 0)
-            role["exp"] += 1000
+            body = _extract_body(envelope)
+            gen_id = None
+            if isinstance(body, list) and len(body) >= 3:
+                gen_id = body[2]
+            elif isinstance(body, dict):
+                gen_id = body.get("3_generalId") or body.get("generalId")
+            
+            now_ts = float(int(time.time()))
+            train_list = role.setdefault("training_list", [])
+            for g in role.get("generals", []):
+                if gen_id and int(g.get("general_id", 0)) == int(gen_id):
+                    g["experience"] = int(g.get("experience", 0)) + 3000
+                    g["level"] = max(int(g.get("level", 1)), min(role.get("level", 1), int(g.get("level", 1)) + 1))
+                    updated = False
+                    for t in train_list:
+                        if int(t.get("general_id", 0)) == int(gen_id):
+                            t["training_end"] = now_ts + 86400
+                            t["experience"] = g["experience"]
+                            t["level"] = g["level"]
+                            updated = True
+                            break
+                    if not updated:
+                        train_list.append({
+                            "general_id": int(gen_id),
+                            "training_end": now_ts + 86400,
+                            "experience": g["experience"],
+                            "level": g["level"]
+                        })
+                    break
             _save()
-            print(f"  -> manor.trainingStart OK (+1000 exp, total={role['exp']})", flush=True)
-            return _build_general_response(correlation_id)
+            print(f"  -> manor.trainingStart OK (gen={gen_id})", flush=True)
+            return _build_training_response(correlation_id)
 
-        if "TRAININGSTATUS" in op_upper_check or "TRAINING" in op_upper_check:
-            # 训练状态查询
-            print(f"  -> manor.trainingStatus OK", flush=True)
-            return _build_general_response(correlation_id)
+        if any(k in op_upper_check for k in ["TRAININGSTATUS", "TRAININGSLOT", "TRAININGSTOP", "TRAINING"]):
+            print(f"  -> manor.trainingStatus/slot/stop OK", flush=True)
+            return _build_training_response(correlation_id)
 
         if "FORGE" in op_name or "MANOR" in op_upper:
             print(f"  -> manor/forge handler: {operation}", flush=True)
