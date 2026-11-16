@@ -6,13 +6,13 @@
     "face": 1001,
     "figure": 1001,
     "nation": 0,
-    "gold": 99649,
+    "gold": 99549,
     "copper": 1492099,
     "action_point": 100,
     "ap_max": 100,
     "scene_id": 2002,
-    "scene_x": 930,
-    "scene_y": 94,
+    "scene_x": 929,
+    "scene_y": 93,
     "current_task": 100001,
     "completed_tasks": [],
     "battle_wins": {
@@ -307,11 +307,11 @@
     "generals": [],
     "tavern_round": {
       "cfg_ids": [
-        10051237,
-        10043235,
-        10041220,
-        10041234,
-        10042233
+        10052199,
+        10042233,
+        10041229,
+        10042230,
+        10041228
       ],
       "open_generals": [
         0,

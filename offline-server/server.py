@@ -3830,20 +3830,18 @@ class Handler(BaseHTTPRequestHandler):
 
 
     def _send(self, status: int, content_type: str, body: bytes) -> None:
-
-        self.send_response(status)
-
-        self.send_header("Content-Type", content_type)
-
-        self.send_header("Content-Length", str(len(body)))
-
-        self.send_header("Cache-Control", "no-store")
-
-        self.send_header("Set-Cookie", "JSESSIONID=LOCAL_OFFLINE_SESSION_ID; Path=/")
-
-        self.end_headers()
-
-        self.wfile.write(body)
+        try:
+            self.send_response(status)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Set-Cookie", "JSESSIONID=LOCAL_OFFLINE_SESSION_ID; Path=/")
+            self.end_headers()
+            self.wfile.write(body)
+        except (ConnectionResetError, BrokenPipeError, ConnectionAbortedError) as e:
+            print(f"  [HTTP] Client dropped connection: {e}", flush=True)
+        except Exception as e:
+            print(f"  [HTTP] send error: {e}", flush=True)
 
 
 
@@ -3961,17 +3959,14 @@ def main() -> None:
 
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
-
     try:
-
         server.serve_forever()
-
-    except KeyboardInterrupt:
-
+    except (KeyboardInterrupt, SystemExit):
         pass
-
+    except Exception as e:
+        print(f"[FATAL SERVER ERROR] {e}", flush=True)
+        import traceback; traceback.print_exc()
     finally:
-
         server.server_close()
 
 
