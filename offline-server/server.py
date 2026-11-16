@@ -2283,6 +2283,53 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         fig = 1008
     cfg = PROTAGONIST_CONFIG[fig]
 
+    # The client package only bundles textures for these 17 complete soldier models:
+    # Any other figure is redirected to Blank.png by DynDefAni.ani and becomes invisible.
+    VALID_BATTLE_FIGURES = {
+        1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008,
+        10004, 10009, 10012, 10014, 10019, 10021, 10042, 10061, 10070
+    }
+    SPECIAL_BATTLE_FIGURE_MAP = {
+        10011: 10021,  # 小丑巴基 (红鼻子大炮狙击手) -> 10021 (海贼重炮头目)
+        10083: 10009,  # 赞高 (催眠师/航海士) -> 10009 (见习航海士/魔导法师)
+        10012: 10012,  # 铁棒亚尔丽塔 (自带原生完整模型) -> 10012
+        10076: 10042,  # 海军剑士 -> 10042 (见习剑士/刀客小兵)
+        10075: 10014,  # 贝鲁梅伯 -> 10014 (剑士队长)
+        10073: 10021,  # 斧手亲卫/警卫 -> 10021 (海贼头目)
+    }
+
+    def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False) -> int:
+        try:
+            fv = int(f_val)
+        except Exception:
+            fv = 0
+        if fv in VALID_BATTLE_FIGURES:
+            return fv
+        if fv in SPECIAL_BATTLE_FIGURE_MAP:
+            return SPECIAL_BATTLE_FIGURE_MAP[fv]
+        if 1 <= job <= 4:
+            job += 10000
+        if is_enemy:
+            if quality >= 4:
+                return 10014 if (fv % 2 == 0) else 10019
+            elif job == 10002:
+                return 10021
+            elif job == 10003:
+                return 10009
+            elif job == 10004:
+                return 10070
+            else:
+                return 10042 if (fv % 2 == 0) else 10004
+        else:
+            if job == 10002:
+                return 10021
+            elif job == 10003:
+                return 10070 if (quality >= 4) else 10009
+            elif job == 10004:
+                return 10008
+            else:
+                return 10061 if (quality >= 4) else 10004
+
     # 1. Player team (attack_generals)
     fmt_dict = _get_formation_dict(role)
     proto_fig = cfg["figure"]
@@ -2340,14 +2387,16 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         c_fig = int(comp.get("figure") or c_gid)
         c_qual = int(comp.get("quality", 4))
         c_skill = int(comp.get("skill", 0))
+        c_job = 10001
 
-        row = cur.execute("SELECT name, face, figure, quality, cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (c_cfg_id,)).fetchone()
+        row = cur.execute("SELECT name, face, figure, quality, cfg_skill_id, job FROM cfg_general WHERE cfg_general_id = ?", (c_cfg_id,)).fetchone()
         if row:
             if not c_name or c_name == "船员": c_name = row[0]
             if not c_face: c_face = int(row[1])
             if not c_fig: c_fig = int(row[2])
             if not c_qual: c_qual = int(row[3])
             if not c_skill or (c_skill == 51001 and c_cfg_id != 10041220): c_skill = int(row[4] or 51001)
+            c_job = int(row[5] or 10001)
 
         # Look up assigned position in formation
         assigned_pos = None
@@ -2364,6 +2413,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
         comp_stats = _calc_general_stats(False, c_cfg_id, c_level)
         c_hp = comp_stats["hp"]
+        c_render_fig = _get_safe_battle_figure(c_fig, job=c_job, quality=c_qual, is_enemy=False)
         c_gen_obj = _amf3_object([
             ("position",         _amf3_int(assigned_pos)),
             ("health_point",     _amf3_int(c_hp)),
@@ -2372,7 +2422,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             ("id",               _amf3_int(c_gid)),
             ("health_point_max", _amf3_int(c_hp)),
             ("category",         _amf3_int(2)),
-            ("figure",           _amf3_int(c_fig)),
+            ("figure",           _amf3_int(c_render_fig)),
             ("level",            _amf3_int(c_level)),
             ("cfg_general_id",   _amf3_int(c_cfg_id)),
             ("name",             _amf3_string(c_name)),
@@ -2457,9 +2507,10 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             m_hp = 200 + army_level * 30
             m_skill_id = 11003
             m_qual = 1
+            m_job = 10001
 
             m_row = cur.execute(
-                "SELECT name, face, figure, level, quality, hp, cast_skill FROM cfg_monster WHERE figure = ? ORDER BY abs(level - ?) LIMIT 1",
+                "SELECT name, face, figure, level, quality, hp, cast_skill, category FROM cfg_monster WHERE figure = ? ORDER BY abs(level - ?) LIMIT 1",
                 (m_fig, army_level)
             ).fetchone()
             if m_row:
@@ -2468,7 +2519,9 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 m_qual = int(m_row[4] or 1)
                 m_hp = int(m_row[5] or m_hp)
                 m_skill_id = int(m_row[6] or 11003)
+                m_job = int(m_row[7] or 1)
 
+            m_render_fig = _get_safe_battle_figure(m_fig, job=m_job, quality=m_qual, is_enemy=True)
             def_gen_elem = _amf3_object([
                 ("position",         _amf3_int(p_slot)),
                 ("health_point",     _amf3_int(m_hp)),
@@ -2477,7 +2530,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("id",               _amf3_int(1000 + p_slot)),
                 ("health_point_max", _amf3_int(m_hp)),
                 ("category",         _amf3_int(2)),
-                ("figure",           _amf3_int(m_fig)),
+                ("figure",           _amf3_int(m_render_fig)),
                 ("level",            _amf3_int(army_level)),
                 ("cfg_general_id",   _amf3_int(100000 + p_slot)),
                 ("name",             _amf3_string(m_name)),
@@ -2499,6 +2552,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             total_enemy_damage += m_hp
     else:
         # Fallback single enemy
+        def_render_fig = _get_safe_battle_figure(def_figure, job=10001, quality=1, is_enemy=True)
         def_gen = _amf3_object([
             ("position",         _amf3_int(1)),
             ("health_point",     _amf3_int(224)),
@@ -2507,7 +2561,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             ("id",               _amf3_int(2)),
             ("health_point_max", _amf3_int(224)),
             ("category",         _amf3_int(2)),
-            ("figure",           _amf3_int(def_figure)),
+            ("figure",           _amf3_int(def_render_fig)),
             ("level",            _amf3_int(army_level)),
             ("cfg_general_id",   _amf3_int(100001)),
             ("name",             _amf3_string(def_name)),
