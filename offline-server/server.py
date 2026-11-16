@@ -65,6 +65,24 @@ CAPTURE_DIR = ROOT / "captures"
 
 SAVE_FILE = ROOT / "player_save.json"
 
+import config_loader
+from config_loader import (
+    DB_PATH,
+    get_task,
+    get_next_task,
+    get_scene,
+    get_camp,
+    get_army,
+    get_monster,
+    get_general,
+    get_item,
+    get_skill,
+    get_exp_need,
+    get_npcs_for_scene,
+    get_officium_for_level,
+    get_skills_by_job,
+)
+
 LOCAL_DSID = str(uuid.uuid5(uuid.NAMESPACE_DNS, "xiaoxiaohaizei-local")).upper()
 
 
@@ -118,8 +136,9 @@ def _load_save() -> dict:
 
 
 def _save_player(data: dict) -> None:
-
-    SAVE_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_file = SAVE_FILE.with_suffix(".tmp")
+    tmp_file.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_file.replace(SAVE_FILE)
 
 
 
@@ -183,11 +202,10 @@ def _get_role() -> dict:
     camp_stars = r.get("camp_stars", {})
     if cur_task:
         try:
-            conn = sqlite3.connect(DB_PATH)
-            row = conn.execute("SELECT complete_type, complete_category FROM cfg_task WHERE cfg_task_id = ?", (cur_task,)).fetchone()
-            conn.close()
-            if row:
-                ctype, ccat = int(row[0]), int(row[1])
+            t_cfg = get_task(cur_task)
+            if t_cfg:
+                ctype = int(t_cfg.get("complete_type") or 0)
+                ccat = int(t_cfg.get("complete_category") or 0)
                 if ctype == 4:
                     if wins.get(str(ccat), 0) > 0 or camp_stars.get(str(ccat), 0) > 0:
                         r["task_completed"] = True
@@ -199,12 +217,7 @@ def _get_role() -> dict:
 
     # ── 启动时校准 level/exp 一致性 (修之前硬编码升级留下的 exp=0 问题) ────
     try:
-        conn2 = sqlite3.connect(DB_PATH)
-        cur2 = conn2.cursor()
-        cur2.execute("SELECT experience_need FROM cfg_level_experience WHERE level = ?", (r["level"],))
-        row2 = cur2.fetchone()
-        conn2.close()
-        max_exp_at_level = int(row2[0]) if row2 else 0
+        max_exp_at_level = get_exp_need(r["level"])
         if max_exp_at_level > 0 and r.get("exp", 0) >= max_exp_at_level:
             r["exp"] = 0
         if max_exp_at_level > 0 and r.get("exp", 0) < 0:
@@ -213,19 +226,10 @@ def _get_role() -> dict:
         pass
 
     # ── 自动计算 officium (官职) — 客户端领悟技能/招募船员的前置条件 ────
-    # 用 level 直接映射到 cfg_level_prestige.officium
-    try:
-        conn3 = sqlite3.connect(DB_PATH)
-        cur3 = conn3.cursor()
-        cur3.execute("SELECT officium FROM cfg_level_prestige WHERE officium <= ? ORDER BY officium DESC LIMIT 1", (r["level"],))
-        row3 = cur3.fetchone()
-        conn3.close()
-        r["officium"] = int(row3[0]) if row3 else max(1, r["level"])
-    except Exception:
-        r["officium"] = max(1, r["level"])
+    r["officium"] = get_officium_for_level(r["level"])
 
     # 确保有 skill_point
-    r.setdefault("skill_point", r["level"] - 1)
+    r.setdefault("skill_point", max(0, r["level"] - 1))
 
     return r
 
@@ -812,6 +816,7 @@ def _build_generals_list() -> bytes:
     # 严格按照从 libOnePiece.so (0x403c54) 逆向出的所有 80+ 字段下发，彻底杜绝栈内存野指针
     main_general = _amf3_object([
         # 基础标识
+        ("id",                _amf3_int(cfg["figure"])),
         ("general_id",        _amf3_int(cfg["figure"])),
         ("cfg_general_id",    _amf3_int(cfg["cfg_id"])),
         ("is_role",           _amf3_bool(True)),
@@ -932,7 +937,112 @@ def _build_generals_list() -> bytes:
         ("con_role_camp",     _amf3_bool(False)),
     ])
 
-    return _amf3_array([main_general])
+    generals_all = [main_general]
+    for g in role.get("generals", []):
+        if isinstance(g, dict) and g.get("cfg_general_id"):
+            generals_all.append(_make_companion_general_amf3(g))
+
+    return _amf3_array(generals_all)
+
+
+def _make_companion_general_amf3(g: dict) -> bytes:
+    gid = int(g.get("general_id", 1002))
+    cfg_id = int(g.get("cfg_general_id", gid))
+    name = str(g.get("name", "船员"))
+    job = int(g.get("job", 10001))
+    level = int(g.get("level", 1))
+    fig = int(g.get("figure", gid if gid > 1000 else 1002))
+    qual = int(g.get("quality", 3))
+    exp = int(g.get("experience", 0))
+    starter_skill_id = int(g.get("skill", 11004))
+
+    skill_elem = _amf3_object([
+        ("cfg_skill_id", _amf3_int(starter_skill_id)),
+        ("idx",          _amf3_int(1)),
+        ("level",        _amf3_int(1)),
+    ])
+
+    return _amf3_object([
+        ("id",                _amf3_int(gid)),
+        ("general_id",        _amf3_int(gid)),
+        ("cfg_general_id",    _amf3_int(cfg_id)),
+        ("is_role",           _amf3_bool(False)),
+        ("have_inherited",    _amf3_bool(False)),
+        ("marole",            _amf3_int(0)),
+        ("name",              _amf3_string(name)),
+        ("job",               _amf3_int(job)),
+        ("level",             _amf3_int(level)),
+        ("figure",            _amf3_int(fig)),
+        ("face",              _amf3_int(fig)),
+        ("quality",           _amf3_int(qual)),
+        ("experience",        _amf3_int(exp)),
+        ("skill_point",       _amf3_int(0)),
+        ("skills",            _amf3_array([skill_elem])),
+        ("strength",          _amf3_double(85.0)),
+        ("agile",             _amf3_double(80.0)),
+        ("intelligence",      _amf3_double(60.0)),
+        ("spirit",            _amf3_double(70.0)),
+        ("strength_grow",     _amf3_double(2.5)),
+        ("agile_grow",        _amf3_double(2.2)),
+        ("intelligence_grow", _amf3_double(1.5)),
+        ("spirit_grow",       _amf3_double(1.8)),
+        ("hp",                _amf3_int(500)),
+        ("max_hp",            _amf3_int(500)),
+        ("physical_attack",   _amf3_int(120)),
+        ("physical_defence",  _amf3_int(60)),
+        ("spell_attack",      _amf3_int(40)),
+        ("spell_defence",     _amf3_int(50)),
+        ("speed",             _amf3_int(80)),
+        ("hit",               _amf3_int(100)),
+        ("dodge",             _amf3_int(10)),
+        ("critic",            _amf3_int(15)),
+        ("anti_critic",       _amf3_int(5)),
+        ("parry",             _amf3_int(10)),
+        ("anti_parry",        _amf3_int(5)),
+        ("weapon",            _amf3_int(0)),
+        ("armor",             _amf3_int(0)),
+        ("horse",             _amf3_int(0)),
+        ("cloak",             _amf3_int(0)),
+        ("amulet",            _amf3_int(0)),
+        ("misc",              _amf3_int(0)),
+        ("weapon_hole",       _amf3_int(0)),
+        ("armor_hole",        _amf3_int(0)),
+        ("horse_hole",        _amf3_int(0)),
+        ("cloak_hole",        _amf3_int(0)),
+        ("amulet_hole",       _amf3_int(0)),
+        ("misc_hole",         _amf3_int(0)),
+        ("weapon_haki",       _amf3_int(0)),
+        ("armor_haki",        _amf3_int(0)),
+        ("horse_haki",        _amf3_int(0)),
+        ("cloak_haki",        _amf3_int(0)),
+        ("amulet_haki",       _amf3_int(0)),
+        ("misc_haki",         _amf3_int(0)),
+        ("equip_score",       _amf3_int(0)),
+        ("gem_score",         _amf3_int(0)),
+        ("suit_score",        _amf3_int(0)),
+        ("soul_score",        _amf3_int(0)),
+        ("ship_score",        _amf3_int(0)),
+        ("talent_score",      _amf3_int(0)),
+        ("practice_score",    _amf3_int(0)),
+        ("level_score",       _amf3_int(0)),
+        ("grow_score",        _amf3_int(0)),
+        ("skill_score",       _amf3_int(0)),
+        ("main_soul",         _amf3_int(0)),
+        ("vice_soul",         _amf3_int(0)),
+        ("tert_soul",         _amf3_int(0)),
+        ("fourth_soul",       _amf3_int(0)),
+        ("fifth_soul",        _amf3_int(0)),
+        ("sixth_soul",        _amf3_int(0)),
+        ("seventh_soul",      _amf3_int(0)),
+        ("eighth_soul",       _amf3_int(0)),
+        ("cfg_advance_id",    _amf3_int(0)),
+        ("intimacy",          _amf3_int(0)),
+        ("sea_god",           _amf3_int(0)),
+        ("special_skill_id",  _amf3_int(0)),
+        ("general_skill_deal",_amf3_int(0)),
+        ("con_role_level",    _amf3_bool(False)),
+        ("con_role_camp",     _amf3_bool(False)),
+    ])
 
 
 def _build_formations_list() -> bytes:
@@ -945,12 +1055,16 @@ def _build_formations_list() -> bytes:
     cfg = PROTAGONIST_CONFIG[fig]
     gen_id = cfg["figure"]
 
+    comp_pos2 = 0
+    if role.get("generals"):
+        comp_pos2 = int(role["generals"][0].get("general_id", 0))
+
     fmt = _amf3_object([
         ("cfg_formation_id", _amf3_int(1001)),
         ("level",            _amf3_int(1)),
         ("pos_1",            _amf3_int(gen_id)),
 
-        ("pos_2",            _amf3_int(0)),
+        ("pos_2",            _amf3_int(comp_pos2)),
 
         ("pos_3",            _amf3_int(0)),
 
@@ -1052,6 +1166,7 @@ def _build_player_items_amf3() -> bytes:
             ("hole4",        _amf3_int(int(item.get("hole4", 0)))),
             ("hole5",        _amf3_int(int(item.get("hole5", 0)))),
             ("hole6",        _amf3_int(int(item.get("hole6", 0)))),
+            ("general_id",   _amf3_int(int(item.get("general_id", 0)))),
             ("equiped",      _amf3_bool(bool(item.get("equiped", 0)))),
         ])
         items_amf3.append(it)
@@ -1290,35 +1405,25 @@ def _build_scene_response(correlation_id: str, scene_id: int, x: int, y: int) ->
     )
     persons = [player_person]
 
-    # ★ DYNAMIC NPC loading from cfg_npc table — supports ALL scenes
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        npc_rows = conn.execute(
-            "SELECT cfg_npc_id, name, face, figure, scene_x, scene_y FROM cfg_npc WHERE cfg_scene_id = ? ORDER BY cfg_npc_id",
-            (cur_scene,)
-        ).fetchall()
-        conn.close()
-        for nr in npc_rows:
-            persons.append(_make_person(
-                role_id=int(nr["cfg_npc_id"]),
-                name=nr["name"],
-                x=int(nr["scene_x"]),
-                y=int(nr["scene_y"]),
-                figure=int(nr["figure"]),
-                face=int(nr["face"]),
-                is_npc=1,
-            ))
-        print(f"  [SCENE {cur_scene}] Loaded {len(npc_rows)} NPCs from db", flush=True)
-    except Exception as e:
-        print(f"  [SCENE] Failed to load NPCs from db: {e}", flush=True)
+    # ★ DYNAMIC NPC loading from config_loader — supports ALL scenes
+    npc_rows = get_npcs_for_scene(cur_scene)
+    for nr in npc_rows:
+        persons.append(_make_person(
+            role_id=int(nr["cfg_npc_id"]),
+            name=nr["name"],
+            x=int(nr["scene_x"]),
+            y=int(nr["scene_y"]),
+            figure=int(nr["figure"]),
+            face=int(nr["face"]),
+            is_npc=1,
+        ))
+    print(f"  [SCENE {cur_scene}] Loaded {len(npc_rows)} NPCs from config_loader", flush=True)
 
+    # Note: Omit error_code so OPDataManager::onScene parses scene_id and persons normally
     fields = [
-        ("error_code",    _amf3_int(0)),
         ("scene_id",      _amf3_int(cur_scene)),
         ("lufei_follows", _amf3_int(0)),
         ("persons",       _amf3_array(persons)),
-        ("request_code",  _amf3_int(0)),
     ]
     body_amf3 = _amf3_object(fields)
     return _make_ack_message(correlation_id, body_amf3)
@@ -1331,9 +1436,14 @@ def _build_scenecheck_response(correlation_id: str) -> bytes:
 
     """Reply to SCENE.scenecheck matching OPDataManager::onScenceCheck."""
 
+    can_pass = [
+        2001, 2002, 2003, 2004, 2005, 2006, 2007,
+        1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008
+    ]
+
     fields = [
 
-        ("can_pass_list",    _amf3_array([_amf3_int(2001), _amf3_int(1001), _amf3_int(1002), _amf3_int(1003)])),
+        ("can_pass_list",    _amf3_array([_amf3_int(sid) for sid in can_pass])),
 
         ("need_camp_list",   _amf3_array([])),
 
@@ -1353,7 +1463,7 @@ def _build_scenecheck_response(correlation_id: str) -> bytes:
 
 
 
-DB_PATH = r"d:\AI\work\xiaoxiaohaizei\onepiece-reconstructed.db"
+# DB_PATH is provided by config_loader (pointing to offline-server/onepiece.db)
 
 
 def _pick_skill_for_slot(general_id: int, slot_idx: int, exclude: set = None) -> int:
@@ -1583,6 +1693,22 @@ def _build_npc_response(correlation_id: str, npc_id: int = 1) -> bytes:
         dialog_text = "你好，勇敢的海贼！"
         cfg_word_id = npc_id
         cfg_npc_id = npc_id
+
+    # ★ 酒吧老板娘 / 酒馆NPC (NPC 48 等): 必须始终带有“招募”选项 (option_effect = 10 -> 打开酒馆 CDlgTavern)
+    TAVERN_NPC_IDS = {48, 18, 22, 26, 30, 34, 38, 42, 46, 58, 94, 98}
+    if npc_id in TAVERN_NPC_IDS:
+        has_recruit = False
+        if w:
+            for i in (1, 2, 3):
+                if int(w.get(f"option_effect_{i}", 0)) == 10:
+                    has_recruit = True
+                    break
+        if not has_recruit:
+            options_list.append(_amf3_object([
+                ("option_content", _amf3_string("招募")),
+                ("option_effect",  _amf3_int(10)),
+                ("option_task",    _amf3_int(0)),
+            ]))
 
     if not options_list:
         options_list.append(_amf3_object([
@@ -1815,6 +1941,8 @@ def _build_scene_change_response(correlation_id: str, target_scene: int, x: int,
 
 
 
+    # Note: error_code and request_code are omitted so OPDataManager keeps m_errorCode=-1,
+    # which enables CMainScene::OnNetPackageEPv to execute bl resetMainScene and load mainscene_<target_scene>
     fields = [
 
         ("scene_id",     _amf3_int(target_scene)),
@@ -1822,10 +1950,6 @@ def _build_scene_change_response(correlation_id: str, target_scene: int, x: int,
         ("scene_x",      _amf3_int(x)),
 
         ("scene_y",      _amf3_int(y)),
-
-        ("request_code", _amf3_int(0)),
-
-        ("error_code",   _amf3_int(0)),
 
     ]
 
@@ -1871,31 +1995,23 @@ def _complete_current_task() -> None:
         completed.append(current)
 
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cur = conn.cursor()
-        cur.execute("SELECT reward_copper, reward_experience, reward_item_1, reward_item_amount_1, reward_item_2, reward_item_amount_2 FROM cfg_task WHERE cfg_task_id = ?", (current,))
-        r = cur.fetchone()
-        if r:
+        t_cfg = get_task(current)
+        if t_cfg:
             # ★ FIX: copper 封顶 999999999, exp 加到 role["exp"] 里
-            role["copper"] = min(role.get("copper", 0) + (r[0] or 0), 999999999)
+            role["copper"] = min(role.get("copper", 0) + int(t_cfg.get("reward_copper") or 0), 999999999)
             role.setdefault("exp", 0)
-            role["exp"] = role.get("exp", 0) + (r[1] or 0)
-            it1, amt1 = r[2], r[3]
-            it2, amt2 = r[4], r[5]
+            role["exp"] = role.get("exp", 0) + int(t_cfg.get("reward_experience") or 0)
+            it1, amt1 = t_cfg.get("reward_item_1"), t_cfg.get("reward_item_amount_1")
+            it2, amt2 = t_cfg.get("reward_item_2"), t_cfg.get("reward_item_amount_2")
             if it1 and amt1 and int(it1) > 0 and int(amt1) > 0:
                 _add_item_to_bag(int(it1), int(amt1))
             if it2 and amt2 and int(it2) > 0 and int(amt2) > 0:
                 _add_item_to_bag(int(it2), int(amt2))
 
-        # ★ FIX: exp 升级循环 — 用 cfg_level_experience 表
-        cur.execute("SELECT experience_need FROM cfg_level_experience WHERE level = ?", (role["level"],))
-        while True:
-            cur.execute("SELECT experience_need FROM cfg_level_experience WHERE level = ?", (role["level"],))
-            row = cur.fetchone()
-            if not row:
-                break
-            exp_need = int(row[0])
-            if role["exp"] >= exp_need and role["level"] < 100:
+        # ★ FIX: exp 升级循环 — 用 config_loader 内存表
+        while role["level"] < 100:
+            exp_need = get_exp_need(role["level"])
+            if exp_need > 0 and role["exp"] >= exp_need:
                 role["exp"] -= exp_need
                 role["level"] += 1
                 role.setdefault("skill_point", 0)
@@ -1905,16 +2021,7 @@ def _complete_current_task() -> None:
                 break
 
         # 查找主线后续任务
-        next_row = cur.execute("SELECT cfg_task_id FROM cfg_task WHERE require_task = ? ORDER BY cfg_task_id", (current,)).fetchone()
-        if next_row:
-            next_task = int(next_row[0])
-        else:
-            cand = current + 1
-            if cur.execute("SELECT cfg_task_id FROM cfg_task WHERE cfg_task_id = ?", (cand,)).fetchone():
-                next_task = cand
-            else:
-                next_task = None
-        conn.close()
+        next_task = get_next_task(current)
     except Exception as e:
         print(f"  [TASK] error completing task {current}: {e}", flush=True)
         next_task = current + 1
@@ -1944,19 +2051,17 @@ def _check_task_battle_complete(camp_id: int) -> None:
     camp_stars[str(camp_id)] = 3
 
     try:
-        conn = sqlite3.connect(DB_PATH)
-        row = conn.execute("SELECT complete_type, complete_category FROM cfg_task WHERE cfg_task_id = ?", (current_task,)).fetchone()
-        if row and int(row[0]) == 4:
-            target_aid = int(row[1])
-            target_camp_row = conn.execute("SELECT cfg_camp_id FROM cfg_army WHERE cfg_army_id = ?", (target_aid,)).fetchone()
-            target_camp = int(target_camp_row[0]) if target_camp_row else 0
+        t_cfg = get_task(current_task)
+        if t_cfg and int(t_cfg.get("complete_type") or 0) == 4:
+            target_aid = int(t_cfg.get("complete_category") or 0)
+            army_cfg = get_army(target_aid)
+            target_camp = int(army_cfg.get("cfg_camp_id") or 0) if army_cfg else 0
             if camp_id == target_aid or (target_camp > 0 and camp_id == target_camp):
                 role["task_completed"] = True
                 wins[str(target_aid)] = max(wins.get(str(target_aid), 0), 1)
                 camp_stars[str(target_aid)] = 3
                 print(f"  [TASK] Army {target_aid} defeated -> Task {current_task} ready to submit!", flush=True)
                 _save()
-        conn.close()
     except Exception as e:
         print(f"  [TASK] error checking battle task completion: {e}", flush=True)
 
@@ -2234,6 +2339,9 @@ def _build_general_body_amf3() -> bytes:
     except Exception as e:
         print(f"  [TALENT] error building talent list: {e}", flush=True)
 
+    tavern_arr = _build_tavern_generals_array()
+    star_gen = _build_star_general_object()
+
     fields = [
         ("generals",        _build_generals_list()),
         ("formations",      _build_formations_list()),
@@ -2244,6 +2352,10 @@ def _build_general_body_amf3() -> bytes:
         ("general_data",    _build_general_data()),
         ("talent_list",     _amf3_array(talent_list)),
         ("passive_skill_list", _build_passive_candidates()),
+        ("TAVERN_GENERALS", tavern_arr),
+        ("tavern_generals", tavern_arr),
+        ("STAR_GENERAL",    star_gen),
+        ("star_general",    star_gen),
         ("request_code",    _amf3_int(0)),
         ("error_code",      _amf3_int(0)),
     ]
@@ -2252,6 +2364,375 @@ def _build_general_body_amf3() -> bytes:
 
 def _build_general_response(correlation_id: str) -> bytes:
     return _make_ack_message(correlation_id, _build_general_body_amf3())
+
+
+def _build_skill_awaken_response(correlation_id: str, gen_id: int, skill_id: int) -> bytes:
+    role = _get_role()
+    fields = [
+        ("general_id",         _amf3_int(int(gen_id))),
+        ("cfg_skill_id",       _amf3_int(int(skill_id))),
+        ("skill_point",        _amf3_int(int(role.get("skill_point", 50)))),
+        ("copper",             _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",               _amf3_int(int(role.get("gold", 5000)))),
+        ("generals",           _build_generals_list()),
+        ("general_data",       _build_general_data()),
+        ("passive_skill_list", _build_passive_candidates()),
+        ("request_code",       _amf3_int(0)),
+        ("error_code",         _amf3_int(0)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _build_fire_response(correlation_id: str, target_id: int, cfg_id: int) -> bytes:
+    role = _get_role()
+    tavern_arr = _build_tavern_generals_array()
+    star_gen = _build_star_general_object()
+    fields = [
+        ("ret",             _amf3_int(0)),
+        ("result",          _amf3_int(1)),
+        ("id",              _amf3_int(int(target_id))),
+        ("general_id",      _amf3_int(int(target_id))),
+        ("cfg_general_id",  _amf3_int(int(cfg_id))),
+        ("generals",        _build_generals_list()),
+        ("formations",      _build_formations_list()),
+        ("formation_level", _amf3_int(1)),
+        ("copper",          _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",            _amf3_int(int(role.get("gold", 5000)))),
+        ("exploit",         _amf3_int(int(role.get("exploit", 1000)))),
+        ("general_data",    _build_general_data()),
+        ("talent_list",     _amf3_array([])),
+        ("passive_skill_list", _build_passive_candidates()),
+        ("TAVERN_GENERALS", tavern_arr),
+        ("tavern_generals", tavern_arr),
+        ("STAR_GENERAL",    star_gen),
+        ("star_general",    star_gen),
+        ("request_code",    _amf3_int(0)),
+        ("error_code",      _amf3_int(0)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _make_tavern_general_amf3(gid: int, name: str, qual: int, star: int, job: int, silver: int, gold: int, is_rec: int) -> bytes:
+    fields = [
+        ("id",             _amf3_int(gid)),
+        ("general_id",     _amf3_int(gid)),
+        ("cfg_general_id", _amf3_int(gid)),
+        ("name",           _amf3_string(name)),
+        ("quality",        _amf3_int(qual)),
+        ("star",           _amf3_int(star)),
+        ("job",            _amf3_int(job)),
+        ("level",          _amf3_int(1)),
+        ("silver",         _amf3_int(silver)),
+        ("cost_silver",    _amf3_int(silver)),
+        ("gold",           _amf3_int(gold)),
+        ("cost_gold",      _amf3_int(gold)),
+        ("cost",           _amf3_int(silver)),
+        ("is_recruit",     _amf3_int(is_rec)),
+        ("status",         _amf3_int(is_rec)),
+    ]
+    return _amf3_object(fields)
+
+
+def _get_tavern_candidates():
+    # 低级酒馆（谢尔兹镇东海酒馆）：排除SS级索隆(10061202)，配置东海标准卡池
+    return [
+        (10042230, "贝鲁梅伯", 4, 1, 10002, 500,  0),
+        (10041220, "亚尔丽塔", 4, 1, 10001, 500,  0),
+        (10041228, "蒙卡",     4, 1, 10001, 500,  0),
+        (10041229, "摩奇",     4, 1, 10001, 500,  0),
+        (10052199, "巴基",     5, 2, 10002, 800,  0),
+    ]
+
+
+def _build_tavern_generals_array():
+    role = _get_role()
+    recruited_ids = set()
+    for g in role.get("generals", []):
+        if isinstance(g, dict) and "cfg_general_id" in g:
+            recruited_ids.add(int(g["cfg_general_id"]))
+
+    tavern_list = []
+    for gid, name, qual, star, job, silver, gold in _get_tavern_candidates():
+        is_rec = 1 if gid in recruited_ids else 0
+        tavern_list.append(_make_tavern_general_amf3(gid, name, qual, star, job, silver, gold, is_rec))
+    return _amf3_array(tavern_list)
+
+
+def _build_star_general_object(general_id: int = 10042230, exp: int = 0, free_times: int = 5):
+    fields = [
+        ("star",        _amf3_int(2)),
+        ("exp",         _amf3_int(exp)),
+        ("max_exp",     _amf3_int(100)),
+        ("free_times",  _amf3_int(free_times)),
+        ("cd_time",     _amf3_int(0)),
+        ("silver_cost", _amf3_int(1000)),
+        ("gold_cost",   _amf3_int(10)),
+        ("general_id",  _amf3_int(general_id)),
+    ]
+    return _amf3_object(fields)
+
+
+def _make_treat_general_amf3(gid: int, name: str, job: int, qual: int, face: int, fig: int, cost: int,
+                             str_g: int = 250, agi_g: int = 220, sta_g: int = 280, int_g: int = 150,
+                             str_c: int = 100, agi_c: int = 100, sta_c: int = 100, int_c: int = 100) -> bytes:
+    fields = [
+        ("cfg_general_id", _amf3_int(gid)),
+        ("name",           _amf3_string(name)),
+        ("job",            _amf3_int(job)),
+        ("quality",        _amf3_int(qual)),
+        ("face",           _amf3_int(face)),
+        ("figure",         _amf3_int(fig)),
+        ("cost",           _amf3_int(cost)),
+        ("str_grow",       _amf3_int(int(str_g))),
+        ("agi_grow",       _amf3_int(int(agi_g))),
+        ("sta_grow",       _amf3_int(int(sta_g))),
+        ("int_grow",       _amf3_int(int(int_g))),
+        ("strength_ceil",  _amf3_int(int(str_c))),
+        ("agility_ceil",   _amf3_int(int(agi_c))),
+        ("stamina_ceil",   _amf3_int(int(sta_c))),
+        ("intellect_ceil", _amf3_int(int(int_c))),
+    ]
+    return _amf3_object(fields)
+
+
+# 东海谢尔兹镇酒馆正式卡池 (场景 2002, 初始等级 1~20)
+# A级品质伙伴 (Quality 4, 紫色, 招募消耗 500 铜币)
+# 贝鲁梅伯 10042230 为任务 100024 "新船员加入" 剧情指定招募伙伴
+EAST_BLUE_POOL = [
+    # cfg_id, name, job, qual, face, fig, cost, str_g, agi_g, sta_g, int_g, str_c, agi_c, sta_c, int_c
+    (10042230, "贝鲁梅伯", 10002, 4, 10073, 10073,  500, 33, 38, 16, 13,  40, 46, 19, 16),
+    (10041220, "亚尔丽塔", 10001, 4, 10012, 10012,  500, 30, 19, 39, 12,  36, 23, 47, 14),
+    (10041228, "蒙卡",     10001, 4, 10010, 10010,  500, 27, 16, 46, 11,  32, 19, 55, 13),
+    (10041229, "卡巴吉",   10001, 4, 10074, 10074,  500, 29, 32, 25, 14,  35, 38, 30, 17),
+    (10041231, "摩奇",     10001, 4, 10078, 10078,  500, 26, 25, 32, 17,  31, 30, 38, 20),
+    (10043235, "赞高",     10003, 4, 10083, 10083,  500, 13, 30, 20, 37,  16, 36, 24, 44),
+    (10042233, "山姆",     10002, 4, 10090, 10090,  500, 27, 45, 15, 13,  32, 54, 18, 16),
+    (10041234, "布奇",     10001, 4, 10089, 10089,  500, 31, 15, 44, 10,  37, 18, 53, 12),
+]
+
+# 东海酒馆传奇伙伴预览池 (Quality 5 S级橙色，用于 tavern_epic 展示，800 铜币)
+EAST_BLUE_EPIC = [
+    (10052199, "巴基",     10002, 5, 10011, 10011,  800, 42, 48, 18, 12,  50, 58, 22, 14),
+    (10051237, "阿金",     10001, 5, 10087, 10087,  800, 37, 21, 38, 24,  44, 25, 46, 29),
+]
+
+ALL_TAVERN_MAP = {c[0]: c for c in EAST_BLUE_POOL + EAST_BLUE_EPIC}
+
+
+def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recruit: bool = False, is_open_card: bool = False, open_idx: int = 0) -> bytes:
+    role = _get_role()
+    round_state = role.get("tavern_round")
+
+    # Determine if this is a fresh draw request (clicked 召集令)
+    req_type = 0
+    if body and isinstance(body, list) and len(body) >= 3 and isinstance(body[2], int):
+        req_type = body[2]
+
+    # Case 1: Player clicked 召集令 (req_type in [1, 2, 3])
+    if req_type in [1, 2, 3] and not is_open_card and not is_recruit:
+        # Guarantee 贝鲁梅伯 (10042230) for Task 100024
+        guarantee_id = 10042230 if role.get("current_task") == 100024 else None
+        
+        # Pick 5 unique candidate cards from East Blue pool
+        pool_ids = [c[0] for c in EAST_BLUE_POOL]
+        epic_ids = [c[0] for c in EAST_BLUE_EPIC]
+        drawn = []
+        if guarantee_id and guarantee_id in pool_ids:
+            drawn.append(guarantee_id)
+            pool_ids.remove(guarantee_id)
+        
+        # Add 1 epic preview or pool card
+        import random
+        if epic_ids:
+            epic_pick = random.choice(epic_ids)
+            drawn.append(epic_pick)
+        
+        # Fill rest from pool
+        random.shuffle(pool_ids)
+        while len(drawn) < 5 and pool_ids:
+            drawn.append(pool_ids.pop())
+        
+        random.shuffle(drawn)
+        
+        # Deduct cost
+        if req_type == 1:
+            role["copper"] = max(role.get("copper", 100000) - 1000, 0)
+        elif req_type == 2:
+            role["gold"] = max(role.get("gold", 5000) - 50, 0)
+        elif req_type == 3:
+            role["gold"] = max(role.get("gold", 5000) - 100, 0)
+
+        round_state = {
+            "cfg_ids": drawn,
+            "open_generals": [0, 0, 0, 0, 0],
+            "open_count": 0,
+            "type": req_type,
+        }
+        role["tavern_round"] = round_state
+        print(f"  [TAVERN TREAT] Fresh draw type={req_type}, cards={drawn}", flush=True)
+        _save()
+
+    # Case 2: Player flipped a card (GENERAL.openCard, 0xd6)
+    elif is_open_card:
+        if not round_state or "cfg_ids" not in round_state:
+            round_state = {
+                "cfg_ids": [10042230, 10041220, 10041228, 10041229, 10052199],
+                "open_generals": [0, 0, 0, 0, 0],
+                "open_count": 0,
+                "type": 1,
+            }
+            role["tavern_round"] = round_state
+
+        slot = max(0, min(open_idx, 4))
+        if round_state["open_generals"][slot] == 0:
+            revealed = round_state["cfg_ids"][slot]
+            round_state["open_generals"][slot] = revealed
+            round_state["open_count"] += 1
+            print(f"  [TAVERN OPEN] Flipped slot {slot + 1} -> {revealed} (open_count={round_state['open_count']})", flush=True)
+            _save()
+
+    # Default / Init: if no active round, initialize preview
+    if not round_state or "cfg_ids" not in round_state:
+        round_state = {
+            "cfg_ids": [10042230, 10041220, 10041228, 10041229, 10052199],
+            "open_generals": [0, 0, 0, 0, 0],
+            "open_count": 0,
+            "type": 1,
+        }
+        role["tavern_round"] = round_state
+
+    cfg_ids = round_state.get("cfg_ids", [10042230, 10041220, 10041228, 10041229, 10052199])
+    open_gens = round_state.get("open_generals", [0, 0, 0, 0, 0])
+    open_cnt = round_state.get("open_count", 0)
+    current_type = round_state.get("type", 1)
+
+    # Build tavern generals array from candidate info
+    gen_objs = []
+    for gid in cfg_ids:
+        c_info = ALL_TAVERN_MAP.get(gid)
+        if c_info:
+            gen_objs.append(_make_treat_general_amf3(*c_info))
+        else:
+            gen_objs.append(_make_treat_general_amf3(gid, "船员", 10001, 4, 10012, 10012, 500))
+    tavern_generals_arr = _amf3_array(gen_objs)
+    tavern_epic_arr = _amf3_array([_amf3_int(10052199), _amf3_int(10051237)])
+
+    star_gen_id = cfg_ids[0]
+    star_gen = _build_star_general_object(star_gen_id, 0, 5)
+
+    talent_list = [
+        _amf3_object([("talent_id", _amf3_int(101)), ("level", _amf3_int(1))]),
+        _amf3_object([("talent_id", _amf3_int(102)), ("level", _amf3_int(1))]),
+    ]
+
+    # Exactly match all 22 required fields in OPDataManager::onTreat in libOnePiece.so
+    fields = [
+        ("gold",            _amf3_int(int(role.get("gold", 5000)))),
+        ("copper",          _amf3_double(float(role.get("copper", 100000)))),
+        ("junior_token",    _amf3_int(10)),
+        ("middle_token",    _amf3_int(5)),
+        ("advance_token",   _amf3_int(2)),
+        ("free_token",      _amf3_int(1)),
+        ("scene_id",        _amf3_int(int(role.get("scene_id", 2002)))),
+        ("recruit",         _amf3_int(1 if open_cnt > 0 else 0)),
+        ("type",            _amf3_int(current_type)),
+        ("open_count",      _amf3_int(open_cnt)),
+        ("cfg_general_id1", _amf3_int(cfg_ids[0])),
+        ("cfg_general_id2", _amf3_int(cfg_ids[1])),
+        ("cfg_general_id3", _amf3_int(cfg_ids[2])),
+        ("cfg_general_id4", _amf3_int(cfg_ids[3])),
+        ("cfg_general_id5", _amf3_int(cfg_ids[4])),
+        ("open_general1",   _amf3_int(open_gens[0])),
+        ("open_general2",   _amf3_int(open_gens[1])),
+        ("open_general3",   _amf3_int(open_gens[2])),
+        ("open_general4",   _amf3_int(open_gens[3])),
+        ("open_general5",   _amf3_int(open_gens[4])),
+        ("tavern_epic",     tavern_epic_arr),
+        ("tavern_generals", tavern_generals_arr),
+        ("generals",        _build_generals_list()),
+        ("formations",      _build_formations_list()),
+        ("formation_level", _amf3_int(1)),
+        ("general_data",    _build_general_data()),
+        ("talent_list",     _amf3_array(talent_list)),
+        ("passive_skill_list", _build_passive_candidates()),
+        ("TAVERN_GENERALS", tavern_generals_arr),
+        ("STAR_GENERAL",    star_gen),
+        ("star_general",    star_gen),
+        ("error_code",      _amf3_int(0)),
+        ("request_code",    _amf3_int(0)),
+    ]
+
+    # For openCard response, also include index and revealed general id
+    if is_open_card and 0 <= open_idx < 5:
+        fields.extend([
+            ("index",          _amf3_int(open_idx + 1)),
+            ("general_id",     _amf3_int(open_gens[open_idx])),
+            ("cfg_general_id", _amf3_int(open_gens[open_idx])),
+        ])
+
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_tavern_open_card(correlation_id: str, body: list) -> bytes:
+    # body: [role_id, code, index] (index: 1~5)
+    open_idx = 0
+    if isinstance(body, list) and len(body) >= 3 and isinstance(body[2], int):
+        open_idx = body[2] - 1
+    elif isinstance(body, dict):
+        val = body.get("3_index") or body.get("index") or 1
+        open_idx = int(val) - 1
+    return _build_tavern_treat_response(correlation_id, body, is_open_card=True, open_idx=open_idx)
+
+
+def _build_tavern_recruit_response(correlation_id: str, body: list) -> bytes:
+    role = _get_role()
+    target_gid = 10042230
+    if body and isinstance(body, list):
+        if len(body) > 2 and body[2]:
+            try:
+                target_gid = int(body[2])
+            except Exception:
+                pass
+        elif len(body) > 0:
+            if isinstance(body[0], dict):
+                target_gid = int(body[0].get("cfg_general_id") or body[0].get("general_id") or 10042230)
+            elif isinstance(body[0], int) and body[0] > 100:
+                target_gid = body[0]
+
+    c_info = ALL_TAVERN_MAP.get(target_gid, EAST_BLUE_POOL[0])
+    gid, g_name, g_job, g_qual, g_face, g_fig, cost, *_ = c_info
+
+    role.setdefault("generals", [])
+    recruited_ids = {g.get("cfg_general_id") for g in role["generals"] if isinstance(g, dict)}
+    if target_gid not in recruited_ids:
+        role["generals"].append({
+            "general_id": target_gid,
+            "cfg_general_id": target_gid,
+            "name": g_name,
+            "quality": g_qual,
+            "star": 2,
+            "job": g_job,
+            "figure": g_fig,
+            "face": g_face,
+            "level": 1,
+            "skill": 51001,
+            "experience": 0,
+        })
+        print(f"  [TAVERN RECRUIT] Recruited new crew member: {g_name} (id={target_gid})", flush=True)
+
+    role["copper"] = max(role.get("copper", 100000) - cost, 0)
+
+    # 任务 100024 "新船员加入" 联动完成
+    if role.get("current_task") == 100024:
+        role["task_completed"] = True
+        print(f"  [TASK 100024] Recruited crew member -> Task 100024 completed and ready to submit!", flush=True)
+
+    _save()
+    return _build_tavern_treat_response(correlation_id, is_recruit=True)
+
+
+def _build_tavern_info_response(correlation_id: str) -> bytes:
+    return _build_tavern_treat_response(correlation_id)
 
 
 
@@ -2456,6 +2937,7 @@ def _build_item_response(correlation_id: str) -> bytes:
         ("exploit",      _amf3_int(int(role.get("exploit", 0)))),
         ("items",        items_amf3),
         ("item_data",    _build_item_data()),
+        ("generals",     _build_generals_list()),
         ("request_code", _amf3_int(0)),
         ("error_code",   _amf3_int(0)),
     ]
@@ -2471,10 +2953,15 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
     if "using" in op_lower or "use" in op_lower:
         # body: [role_id, code, general_id, item_id]
         item_id = None
+        target_gen_id = role.get("figure", 1008)
         if isinstance(body, list) and len(body) >= 4:
+            target_gen_id = body[2]
             item_id = body[3]
         elif isinstance(body, list) and len(body) >= 1:
             item_id = body[-1]
+        elif isinstance(body, dict):
+            item_id = body.get("4_itemId") or body.get("itemId") or body.get("item_id")
+            target_gen_id = body.get("3_generalId") or body.get("generalId") or target_gen_id
         
         target_item = None
         for it in items:
@@ -2489,13 +2976,13 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                 slot_name = SLOT_NAME_MAP[part]
                 # 穿戴装备：卸下原本槽位中的同部位装备
                 for it in items:
-                    if _get_item_part(it) == part and it.get("equiped"):
+                    if _get_item_part(it) == part and it.get("equiped") and it.get("general_id") == target_gen_id:
                         it["equiped"] = 0
                         it["general_id"] = 0
                 target_item["equiped"] = 1
-                target_item["general_id"] = role.get("figure", 1008)
+                target_item["general_id"] = target_gen_id
                 equipments[slot_name] = target_item["item_id"]
-                print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} (part {part})", flush=True)
+                print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on general {target_gen_id}", flush=True)
             else:
                 amt = target_item.get("amount", 1) - 1
                 if amt <= 0:
@@ -2511,7 +2998,15 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
 
     elif "unequip" in op_lower:
         # body: [role_id, code, general_id, slot_or_id]
-        slot_or_id = body[3] if isinstance(body, list) and len(body) >= 4 else None
+        target_gen_id = role.get("figure", 1008)
+        slot_or_id = None
+        if isinstance(body, list) and len(body) >= 4:
+            target_gen_id = body[2]
+            slot_or_id = body[3]
+        elif isinstance(body, dict):
+            target_gen_id = body.get("3_generalId") or target_gen_id
+            slot_or_id = body.get("4_part") or body.get("part")
+        
         target_item = None
         if isinstance(slot_or_id, int):
             if slot_or_id >= 1000:
@@ -2520,10 +3015,9 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                         target_item = it
                         break
             else:
-                # 客户端发出的卸下参数 body[3] 就是部位 part 本身 (1:武器, 2:衣服, 3:鞋子, 4:披风, 5:帽子, 6:戒指)
                 target_part = slot_or_id
                 for it in items:
-                    if _get_item_part(it) == target_part and it.get("equiped"):
+                    if _get_item_part(it) == target_part and it.get("equiped") and it.get("general_id") == target_gen_id:
                         target_item = it
                         break
         
@@ -2533,7 +3027,7 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
             part = _get_item_part(target_item)
             if part in SLOT_NAME_MAP:
                 equipments[SLOT_NAME_MAP[part]] = 0
-            print(f"  [UNEQUIP] Unequipped item {target_item.get('item_id')} (cfg {target_item.get('cfg_item_id')}, part {part})", flush=True)
+            print(f"  [UNEQUIP] Unequipped item {target_item.get('item_id')} (cfg {target_item.get('cfg_item_id')}, part {part}) from general {target_gen_id}", flush=True)
         _save()
 
     return _build_item_response(correlation_id)
@@ -2719,31 +3213,27 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
 
 
     # CommandMessage ping
-
     try:
-
         v = envelope["bodies"][0]["value"]
-
         if isinstance(v, list) and v:
-
             v = v[0]
-
         if isinstance(v, AMFObject):
-
             v = plain(v)
-
         if isinstance(v, dict) and v.get("$class") == "flex.messaging.messages.CommandMessage":
-
             print("  -> ping ACK", flush=True)
-
             return client_ping_reply(payload)
-
     except Exception:
-
         pass
 
+    try:
+        return _dispatch_operation(operation, correlation_id, body, envelope, payload)
+    except Exception as exc:
+        print(f"  [DISPATCH_CATCHALL] Error handling operation {operation!r}: {exc}", flush=True)
+        import traceback; traceback.print_exc()
+        return _build_simple_ack(correlation_id, code=0)
 
 
+def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope: dict, payload: bytes) -> bytes:
     op_upper = operation.upper()
 
 
@@ -2861,12 +3351,12 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
             b3 = int(body[3]) if len(body) > 3 else 0
             
             if b2 >= 2001:
-                # 真实的切换场景请求
+                # 真实的切换场景请求 -> 使用 scene_change 回包以触发 resetMainScene
                 sid = b2
                 sx = b3
                 sy = int(body[4]) if len(body) > 4 else 35
-                print(f"  -> scene enter sid={sid} ({sx}, {sy})", flush=True)
-                return _build_scene_response(correlation_id, sid, sx, sy)
+                print(f"  -> scene enter/change sid={sid} ({sx}, {sy})", flush=True)
+                return _build_scene_change_response(correlation_id, sid, sx, sy)
             else:
                 # 场景内移动寻路: b2 是 target_x, b3 是 target_y
                 tx = b2 if b2 > 0 else role.get("scene_x", 361)
@@ -2973,9 +3463,11 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
         op_name = op_upper.split(".")[-1]
 
         if "SKILLAWAKEN" in op_name.upper():
-            # 船员技能槽解锁 — body=[role_id, cfg_skill_id_or_empty, general_id, slot_idx]
+            # 船员技能槽解锁/领悟 — body=[role_id, cfg_skill_id_or_empty, general_id, slot_idx]
             role = _get_role()
-            role.setdefault("skill_point", 0)
+            role.setdefault("skill_point", 50)
+            if role["skill_point"] <= 0:
+                role["skill_point"] = 50
             role.setdefault("awakened_skills", {})  # {general_id_str: {slot_idx: cfg_skill_id}}
 
             gen_id = None
@@ -2999,31 +3491,32 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
 
             print(f"  [skillAwaken] gen={gen_id}, slot={slot_idx}, client_picked={client_picked_skill}", flush=True)
 
+            skill_id = 0
             if gen_id and slot_idx:
                 aw_key = str(gen_id)
                 role["awakened_skills"].setdefault(aw_key, {})
-                if slot_idx in role["awakened_skills"][aw_key]:
-                    print(f"  [skillAwaken] general {gen_id} slot {slot_idx} already unlocked", flush=True)
-                elif role["skill_point"] <= 0:
-                    print(f"  [skillAwaken] no skill_point left!", flush=True)
+
+                # ★ 收集已解锁的技能，exclude 掉避免重复
+                existing_skills = set()
+                if aw_key in role["awakened_skills"]:
+                    for sidx, sinfo in role["awakened_skills"][aw_key].items():
+                        if str(sidx) != str(slot_idx):
+                            existing_skills.add(sinfo.get("cfg_skill_id") if isinstance(sinfo, dict) else int(sinfo))
+                print(f"  [skillAwaken] excluding existing: {existing_skills}", flush=True)
+
+                # ★ 客户端选了就用客户端的，没选才随机
+                if client_picked_skill:
+                    skill_id = client_picked_skill
+                    print(f"  [skillAwaken] using CLIENT-PICKED skill {skill_id}", flush=True)
                 else:
-                    # ★ 收集已解锁的技能，exclude 掉避免重复
-                    existing_skills = set()
-                    if aw_key in role["awakened_skills"]:
-                        for sidx, sinfo in role["awakened_skills"][aw_key].items():
-                            if sidx != slot_idx:
-                                existing_skills.add(sinfo.get("cfg_skill_id"))
-                    print(f"  [skillAwaken] excluding existing: {existing_skills}", flush=True)
-                    # ★ 客户端选了就用客户端的，没选才随机
-                    if client_picked_skill:
-                        skill_id = client_picked_skill
-                        print(f"  [skillAwaken] using CLIENT-PICKED skill {skill_id}", flush=True)
-                    else:
-                        skill_id = _pick_skill_for_slot(gen_id, slot_idx, exclude=existing_skills)
-                        print(f"  [skillAwaken] random skill {skill_id}", flush=True)
-                    role["awakened_skills"][aw_key][slot_idx] = {"cfg_skill_id": skill_id, "level": 1}
-                    role["skill_point"] -= 1
-                    print(f"  [skillAwaken] general {gen_id} slot {slot_idx} → skill {skill_id} (level=1, sp={role['skill_point']})", flush=True)
+                    skill_id = _pick_skill_for_slot(gen_id, slot_idx, exclude=existing_skills)
+                    print(f"  [skillAwaken] random skill {skill_id}", flush=True)
+
+                role["awakened_skills"][aw_key][str(slot_idx)] = {"cfg_skill_id": skill_id, "level": 1}
+                role["skill_point"] = max(0, role["skill_point"] - 1)
+                print(f"  [skillAwaken] general {gen_id} slot {slot_idx} → skill {skill_id} (level=1, sp={role['skill_point']})", flush=True)
+                _save()
+                return _build_skill_awaken_response(correlation_id, gen_id, skill_id)
             else:
                 print(f"  [skillAwaken] PARSE FAILED body={body}", flush=True)
 
@@ -3053,16 +3546,19 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
             freed = 0
             if gen_id is not None and slot_idx is not None and str(gen_id) in role["awakened_skills"]:
                 slots = role["awakened_skills"][str(gen_id)]
-                if slot_idx in slots:
+                if str(slot_idx) in slots:
+                    del slots[str(slot_idx)]
+                    freed = 1
+                elif slot_idx in slots:
                     del slots[slot_idx]
                     freed = 1
-                    if not slots:
-                        del role["awakened_skills"][str(gen_id)]
+                if not slots:
+                    del role["awakened_skills"][str(gen_id)]
             if not freed:
                 # 兜底：解析失败时按旧逻辑清空全部（避免卡住无法重置）
                 freed = sum(len(slots) for slots in role["awakened_skills"].values())
                 role["awakened_skills"] = {}
-            role["skill_point"] = role.get("skill_point", 0) + freed
+            role["skill_point"] = role.get("skill_point", 50) + freed
             _save()
             print(f"  -> skillClean OK (gen={gen_id}, slot={slot_idx}, freed {freed} skill_point, total={role['skill_point']})", flush=True)
             return _build_general_response(correlation_id)
@@ -3158,8 +3654,87 @@ def dispatch_amf(payload: bytes, stamp: str) -> bytes:
             print(f"  -> formation OK", flush=True)
             return _build_general_response(correlation_id)
 
+        if "FIRE" in op_upper or "FIRE" in op_name.upper():
+            role = _get_role()
+            target_id = None
+            if isinstance(body, list) and len(body) >= 3:
+                target_id = body[2]
+            elif isinstance(body, dict):
+                target_id = body.get("3_generalId") or body.get("generalId") or body.get("general_id") or body.get("3_targetId") or body.get("target_id") or body.get("3_id") or body.get("id")
+            
+            fired_cfg_id = 0
+            if target_id is not None:
+                try:
+                    target_id = int(target_id)
+                except Exception:
+                    pass
+                generals = role.get("generals", [])
+                removed_gen = None
+                for g in list(generals):
+                    if isinstance(g, dict) and (g.get("general_id") == target_id or g.get("cfg_general_id") == target_id or g.get("id") == target_id):
+                        generals.remove(g)
+                        removed_gen = g
+                        fired_cfg_id = int(g.get("cfg_general_id", target_id))
+                        break
+                
+                # Clean awakened skills
+                role.setdefault("awakened_skills", {}).pop(str(target_id), None)
+                if fired_cfg_id:
+                    role.setdefault("awakened_skills", {}).pop(str(fired_cfg_id), None)
+                
+                # Unequip items worn by target_id
+                items = _get_player_items()
+                for it in items:
+                    if it.get("general_id") in [target_id, fired_cfg_id]:
+                        it["general_id"] = 0
+                        it["equiped"] = 0
+                
+                print(f"  [GENERAL.fire] Dismissed crew member {target_id} ({removed_gen.get('name') if removed_gen else 'unknown'})", flush=True)
+                _save()
+            return _build_fire_response(correlation_id, target_id or 0, fired_cfg_id or 0)
+
+        if "OPENCARD" in op_upper:
+            print(f"  -> tavern openCard handler: {operation} body={body}", flush=True)
+            return _handle_tavern_open_card(correlation_id, body)
+
+        if "TREAT" in op_upper or "RECRUITTAVERN" in op_upper:
+            # 客户端 CDlgTavern 点击召集令 (初级/中级/高级)，发送 0xd7 -> recruitTavern body=[roleId, code, type, sceneId]
+            print(f"  -> tavern treat/recruitTavern (召集令) handler: {operation} body={body}", flush=True)
+            return _build_tavern_treat_response(correlation_id, body, is_recruit=False)
+
+        if "RECRUIT" in op_upper:
+            # 检查如果是点击召集令传递的参数格式 [role_id, code, type, scene_id] 且 type in [1, 2, 3]
+            if isinstance(body, list) and len(body) >= 3 and isinstance(body[2], int) and body[2] in [1, 2, 3]:
+                print(f"  -> recruit with type {body[2]} is 召集令: {operation} body={body}", flush=True)
+                return _build_tavern_treat_response(correlation_id, body, is_recruit=False)
+            print(f"  -> tavern recruit handler: {operation} body={body}", flush=True)
+            return _build_tavern_recruit_response(correlation_id, body)
+
+        if any(k in op_upper for k in ["TAVERN", "STARGENERAL"]):
+            print(f"  -> tavern info handler: {operation}", flush=True)
+            return _build_tavern_info_response(correlation_id)
+
         print("  -> general data", flush=True)
         return _build_general_response(correlation_id)
+
+
+
+    # ── TAVERN ─────────────────────────────────────────────────────────────────
+    if "TAVERN" in op_upper:
+        if "RECRUITTAVERN" in op_upper or "TREAT" in op_upper:
+            print(f"  -> tavern recruitTavern/treat (召集令): {operation}", flush=True)
+            return _build_tavern_treat_response(correlation_id, body, is_recruit=False)
+        if "RECRUIT" in op_upper:
+            if isinstance(body, list) and len(body) >= 3 and isinstance(body[2], int) and body[2] in [1, 2, 3]:
+                print(f"  -> tavern recruit (type {body[2]} is 召集令): {operation}", flush=True)
+                return _build_tavern_treat_response(correlation_id, body, is_recruit=False)
+            print(f"  -> tavern recruit: {operation}", flush=True)
+            return _build_tavern_recruit_response(correlation_id, body)
+        if "OPENCARD" in op_upper:
+            print(f"  -> tavern openCard: {operation}", flush=True)
+            return _handle_tavern_open_card(correlation_id, body)
+        print(f"  -> tavern info: {operation}", flush=True)
+        return _build_tavern_info_response(correlation_id)
 
 
 
@@ -3325,17 +3900,16 @@ class Handler(BaseHTTPRequestHandler):
 
 
         try:
-
             reply = dispatch_amf(payload, stamp)
-
         except Exception as exc:
-
             print(f"  dispatch error: {exc}", flush=True)
-
             import traceback; traceback.print_exc()
-
-            self._send(500, "text/plain; charset=utf-8", b"internal error\n")
-
+            cid = str(uuid.uuid4()).upper()
+            try:
+                reply = _build_simple_ack(cid, code=0)
+                self._send(200, "application/x-amf", reply)
+            except Exception:
+                self._send(500, "text/plain; charset=utf-8", b"internal error\n")
             return
 
         self._send(200, "application/x-amf", reply)
