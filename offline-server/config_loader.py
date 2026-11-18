@@ -44,6 +44,19 @@ def init_configs(db_file: Optional[Path] = None) -> bool:
         return False
 
     print(f"[CONFIG] Preloading configuration from {DB_PATH} ...")
+    TASKS.clear()
+    NEXT_TASK_MAP.clear()
+    SCENES.clear()
+    CAMPS.clear()
+    ARMIES.clear()
+    MONSTERS.clear()
+    GENERALS.clear()
+    ITEMS.clear()
+    SKILLS.clear()
+    LEVEL_EXP.clear()
+    NPCS_BY_SCENE.clear()
+    OFFICIUM_LIST.clear()
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -183,8 +196,17 @@ def get_task(task_id: int) -> Optional[Dict[str, Any]]:
     return TASKS.get(int(task_id))
 
 
-def get_next_task(current_task_id: int) -> Optional[int]:
+def get_next_task(current_task_id: int, nation: int = 0) -> Optional[int]:
     ensure_loaded()
+    # 0. Faction branch check
+    if current_task_id == 100039:
+        return 120001 if nation == 2 else 110001
+    if nation > 0:
+        for tid, t in TASKS.items():
+            if t.get("require_task") and int(t["require_task"]) == current_task_id:
+                req_nat = int(t.get("require_nation") or 0)
+                if req_nat == nation:
+                    return tid
     # 1. Direct match by require_task map
     if current_task_id in NEXT_TASK_MAP:
         return NEXT_TASK_MAP[current_task_id]

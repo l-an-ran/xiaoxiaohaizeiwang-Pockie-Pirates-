@@ -1922,7 +1922,12 @@ def _build_camp_by_scene_response(correlation_id: str, scene_id: int = 2001) -> 
         print(f"  [CAMP] error in campByScene: {e}", flush=True)
 
     if not camps:
-        fallback_camps = [1004, 1005, 1006] if scene_id == 2002 else [1001, 1002, 1003]
+        if scene_id == 2003:
+            fallback_camps = [1007, 1008, 1009]
+        elif scene_id == 2002:
+            fallback_camps = [1004, 1005, 1006]
+        else:
+            fallback_camps = [1001, 1002, 1003]
         for cid in fallback_camps:
             camps.append(_amf3_object([
                 ("cfg_camp_id",   _amf3_int(cid)),
@@ -1973,6 +1978,12 @@ def _get_camp_army_list(camp_id: int):
         elif camp_id == 1006:
             armies = [(10601, 1), (10602, 2), (10603, 3), (10604, 4), (10605, 5),
                       (10606, 6), (10607, 7), (10608, 8), (10609, 9), (10610, 10)]
+        elif camp_id == 1007:
+            armies = [(10700 + i, i) for i in range(1, 11)]
+        elif camp_id == 1008:
+            armies = [(10800 + i, i) for i in range(1, 11)]
+        elif camp_id == 1009:
+            armies = [(10900 + i, i) for i in range(1, 16)]
     return armies
 
 
@@ -2141,8 +2152,30 @@ def _complete_current_task() -> None:
             else:
                 break
 
-        # 查找主线后续任务
-        next_task = get_next_task(current)
+        # 查找主线后续任务 (支持阵营分支)
+        nat = role.get("nation", 1) or 1
+        next_task = get_next_task(current, nation=nat)
+
+        # 章节场景平滑切换与位置更新
+        if current == 100039:
+            # 阵营选择完成 -> 传送到对应主城
+            if not role.get("nation"):
+                role["nation"] = 1
+            if role["nation"] == 2:
+                role["scene_id"] = 3002  # 圣克洛伊岛 (海军)
+                role["scene_x"] = 33
+                role["scene_y"] = 292
+            else:
+                role["scene_id"] = 3001  # 西摩志基村 (海贼)
+                role["scene_x"] = 251
+                role["scene_y"] = 345
+            print(f"  [CHAPTER 3] Nation chosen: {role['nation']} -> Teleport to scene {role['scene_id']}", flush=True)
+        elif current in (110006, 120006):
+            # 前往桔子镇 -> 传送到桔子镇
+            role["scene_id"] = 2003
+            role["scene_x"] = 170
+            role["scene_y"] = 256
+            print(f"  [CHAPTER 3] Teleport to Orange Town (scene 2003)!", flush=True)
     except Exception as e:
         print(f"  [TASK] error completing task {current}: {e}", flush=True)
         next_task = current + 1
@@ -2298,6 +2331,18 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         10076: 10042,  # 海军剑士 -> 10042 (见习剑士/刀客小兵)
         10075: 10014,  # 贝鲁梅伯 -> 10014 (剑士队长)
         10073: 10021,  # 斧手亲卫/警卫 -> 10021 (海贼头目)
+        10080: 10014,  # 利基 (驯兽/剑士) -> 10014 (剑士队长)
+        10078: 10009,  # 摩奇 (驯兽师/航海) -> 10009 (魔导法师)
+        10074: 10061,  # 卡巴吉 (曲艺剑士) -> 10061 (精锐刀客)
+        10062: 10021,  # 狡诈神枪手 -> 10021 (重炮头目)
+        10063: 10070,  # 嗜血船医 -> 10070 (船医)
+        10058: 10009,  # 航海士队长 -> 10009 (魔导法师)
+    }
+
+    # Valid open battle skills with complete animations/shades in client
+    VALID_OPEN_SKILLS = {
+        11001, 11003, 11005, 11007, 11008, 12021, 12022, 12024,
+        13042, 13044, 13047, 14061, 14067, 51001, 51004, 51005, 51006, 51009
     }
 
     def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False) -> int:
@@ -2523,6 +2568,16 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 m_skill_id = int(m_row[6] or 11003)
                 m_job = int(m_row[7] or 1)
 
+            if m_skill_id not in VALID_OPEN_SKILLS:
+                if m_job in (10002, 2):
+                    m_skill_id = 12021
+                elif m_job in (10003, 3):
+                    m_skill_id = 13042
+                elif m_job in (10004, 4):
+                    m_skill_id = 14067
+                else:
+                    m_skill_id = 11003
+
             m_render_fig = _get_safe_battle_figure(m_fig, job=m_job, quality=m_qual, is_enemy=True)
             def_gen_elem = _amf3_object([
                 ("position",         _amf3_int(p_slot)),
@@ -2612,9 +2667,6 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     combat_rounds = []
     alive_enemies = [dict(u) for u in def_units]
     alive_players = [dict(u) for u in atk_units]
-
-    # Valid open battle skills with complete animations/shades in client
-    VALID_OPEN_SKILLS = {11001, 11003, 12021, 13042, 13044, 14061, 14067, 51001, 51006, 51009}
 
     # Run up to 15 alternating combat exchanges
     turn = 0
@@ -3793,7 +3845,7 @@ def _build_task_submit_response(correlation_id: str, task_id: int, action: int =
             cur.execute("SELECT complete_type FROM cfg_task WHERE cfg_task_id = ?", (current,))
             r = cur.fetchone()
             conn.close()
-            if r and r[0] in (0, 6, 9, 12, 106, 108):
+            if r and r[0] in (0, 6, 9, 10, 11, 12, 13, 14, 15, 18, 19, 106, 108):
                 role["task_completed"] = True
                 print(f"  [TASK] Accepted talk/equip/feature task {current} (type={r[0]}) -> immediately ready to complete!", flush=True)
             else:
