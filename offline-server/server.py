@@ -737,10 +737,8 @@ ITEM_PART_LOOKUP = {
 # 从 sqlite 动态预载所有装备部位映射 (880+ 种装备)，确保背包所有武器装备均能精准识别部位
 CFG_ITEM_PARTS = {}
 try:
-    import sqlite3
-    _db_p = r"d:\AI\work\xiaoxiaohaizei\clean_onepiece.db"
-    if os.path.exists(_db_p):
-        _conn = sqlite3.connect(_db_p)
+    if os.path.exists(DB_PATH):
+        _conn = sqlite3.connect(DB_PATH)
         _cur = _conn.cursor()
         _cur.execute("SELECT cfg_item_id, part FROM cfg_item WHERE part > 0")
         for _cid, _part in _cur.fetchall():
@@ -765,6 +763,9 @@ def _get_item_part(item: dict) -> int:
     cfg_id = item.get("cfg_item_id", 0)
     if "part" in item and item["part"]:
         return int(item["part"])
+    cfg_info = config_loader.get_item(cfg_id)
+    if cfg_info and cfg_info.get("part"):
+        return int(cfg_info["part"])
     if cfg_id in CFG_ITEM_PARTS:
         return CFG_ITEM_PARTS[cfg_id]
     return ITEM_PART_LOOKUP.get(cfg_id, 0)
@@ -1251,31 +1252,49 @@ def _build_player_items_amf3() -> bytes:
     raw_items = _get_player_items()
     items_amf3: list[bytes] = []
     for item in raw_items:
-        lvl = int(item.get("level", 1))
-        # 装备强化等级必须双向对齐 level 与 star，且至少为 1（由客户端 USER_ITEM+0x10 读取展示）
-        star_val = int(item.get("star", 0))
-        if star_val <= 0:
-            star_val = lvl if lvl > 0 else 1
-            item["star"] = star_val
-        if lvl <= 0:
-            lvl = star_val
-            item["level"] = lvl
-        it = _amf3_object([
+        cfg_id = int(item.get("cfg_item_id", 0))
+        part = _get_item_part(item)
+        cfg_info = config_loader.get_item(cfg_id)
+        is_equip = (part > 0) or (cfg_info and cfg_info.get("type") == 2)
+
+        fields = [
             ("item_id",      _amf3_int(int(item.get("item_id", 0)))),
-            ("cfg_item_id",  _amf3_int(int(item.get("cfg_item_id", 0)))),
-            ("amount",       _amf3_int(int(item.get("amount", 1)))),
-            ("level",        _amf3_int(lvl)),
-            ("star",         _amf3_int(star_val)),
-            ("rise",         _amf3_int(int(item.get("rise", 0)))),
-            ("hole1",        _amf3_int(int(item.get("hole1", 0)))),
-            ("hole2",        _amf3_int(int(item.get("hole2", 0)))),
-            ("hole3",        _amf3_int(int(item.get("hole3", 0)))),
-            ("hole4",        _amf3_int(int(item.get("hole4", 0)))),
-            ("hole5",        _amf3_int(int(item.get("hole5", 0)))),
-            ("hole6",        _amf3_int(int(item.get("hole6", 0)))),
-            ("general_id",   _amf3_int(int(item.get("general_id", 0)))),
-            ("equiped",      _amf3_bool(bool(item.get("equiped", False)))),
-        ])
+            ("cfg_item_id",  _amf3_int(cfg_id)),
+        ]
+
+        if is_equip:
+            lvl = int(item.get("level", 1))
+            # 装备强化等级必须双向对齐 level 与 star，且至少为 1（由客户端 USER_ITEM+0x10 读取展示）
+            star_val = int(item.get("star", 0))
+            if star_val <= 0:
+                star_val = lvl if lvl > 0 else 1
+                item["star"] = star_val
+            if lvl <= 0:
+                lvl = star_val
+                item["level"] = lvl
+            fields.extend([
+                ("level",        _amf3_int(lvl)),
+                ("star",         _amf3_int(star_val)),
+                ("rise",         _amf3_int(int(item.get("rise", 0)))),
+                ("hole1",        _amf3_int(int(item.get("hole1", 0)))),
+                ("hole2",        _amf3_int(int(item.get("hole2", 0)))),
+                ("hole3",        _amf3_int(int(item.get("hole3", 0)))),
+                ("hole4",        _amf3_int(int(item.get("hole4", 0)))),
+                ("hole5",        _amf3_int(int(item.get("hole5", 0)))),
+                ("hole6",        _amf3_int(int(item.get("hole6", 0)))),
+                ("general_id",   _amf3_int(int(item.get("general_id", 0)))),
+                ("equiped",      _amf3_bool(bool(item.get("equiped", False)))),
+            ])
+        else:
+            # 消耗品/材料类道具：客户端 USER_ITEM 0x08 联合体必须只传 amount，绝不可下发 level 覆盖数量
+            amt = int(item.get("amount", 1))
+            fields.extend([
+                ("amount",       _amf3_int(amt)),
+                ("general_id",   _amf3_int(0)),
+                ("equiped",      _amf3_bool(False)),
+            ])
+
+        it = _amf3_object(fields)
         items_amf3.append(it)
     return _amf3_array(items_amf3)
 
@@ -2934,6 +2953,8 @@ def _build_general_body_amf3() -> bytes:
         ("exploit",         _amf3_int(role.get("exploit", 1000))),
         ("general_data",    _build_general_data()),
         ("talent_list",     _amf3_array(talent_list)),
+        ("talent_cooldown", _amf3_int(0)),
+        ("server_time",     _amf3_double(float(int(time.time())))),
         ("passive_skill_list", _build_passive_candidates()),
         ("TAVERN_GENERALS", tavern_arr),
         ("tavern_generals", tavern_arr),
@@ -2947,6 +2968,42 @@ def _build_general_body_amf3() -> bytes:
 
 def _build_general_response(correlation_id: str) -> bytes:
     return _make_ack_message(correlation_id, _build_general_body_amf3())
+
+
+def _handle_talent_request(operation: str, body: Any, correlation_id: str) -> bytes:
+    role = _get_role()
+    role.setdefault("awakened_talents", {})
+    talent_id = None
+    if isinstance(body, list):
+        for item in body:
+            if isinstance(item, int) and item > 100:
+                talent_id = item
+                break
+    elif isinstance(body, dict):
+        talent_id = body.get("3_tanentId") or body.get("tanentId") or body.get("3_talentId") or body.get("talentId") or body.get("cfg_talent_id")
+    elif isinstance(body, str):
+        try:
+            j = json.loads(body)
+            talent_id = j.get("3_tanentId") or j.get("tanentId") or j.get("3_talentId") or j.get("talentId")
+        except Exception:
+            pass
+
+    if talent_id:
+        try:
+            tid_int = int(talent_id)
+            cur_lvl = int(role["awakened_talents"].get(str(tid_int), 0))
+            role["awakened_talents"][str(tid_int)] = cur_lvl + 1
+            print(f"  [TALENT] Upgraded talent {tid_int} to level {cur_lvl + 1}", flush=True)
+
+            # 检查若当前任务为学习天赋(100031)，自动标记完成
+            if role.get("current_task") == 100031:
+                role["task_completed"] = True
+                print("  [TASK] Task 100031 学习天赋 marked completed via talent upgrade", flush=True)
+            _save()
+        except Exception as e:
+            print(f"  [TALENT] Error upgrading talent {talent_id}: {e}", flush=True)
+
+    return _build_general_response(correlation_id)
 
 
 def _build_skill_awaken_response(correlation_id: str, gen_id: int, skill_id: int) -> bytes:
@@ -3304,6 +3361,8 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         ("formation_level", _amf3_int(1)),
         ("general_data",    _build_general_data()),
         ("talent_list",     _amf3_array(talent_list)),
+        ("talent_cooldown", _amf3_int(0)),
+        ("server_time",     _amf3_double(float(int(time.time())))),
         ("passive_skill_list", _build_passive_candidates()),
         ("TAVERN_GENERALS", tavern_generals_arr),
         ("STAR_GENERAL",    star_gen),
@@ -3652,7 +3711,7 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
 
                 target_item["equiped"] = 1
                 if is_proto:
-                    target_item["general_id"] = proto_fig
+                    target_item["general_id"] = 1001
                     equipments[slot_name] = target_item["item_id"]
                     print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on protagonist {proto_fig}", flush=True)
                 else:
@@ -3679,6 +3738,46 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                 else:
                     role["copper"] = role.get("copper", 100000) + 10000
                     print(f"  [ITEM] Used consumable item {item_id} (cfg {cfg_id}) -> copper +10000", flush=True)
+            _save()
+
+    elif "sell" in op_lower:
+        # 物品出售逻辑 (body: [role_id, code, item_id])
+        item_id = None
+        if isinstance(body, list) and len(body) >= 3:
+            item_id = body[2]
+        elif isinstance(body, list) and len(body) >= 1:
+            item_id = body[-1]
+        elif isinstance(body, dict):
+            item_id = body.get("itemId") or body.get("item_id")
+
+        target_item = None
+        for it in items:
+            if it.get("item_id") == item_id:
+                target_item = it
+                break
+
+        if target_item:
+            cfg_id = target_item.get("cfg_item_id", 0)
+            item_cfg = config_loader.get_item(cfg_id)
+            sell_price = 500
+            if item_cfg:
+                sell_price = int(item_cfg.get("sell_price", 500) or 500)
+            if sell_price <= 0:
+                sell_price = int(target_item.get("level", 1)) * 500
+
+            amt = target_item.get("amount", 1)
+            if amt > 1:
+                target_item["amount"] = amt - 1
+            else:
+                if target_item.get("equiped"):
+                    target_item["equiped"] = 0
+                    part = _get_item_part(target_item)
+                    if part in SLOT_NAME_MAP:
+                        equipments[SLOT_NAME_MAP[part]] = 0
+                items.remove(target_item)
+
+            role["copper"] = float(role.get("copper", 100000)) + float(sell_price)
+            print(f"  [ITEM.sell] Sold item {item_id} (cfg {cfg_id}, price +{sell_price}) -> new copper {role['copper']}", flush=True)
             _save()
 
     elif any(k in op_lower for k in ["upgrade", "rise", "forge"]):
@@ -4646,8 +4745,13 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
         print(f"  -> manor training response fallback for {operation}", flush=True)
         return _build_training_response(correlation_id)
 
+    # ── TALENT ─────────────────────────────────────────────────────────────────
+    if "TALENT" in op_upper or "TANENT" in op_upper:
+        print(f"  -> talent handler for {operation}", flush=True)
+        return _handle_talent_request(operation, _extract_body(envelope), correlation_id)
+
     # ── ITEM ───────────────────────────────────────────────────────────────────
-    if "ITEM" in op_upper or any(k in op_upper for k in ["USING", "UNEQUIP", "UPGRADE", "FORGE", "RISE", "HAKI", "GEM"]):
+    if "ITEM" in op_upper or any(k in op_upper for k in ["USING", "SELL", "UNEQUIP", "UPGRADE", "FORGE", "RISE", "HAKI", "GEM"]):
         print(f"  -> item ACK for {operation}", flush=True)
         return _handle_item_request(operation, _extract_body(envelope), correlation_id)
 
