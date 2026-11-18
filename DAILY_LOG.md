@@ -643,3 +643,69 @@
 1. 单元测试套件 `test_polish_suite.py` 全量通过（验证普通培养消耗、随机浮动、上限截断、替换生效、维持丢弃、110004 任务判定与 110005 推进流转）；
 2. 本地服务守护进程重新加载并在 `0.0.0.0:8080` 稳定运行；
 3. 玩家角色：船长 Lv20，当前任务：110004 属性培养。
+
+
+---
+
+## 2026-11-19 专项修复日志：任务奖励结算、日常任务与酒杯兑换、VIP商城/直充到账、背包全部使用及100级测试环境
+
+### 一、核心攻坚背景与协同
+在 **Google AI Studio / Gemini 网页端 (Gemini 4 Argon)** 架构深度指导与协助下，对照 AS3 客户端反编译工程源码（`AllTaskData.as`, `DailyTask.as`, `ItemPanel.as`, `MarketPanel.as`, `VipPanel.as`），系统性定位并修复了 5 项核心体验缺陷。
+
+---
+
+### 二、5 大问题排查与技术方案落实
+
+#### 1. 任务奖励逻辑修复（`AllTaskData.as::submitTask` 与经验数值同步）
+- **根因分析**：
+  1. 客户端 `AllTaskData.as` 的 `submitTask` 核心逻辑依赖 `if (e.result.complete_task)` 判定任务完成并触发奖励弹窗 `Global.taskConfig[complete_task]`、经验/铜币获得飘字和奖励背包物品分发。服务端 `_build_task_data` 原未携带 `complete_task` 与 `follow_npc`，导致奖励结算界面静默跳过。
+  2. 服务端在 `_complete_current_task` 中仅更新了 `role["exp"]`，而 `role["experience"]` 长期固化在初始值，导致客户端 HUD 经验条不刷新。
+- **修复方案**：
+  - 在 `_complete_current_task` 中确保 `role["experience"] = role["exp"]` 双向强一致同步。
+  - 在 `_build_task_submit_response` 中下发完整的已完成任务 ID `override_complete_task` 及 `follow_npc`。
+  - 角色存档平滑接轨第2章 110004（“属性培养”），完成提交后平滑推进至 110005 与 110007（“日常任务”）。
+
+#### 2. 日常任务与酒杯兑换商店修复（`DailyTask.as` 与 `cfg_action`）
+- **根因分析**：
+  1. 客户端打开日常任务面板时发送 `activityService.vitality`，在 `DailyTask.as` 中严格检验 `if (e.result.error_code == -1)`。原服务端未实现该协议，落入通用 ACK（`error_code: 0`），导致日常任务列表空白、面板未加载。
+  2. 兑换商店展示酒杯数量绑定自 `info.tong_cup`, `yin_cup`, `jin_cup`, `yu_cup`，而实际兑换扣除通过 `findItemAmount` 检索背包对应道具（300184 铜酒杯、300185 银酒杯、300186 金酒杯）。
+- **修复方案**：
+  - 新增 `_build_vitality_response`，严格返回 `error_code: -1`、查询 SQLite `cfg_action` 生成完整的日常行为列表 `action_list`，并下发 `tong_cup`、`yin_cup`、`jin_cup`、`yu_cup` 数量。
+  - 玩家背包中同步配置足额铜酒杯（300184）、银酒杯（300185）、金酒杯（300186）。
+  - 实现 `_handle_item_exchange`（`itemService.itemExchage`），根据 `cfg_exchange_shop` 动态扣除对应品质酒杯并产出兑换道具。
+
+#### 3. VIP商城物产上架与点击充值直接到账（`MarketPanel.as`、`VipPanel.as` 与直充通道）
+- **根因分析**：
+  1. 客户端黑市/商城面板发送 `activityService.mall`，需返回 `product_list` 商品列表与 `error_code: -1`。原服务返回空响应，导致界面无商品出售。
+  2. 客户端 `VipPanel.as` 点击充值按钮调用 `ExternalInterface.call("showchagelist")`，在单机纯 Flash 环境下无外部 JavaScript 响应。
+- **修复方案**：
+  - 新增 `_build_mall_response` 与 `_handle_mall_buy`，上架涵盖训练药水、活力药水、初/中/高级银币卡、10/20级礼包、酒杯及打捞绳等热销道具，支持金币购买并实时入包。
+  - 服务端开放 `/recharge`、`/api/recharge` 与 `/pay` HTTP 接口，并拦截 AMF 充值请求；触发时直接增加 100,000 金币，将角色提至 VIP 10、充值累计 500,000。
+  - `swfplayer.html` 挂载 `window.showchagelist`，点击充值立即向本地服务发起请求并弹窗通知“充值成功！已到账 100,000 金币与 VIP 10 特权！”。
+  - `_build_role_data` 下发 `role.vip_level`（10）与 `role.vip_charge`（500,000）。
+
+#### 4. 背包物品“全部使用”逻辑修复（`ItemPanel.as::resolveItem` 与 `ITEM.usingAll`）
+- **根因分析**：
+  1. 客户端点击“全部使用”发送操作码 `usingAll`，服务端先前只做单个物品使用扣减（`- 1`），且未根据总堆叠数倍增奖励。
+  2. 客户端 `resolveItem` 回调中检验 `if (e.result.error_code == -1)` 并读取 `e.result.result_list.source` 数组生成获得提示信息。服务端原响应缺少该结构。
+- **修复方案**：
+  - 在 `_handle_item_request` 中识别 `usingall` / `"all" in op_lower`，按当前物品堆叠数量 `use_count = target_item["amount"]` 一次性全量扣减。
+  - 奖励数值按 `use_count` 成倍累计（如 10 张初级银币卡一次性获得 500,000 银币），并在 `_build_item_response` 中包装标准 `error_code: -1` 与 `result_list.source` 数组。
+  - 触发客户端飘字“使用成功，获得：银币*...”，并同步刷新背包与属性。
+
+#### 5. 角色与船员等级一键提升至 100 级测试环境
+- **实现方案**：
+  - 更新 `player_save.json`：角色等级提升至 100 级，当前经验设为 0，技能点重置充裕（100点），官职晋升为 50（海贼队长十阶）。
+  - 伙伴赞高、巴基等级同步提升至 100 级。
+  - 任务恢复并锁定在第2章 110004（“属性培养”），方便用户继续任务测试。
+
+---
+
+### 三、验证结果与运行状态
+1. 运行自动化测试套件 `verify_fixes_all5.py`，全部 5 项测试指标全部一次性通过：
+   - 角色与伙伴 100 级校验 PASS
+   - 任务结算与奖励推进 PASS
+   - 日常任务与酒杯兑换 PASS
+   - VIP商城商品列表与充值通道 PASS
+   - 背包全部使用（6张银币卡一次性使用获 300,000 银币）PASS
+2. 本地服务守护进程在 `0.0.0.0:8080` 稳定运行中，角色状态：船长 Lv100 | VIP 10 | 金币 300,000 | 任务 110004。

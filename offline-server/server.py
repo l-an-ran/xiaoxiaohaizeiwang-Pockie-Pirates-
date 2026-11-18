@@ -580,7 +580,7 @@ def _build_role_data() -> bytes:
 
         ("nation",                  _amf3_int(role["nation"])),
 
-        ("vip_level",               _amf3_int(0)),
+        ("vip_level",               _amf3_int(int(role.get("vip_level", 10)))),
 
         ("scene_id",                _amf3_int(role["scene_id"])),
 
@@ -625,7 +625,7 @@ def _build_role_data() -> bytes:
         ("login_days",              _amf3_int(role["login_days"])),
         ("daily_login",             _amf3_int(int(role.get("daily_login", role.get("login_days", 1))))),
 
-        ("vip_charge",              _amf3_int(0)),
+        ("vip_charge",              _amf3_int(int(role.get("vip_charge", 500000)))),
 
         ("junior_token",            _amf3_int(0)),
 
@@ -642,7 +642,7 @@ def _build_role_data() -> bytes:
         ("legion_name",             _amf3_string("")),
 
         ("raid_count",              _amf3_int(0)),
-        ("experience",              _amf3_int(int(role.get("experience", role.get("exp", 0))))),
+        ("experience",              _amf3_int(int(role.get("exp", role.get("experience", 0))))),
         ("skill_point",             _amf3_int(role.get("skill_point", 0))),
         ("officium",                _amf3_int(role.get("officium", 1))),
 
@@ -660,13 +660,25 @@ def _build_role_data() -> bytes:
 
 
 
-def _build_task_data() -> bytes:
+def _build_task_data(override_complete_task: int = None) -> bytes:
     role = _get_role()
     completed = role.get("completed_tasks", [])
-    last_completed = completed[-1] if completed else 100000
+    if override_complete_task:
+        last_completed = override_complete_task
+    else:
+        last_completed = completed[-1] if completed else 100000
     current = role.get("current_task", 100001) or 100001
     task_accepted = role.get("task_accepted", False)
     task_completed = role.get("task_completed", False)
+
+    follow_npc = 1
+    if current:
+        try:
+            t_info = get_task(current)
+            if t_info:
+                follow_npc = int(t_info.get("get_npc") or t_info.get("submit_npc") or 1)
+        except Exception:
+            pass
 
     if current == 100001:
         task_accepted = True
@@ -713,7 +725,9 @@ def _build_task_data() -> bytes:
     fields = [
         ("action",                      _amf3_int(0)),
         ("complete_task",               _amf3_int(last_completed)),
+        ("follow_npc",                  _amf3_int(follow_npc)),
         ("accpetable_task",             _amf3_int(acceptable_task)),
+        ("acceptable_task",             _amf3_int(acceptable_task)),
         ("get_task",                    _amf3_int(get_task)),
         ("mem_task_list",               _amf3_array(mem_tasks)),
         ("mem_branch_task_list",        _amf3_array(mem_branch_tasks)),
@@ -2317,6 +2331,7 @@ def _complete_current_task() -> None:
             role["copper"] = min(role.get("copper", 0) + int(t_cfg.get("reward_copper") or 0), 999999999)
             role.setdefault("exp", 0)
             role["exp"] = role.get("exp", 0) + int(t_cfg.get("reward_experience") or 0)
+            role["experience"] = role["exp"]
             it1, amt1 = t_cfg.get("reward_item_1"), t_cfg.get("reward_item_amount_1")
             it2, amt2 = t_cfg.get("reward_item_2"), t_cfg.get("reward_item_amount_2")
             if it1 and amt1 and int(it1) > 0 and int(amt1) > 0:
@@ -3885,6 +3900,237 @@ def _handle_reward_check(correlation_id: str) -> bytes:
     return _make_ack_message(correlation_id, _amf3_object(fields))
 
 
+def _build_vitality_response(correlation_id: str) -> bytes:
+    role = _get_role()
+    items = role.get("items", [])
+    tong_cup = sum(it.get("amount", 0) for it in items if it.get("cfg_item_id") == 300184)
+    yin_cup = sum(it.get("amount", 0) for it in items if it.get("cfg_item_id") == 300185)
+    jin_cup = sum(it.get("amount", 0) for it in items if it.get("cfg_item_id") == 300186)
+    yu_cup = 999
+    if tong_cup == 0: tong_cup = 999
+    if yin_cup == 0: yin_cup = 999
+    if jin_cup == 0: jin_cup = 999
+
+    action_list = []
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT action FROM cfg_action")
+        for row in c.fetchall():
+            action_list.append(_amf3_object([
+                ("action", _amf3_int(int(row[0]))),
+                ("count",  _amf3_int(0)),
+            ]))
+        conn.close()
+    except Exception as e:
+        print(f"  [VITALITY] cfg_action query error: {e}", flush=True)
+
+    fields = [
+        ("error_code",    _amf3_int(-1)),
+        ("tong_cup",      _amf3_int(tong_cup)),
+        ("yin_cup",       _amf3_int(yin_cup)),
+        ("jin_cup",       _amf3_int(jin_cup)),
+        ("yu_cup",        _amf3_int(yu_cup)),
+        ("vitality",      _amf3_int(100)),
+        ("daily_count",   _amf3_int(0)),
+        ("daily_quality", _amf3_int(5)),
+        ("daily_refresh", _amf3_int(3)),
+        ("action_list",   _amf3_array(action_list)),
+        ("copper",        _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",          _amf3_int(int(role.get("gold", 100000)))),
+        ("prestige",      _amf3_int(int(role.get("prestige", 1000)))),
+        ("action_point",  _amf3_int(int(role.get("action_point", 100)))),
+    ]
+    body_amf3 = _amf3_object(fields)
+    return _make_ack_message(correlation_id, body_amf3)
+
+
+def _handle_reward_vitality(correlation_id: str) -> bytes:
+    role = _get_role()
+    reward_exp = 50000
+    reward_copper = 50000
+    role["copper"] = min(float(role.get("copper", 100000)) + float(reward_copper), 999999999.0)
+    role.setdefault("exp", 0)
+    role["exp"] = role.get("exp", 0) + reward_exp
+    role["experience"] = role["exp"]
+    _add_item_to_bag(300061, 1)  # 打捞绳
+    _save()
+
+    fields = [
+        ("error_code",         _amf3_int(-1)),
+        ("reward_experience",  _amf3_int(reward_exp)),
+        ("reward_copper",      _amf3_int(reward_copper)),
+        ("reward_item",        _amf3_int(300061)),
+        ("item_amount",        _amf3_int(1)),
+        ("copper",             _amf3_double(float(role["copper"]))),
+        ("gold",               _amf3_int(int(role.get("gold", 100000)))),
+        ("prestige",           _amf3_int(int(role.get("prestige", 1000)))),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_daily_task_refresh(correlation_id: str) -> bytes:
+    role = _get_role()
+    fields = [
+        ("error_code",    _amf3_int(-1)),
+        ("daily_quality", _amf3_int(5)),
+        ("copper",        _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",          _amf3_int(int(role.get("gold", 100000)))),
+        ("prestige",      _amf3_int(int(role.get("prestige", 1000)))),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_item_exchange(correlation_id: str, body: list) -> bytes:
+    role = _get_role()
+    items = role.setdefault("items", [])
+    exchange_id = 1
+    count = 1
+    if isinstance(body, list) and len(body) >= 4:
+        exchange_id = int(body[2])
+        count = max(1, int(body[3]))
+    elif isinstance(body, list) and len(body) >= 3:
+        exchange_id = int(body[2])
+
+    target_cfg_item_id = 300002
+    need_item = 300184
+    need_amount = 1 * count
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT cfg_item_id, need_item, need_amount FROM cfg_exchange_shop WHERE product_id = ?", (exchange_id,))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            target_cfg_item_id = int(row[0])
+            need_item = int(row[1])
+            need_amount = int(row[2]) * count
+    except Exception as e:
+        print(f"  [EXCHANGE] query error: {e}", flush=True)
+
+    # Deduct cups
+    for it in list(items):
+        if it.get("cfg_item_id") == need_item:
+            cur_amt = int(it.get("amount", 0))
+            if cur_amt <= need_amount:
+                items.remove(it)
+            else:
+                it["amount"] = cur_amt - need_amount
+            break
+
+    _add_item_to_bag(target_cfg_item_id, count)
+    _save()
+    print(f"  [EXCHANGE] Exchanged product {exchange_id}: consumed {need_amount} of cfg {need_item}, awarded {count} of cfg {target_cfg_item_id}", flush=True)
+
+    fields = [
+        ("error_code",   _amf3_int(-1)),
+        ("request_code", _amf3_int(0)),
+        ("items",        _build_player_items_amf3()),
+        ("copper",       _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",         _amf3_int(int(role.get("gold", 100000)))),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+MALL_PRODUCTS = [
+    {"product_id": 1,  "cfg_item_id": 300001, "cost_type": 1, "cost_value": 10},   # 训练药水
+    {"product_id": 2,  "cfg_item_id": 300002, "cost_type": 1, "cost_value": 10},   # 活力药水
+    {"product_id": 3,  "cfg_item_id": 300053, "cost_type": 1, "cost_value": 10},   # 初级银币卡
+    {"product_id": 4,  "cfg_item_id": 300054, "cost_type": 1, "cost_value": 20},   # 中级银币卡
+    {"product_id": 5,  "cfg_item_id": 300055, "cost_type": 1, "cost_value": 50},   # 高级银币卡
+    {"product_id": 6,  "cfg_item_id": 300063, "cost_type": 1, "cost_value": 50},   # 10级成长礼包
+    {"product_id": 7,  "cfg_item_id": 300064, "cost_type": 1, "cost_value": 100},  # 20级成长礼包
+    {"product_id": 8,  "cfg_item_id": 300184, "cost_type": 1, "cost_value": 5},    # 铜酒杯
+    {"product_id": 9,  "cfg_item_id": 300185, "cost_type": 1, "cost_value": 10},   # 银酒杯
+    {"product_id": 10, "cfg_item_id": 300186, "cost_type": 1, "cost_value": 20},   # 金酒杯
+    {"product_id": 11, "cfg_item_id": 300061, "cost_type": 1, "cost_value": 20},   # 打捞绳
+    {"product_id": 12, "cfg_item_id": 200002, "cost_type": 1, "cost_value": 100},  # 名刀·斩月
+]
+
+def _build_mall_response(correlation_id: str) -> bytes:
+    role = _get_role()
+    now_ts = float(int(time.time()))
+    p_elems = []
+    for p in MALL_PRODUCTS:
+        p_elems.append(_amf3_object([
+            ("product_id",  _amf3_int(p["product_id"])),
+            ("cfg_item_id", _amf3_int(p["cfg_item_id"])),
+            ("cost_type",   _amf3_int(p["cost_type"])),
+            ("cost_value",  _amf3_int(p["cost_value"])),
+        ]))
+
+    fields = [
+        ("error_code",    _amf3_int(-1)),
+        ("server_time",   _amf3_double(now_ts)),
+        ("cooldown_mall", _amf3_double(0.0)),
+        ("product_list",  _amf3_array(p_elems)),
+        ("record_list",   _amf3_array([])),
+        ("copper",        _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",          _amf3_int(int(role.get("gold", 100000)))),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_mall_buy(correlation_id: str, body: list) -> bytes:
+    role = _get_role()
+    prod_id = 1
+    count = 1
+    if isinstance(body, list) and len(body) >= 4:
+        prod_id = int(body[2])
+        count = max(1, int(body[3]))
+    elif isinstance(body, list) and len(body) >= 3:
+        prod_id = int(body[2])
+
+    target_prod = None
+    for p in MALL_PRODUCTS:
+        if p["product_id"] == prod_id:
+            target_prod = p
+            break
+    if not target_prod:
+        target_prod = MALL_PRODUCTS[0]
+
+    cost = target_prod["cost_value"] * count
+    role["gold"] = max(0, int(role.get("gold", 100000)) - cost)
+    _add_item_to_bag(target_prod["cfg_item_id"], count)
+    _save()
+    print(f"  [MALL] Bought {count}x product {prod_id} (cfg {target_prod['cfg_item_id']}) for {cost} gold", flush=True)
+
+    fields = [
+        ("error_code",   _amf3_int(-1)),
+        ("request_code", _amf3_int(0)),
+        ("copper",       _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",         _amf3_int(int(role.get("gold", 100000)))),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_first_pay(correlation_id: str) -> bytes:
+    role = _get_role()
+    role["gold"] = int(role.get("gold", 0)) + 10000
+    role["vip_level"] = max(int(role.get("vip_level", 0)), 10)
+    role["vip_charge"] = max(int(role.get("vip_charge", 0)), 500000)
+    _add_item_to_bag(300055, 5)   # 5x 高级银币卡
+    _add_item_to_bag(300064, 1)   # 20级礼包
+    _save()
+    print("  [FIRST PAY] Granted first charge rewards & VIP 10", flush=True)
+    fields = [
+        ("error_code",   _amf3_int(-1)),
+        ("request_code", _amf3_int(0)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_recharge(correlation_id: str) -> bytes:
+    role = _get_role()
+    role["gold"] = int(role.get("gold", 0)) + 100000
+    role["vip_level"] = 10
+    role["vip_charge"] = 500000
+    _save()
+    print(f"  [RECHARGE] Direct recharge success! gold={role['gold']} vip_level={role['vip_level']}", flush=True)
+    return _build_role_response(correlation_id)
+
+
 def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> bytes:
     role = _get_role()
     gen_id = 1001
@@ -4276,10 +4522,20 @@ def _handle_forge_request(body: list, correlation_id: str) -> bytes:
     _save()
     return _build_forge_response(correlation_id, item_id, cfg_item_id, new_level, amount, star, equiped)
 
-def _build_item_response(correlation_id: str) -> bytes:
+def _build_item_response(correlation_id: str, error_code: int = -1, rewards: list = None) -> bytes:
     role = _get_role()
     items_amf3 = _build_player_items_amf3()
+    reward_objects = []
+    for r in (rewards or []):
+        reward_objects.append(_amf3_object([
+            ("type",  _amf3_int(int(r.get("type", 0)))),
+            ("value", _amf3_int(int(r.get("value", 0)))),
+        ]))
+    result_list_obj = _amf3_object([("source", _amf3_array(reward_objects))])
+
     fields = [
+        ("error_code",   _amf3_int(error_code)),
+        ("result_list",  result_list_obj),
         ("prestige",     _amf3_int(int(role.get("prestige", 100)))),
         ("copper",       _amf3_double(float(role.get("copper", 100000)))),
         ("gold",         _amf3_int(int(role.get("gold", 5000)))),
@@ -4298,6 +4554,10 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
     items = _get_player_items()
     equipments = role.setdefault("equipments", {"weapon": 0, "armor": 0, "horse": 0, "cloak": 0, "amulet": 0, "misc": 0})
     op_lower = operation.lower()
+    rewards = []
+
+    if "itemexchage" in op_lower or "exchange" in op_lower:
+        return _handle_item_exchange(correlation_id, body)
 
     proto_fig = role.get("figure", 1008)
     if proto_fig < 1000:
@@ -4349,26 +4609,50 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                     target_item["general_id"] = target_gen_id
                     print(f"  [EQUIP] Equipped item {item_id} (cfg {cfg_id}) to slot {slot_name} on companion {target_gen_id}", flush=True)
             else:
-                amt = target_item.get("amount", 1) - 1
-                if amt <= 0:
+                is_using_all = ("all" in op_lower)
+                avail_amt = int(target_item.get("amount", 1))
+                use_count = avail_amt if is_using_all else 1
+                if use_count <= 0:
+                    use_count = 1
+
+                new_amt = avail_amt - use_count
+                if new_amt <= 0:
                     items.remove(target_item)
                 else:
-                    target_item["amount"] = amt
+                    target_item["amount"] = new_amt
 
                 max_item_id = max([int(it.get("item_id", 0)) for it in items] + [1000])
                 if cfg_id == 300063:
                     # 10级成长礼包：20级礼包*1、初级银币卡*10、金币*20、名刀·斩月*1
-                    role["gold"] = role.get("gold", 5000) + 20
-                    items.append({"item_id": max_item_id + 1, "cfg_item_id": 300053, "amount": 10, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
-                    items.append({"item_id": max_item_id + 2, "cfg_item_id": 300064, "amount": 1, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
-                    items.append({"item_id": max_item_id + 3, "cfg_item_id": 200002, "amount": 1, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 1})
-                    print("  [ITEM] Opened 10级成长礼包 (cfg 300063) -> awarded items & gold", flush=True)
+                    role["gold"] = role.get("gold", 5000) + 20 * use_count
+                    items.append({"item_id": max_item_id + 1, "cfg_item_id": 300053, "amount": 10 * use_count, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
+                    items.append({"item_id": max_item_id + 2, "cfg_item_id": 300064, "amount": 1 * use_count, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 0})
+                    items.append({"item_id": max_item_id + 3, "cfg_item_id": 200002, "amount": 1 * use_count, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 1})
+                    rewards.append({"type": 1, "value": 20 * use_count})
+                    print(f"  [ITEM] Opened {use_count}x 10级成长礼包 (cfg 300063) -> awarded items & gold", flush=True)
+                elif cfg_id == 300064:
+                    role["gold"] = role.get("gold", 5000) + 30 * use_count
+                    items.append({"item_id": max_item_id + 1, "cfg_item_id": 200048, "amount": 1 * use_count, "level": 1, "star": 1, "rise": 0, "equiped": 0, "general_id": 0, "part": 2})
+                    rewards.append({"type": 1, "value": 30 * use_count})
+                    print(f"  [ITEM] Opened {use_count}x 20级成长礼包 (cfg 300064) -> awarded items & gold", flush=True)
                 elif cfg_id in (300053, 300054, 300055, 300001):
-                    role["copper"] = role.get("copper", 100000) + 50000
-                    print(f"  [ITEM] Used silver card (cfg {cfg_id}) -> copper +50000", flush=True)
+                    card_val = 50000
+                    if cfg_id == 300054: card_val = 100000
+                    elif cfg_id == 300055: card_val = 200000
+                    gain_copper = card_val * use_count
+                    role["copper"] = min(float(role.get("copper", 100000)) + float(gain_copper), 999999999.0)
+                    rewards.append({"type": 0, "value": int(gain_copper)})
+                    print(f"  [ITEM] Used {use_count}x silver card (cfg {cfg_id}) -> copper +{gain_copper}", flush=True)
+                elif cfg_id == 300002:
+                    gain_ap = 20 * use_count
+                    role["action_point"] = role.get("action_point", 100) + gain_ap
+                    rewards.append({"type": 3, "value": int(gain_ap)})
+                    print(f"  [ITEM] Used {use_count}x vitality potion (cfg {cfg_id}) -> ap +{gain_ap}", flush=True)
                 else:
-                    role["copper"] = role.get("copper", 100000) + 10000
-                    print(f"  [ITEM] Used consumable item {item_id} (cfg {cfg_id}) -> copper +10000", flush=True)
+                    gain_copper = 10000 * use_count
+                    role["copper"] = min(float(role.get("copper", 100000)) + float(gain_copper), 999999999.0)
+                    rewards.append({"type": 0, "value": int(gain_copper)})
+                    print(f"  [ITEM] Used {use_count}x consumable item {item_id} (cfg {cfg_id}) -> copper +{gain_copper}", flush=True)
             _save()
 
     elif "sell" in op_lower:
@@ -4408,6 +4692,7 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                 items.remove(target_item)
 
             role["copper"] = float(role.get("copper", 100000)) + float(sell_price)
+            rewards.append({"type": 0, "value": int(sell_price)})
             print(f"  [ITEM.sell] Sold item {item_id} (cfg {cfg_id}, price +{sell_price}) -> new copper {role['copper']}", flush=True)
             _save()
 
@@ -4451,9 +4736,8 @@ def _handle_item_request(operation: str, body: list, correlation_id: str) -> byt
                 equipments[SLOT_NAME_MAP[part]] = 0
             print(f"  [UNEQUIP] Unequipped item {target_item.get('item_id')} (cfg {target_item.get('cfg_item_id')}, part {part}) from general {target_gen_id}", flush=True)
         _save()
-        _save()
 
-    return _build_item_response(correlation_id)
+    return _build_item_response(correlation_id, error_code=-1, rewards=rewards)
 
 
 
@@ -4567,6 +4851,7 @@ def _build_task_get_response(correlation_id: str) -> bytes:
 def _build_task_submit_response(correlation_id: str, task_id: int, action: int = 0) -> bytes:
     role = _get_role()
     current = role.get("current_task")
+    last_comp_id = None
     if action == 2:
         role["task_accepted"] = True
         try:
@@ -4585,10 +4870,14 @@ def _build_task_submit_response(correlation_id: str, task_id: int, action: int =
             pass
         _save()
     else:
-        if task_id == current or task_id == 0:
+        target_id = task_id if (task_id and task_id > 0) else current
+        if target_id == current or task_id == 0:
+            last_comp_id = current
             _complete_current_task()
+        elif target_id:
+            last_comp_id = target_id
 
-    return _make_ack_message(correlation_id, _build_task_data())
+    return _make_ack_message(correlation_id, _build_task_data(override_complete_task=last_comp_id))
 
 
 def dispatch_amf(payload: bytes, stamp: str) -> bytes:
@@ -4751,6 +5040,11 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
                     action = int(j["action"])
             except Exception:
                 pass
+        if "DAILYTASK" in op_name:
+            if any(k in op_name for k in ["STARUP", "LEGENDARY", "ADDCOUNT"]):
+                return _handle_daily_task_refresh(correlation_id)
+            return _build_vitality_response(correlation_id)
+
         if "GET" in op_name:
             role = _get_role()
             print(f"  -> task get (current={role.get('current_task')})", flush=True)
@@ -5202,7 +5496,7 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
 
     # ── ACTIVITY ───────────────────────────────────────────────────────────────
 
-    if "ACTIVITY" in op_upper or "REWARDLOGIN" in op_upper or "GETREWARD" in op_upper or "REWARDCHECK" in op_upper:
+    if "ACTIVITY" in op_upper or any(k in op_upper for k in ["REWARDLOGIN", "GETREWARD", "REWARDCHECK", "VITALITY", "MALL"]):
         op_name = op_upper.split(".")[-1]
         if "REWARDLOGIN" in op_name:
             return _handle_reward_login(correlation_id)
@@ -5212,8 +5506,22 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             return _handle_reward_check(correlation_id)
         if "REWARDONLINE" in op_name:
             return _handle_reward_login(correlation_id)
+        if "VITALITY" in op_name:
+            if "REWARD" in op_name:
+                return _handle_reward_vitality(correlation_id)
+            return _build_vitality_response(correlation_id)
+        if "MALL" in op_name:
+            if "BUY" in op_name:
+                return _handle_mall_buy(correlation_id, body)
+            return _build_mall_response(correlation_id)
+        if any(k in op_name for k in ["FIRSTPAY", "FIRSTCHARGE", "REWARDCODE"]):
+            return _handle_first_pay(correlation_id)
         print("  -> activity ACK", flush=True)
         return _build_activity_response(correlation_id)
+
+    # ── RECHARGE / PAY ─────────────────────────────────────────────────────────
+    if any(k in op_upper for k in ["PAY", "RECHARGE", "VIPCHARGE"]):
+        return _handle_recharge(correlation_id)
 
 
 
@@ -5457,6 +5765,22 @@ class Handler(BaseHTTPRequestHandler):
 
             return
 
+        if path in ("/recharge", "/api/recharge", "/pay"):
+            role = _get_role()
+            role["gold"] = int(role.get("gold", 0)) + 100000
+            role["vip_level"] = 10
+            role["vip_charge"] = 500000
+            _save()
+            resp = json.dumps({
+                "status": "ok",
+                "message": "充值成功！已充值 100000 金币，并提升至 VIP 10 特权！",
+                "gold": role["gold"],
+                "vip_level": role["vip_level"],
+                "vip_charge": role["vip_charge"]
+            }, ensure_ascii=False).encode("utf-8")
+            self._send(200, "application/json; charset=utf-8", resp)
+            return
+
         if path == "/health":
 
             role = _get_role()
@@ -5488,6 +5812,23 @@ class Handler(BaseHTTPRequestHandler):
         print(f"POST {self.path}  {len(payload)}B  [{stamp}]", flush=True)
 
 
+
+        path = urlsplit(self.path).path
+        if path in ("/recharge", "/api/recharge", "/pay"):
+            role = _get_role()
+            role["gold"] = int(role.get("gold", 0)) + 100000
+            role["vip_level"] = 10
+            role["vip_charge"] = 500000
+            _save()
+            resp = json.dumps({
+                "status": "ok",
+                "message": "充值成功！已充值 100000 金币，并提升至 VIP 10 特权！",
+                "gold": role["gold"],
+                "vip_level": role["vip_level"],
+                "vip_charge": role["vip_charge"]
+            }, ensure_ascii=False).encode("utf-8")
+            self._send(200, "application/json; charset=utf-8", resp)
+            return
 
         if urlsplit(self.path).path != "/messagebroker/amf":
 
