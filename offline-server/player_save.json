@@ -2,19 +2,46 @@
   "role": {
     "role_id": 100001,
     "name": "船长",
-    "level": 19,
+    "level": 20,
     "face": 1001,
-    "figure": 1008,
+    "figure": 1001,
     "nation": 1,
-    "gold": 96363,
-    "copper": 2047827.0,
+    "gold": 96331,
+    "copper": 2263427.0,
     "action_point": 100,
     "ap_max": 100,
-    "scene_id": 2003,
-    "scene_x": 1566,
-    "scene_y": 27,
-    "current_task": 110008,
+    "scene_id": 3001,
+    "scene_x": 360,
+    "scene_y": 130,
+    "current_task": 110004,
     "completed_tasks": [
+      100001,
+      100002,
+      100003,
+      100004,
+      100005,
+      100006,
+      100007,
+      100008,
+      100009,
+      100010,
+      100011,
+      100012,
+      100013,
+      100014,
+      100015,
+      100016,
+      100017,
+      100018,
+      100019,
+      100020,
+      100021,
+      100022,
+      100023,
+      100024,
+      100025,
+      100026,
+      100027,
       100028,
       100029,
       100030,
@@ -29,11 +56,7 @@
       100039,
       110001,
       110002,
-      110003,
-      110004,
-      110005,
-      110006,
-      110007
+      110003
     ],
     "battle_wins": {
       "10101": 2,
@@ -55,7 +78,7 @@
       "10307": 1,
       "10308": 1,
       "10309": 3,
-      "10310": 14,
+      "10310": 16,
       "10401": 1,
       "10402": 1,
       "10404": 1,
@@ -80,12 +103,15 @@
       "10702": 1,
       "10703": 1,
       "corr_battle": 1,
-      "110001": 1
+      "110001": 1,
+      "10801": 1,
+      "10704": 1,
+      "10705": 1
     },
     "login_days": 1,
     "created": true,
-    "officium": 19,
-    "skill_point": 59,
+    "officium": 20,
+    "skill_point": 60,
     "job": 10001,
     "items": [
       {
@@ -384,6 +410,28 @@
         "equiped": 0,
         "general_id": 0,
         "part": 0
+      },
+      {
+        "item_id": 1058,
+        "cfg_item_id": 200048,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 2
+      },
+      {
+        "item_id": 1059,
+        "cfg_item_id": 300063,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 0
       }
     ],
     "equipments": {
@@ -394,7 +442,7 @@
       "amulet": 0,
       "misc": 1017
     },
-    "exp": 39700,
+    "exp": 46300,
     "task_accepted": true,
     "task_completed": false,
     "camp_stars": {
@@ -442,7 +490,10 @@
       "10702": 3,
       "10703": 3,
       "corr_battle": 3,
-      "110001": 3
+      "110001": 3,
+      "10801": 3,
+      "10704": 3,
+      "10705": 3
     },
     "awakened_skills": {
       "1007": {
@@ -482,10 +533,18 @@
         "job": 10003,
         "figure": 10083,
         "face": 10083,
-        "level": 17,
+        "level": 18,
         "skill": 51009,
-        "experience": 31000,
-        "exp": 31000
+        "experience": 42200,
+        "exp": 42200,
+        "temp_str_grow_add": 4,
+        "temp_agi_grow_add": 2,
+        "temp_sta_grow_add": 3,
+        "temp_int_grow_add": 2,
+        "str_grow_add": 12,
+        "agi_grow_add": 11,
+        "sta_grow_add": 15,
+        "int_grow_add": 10
       },
       {
         "general_id": 10052199,
@@ -496,14 +555,18 @@
         "job": 10002,
         "figure": 10011,
         "face": 10011,
-        "level": 16,
+        "level": 17,
         "skill": 51006,
-        "experience": 27500,
-        "temp_str_grow_add": 2,
-        "temp_agi_grow_add": 2,
-        "temp_sta_grow_add": 1,
+        "experience": 46900,
+        "temp_str_grow_add": 1,
+        "temp_agi_grow_add": 4,
+        "temp_sta_grow_add": 2,
         "temp_int_grow_add": 3,
-        "exp": 27500
+        "exp": 46900,
+        "str_grow_add": 16,
+        "agi_grow_add": 8,
+        "sta_grow_add": 16,
+        "int_grow_add": 16
       }
     ],
     "tavern_round": {
@@ -568,14 +631,14 @@
     "temp_agi_grow_add": 0,
     "temp_sta_grow_add": 0,
     "temp_int_grow_add": 0,
-    "str_grow_add": 4,
-    "agi_grow_add": 3,
-    "sta_grow_add": 5,
-    "int_grow_add": 2,
+    "str_grow_add": 25,
+    "agi_grow_add": 17,
+    "sta_grow_add": 16,
+    "int_grow_add": 16,
     "claimed_login_rewards": [
       1
     ],
-    "exploit": 80,
-    "experience": 39700
+    "exploit": 768,
+    "experience": 38300
   }
 }

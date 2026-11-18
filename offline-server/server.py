@@ -862,6 +862,54 @@ def _calc_general_stats(is_proto: bool, id_val: int, lvl: int) -> dict:
     }
 
 
+def _get_grow_limits(is_proto: bool, job_or_gid: int, lvl: int) -> dict:
+    """Calculate authentic cultivation growth base and ceilings based on cfg_job / cfg_general."""
+    lvl = max(1, int(lvl))
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        if is_proto:
+            r = c.execute(
+                "SELECT str_grow, agi_grow, sta_grow, int_grow, str_add_ceil_param, agi_add_ceil_param, sta_add_ceil_param, int_add_ceil_param, str_add_ceil, agi_add_ceil, sta_add_ceil, int_add_ceil "
+                "FROM cfg_job WHERE cfg_job_id = ?", (job_or_gid,)
+            ).fetchone()
+            if not r:
+                r = c.execute(
+                    "SELECT str_grow, agi_grow, sta_grow, int_grow, str_add_ceil_param, agi_add_ceil_param, sta_add_ceil_param, int_add_ceil_param, str_add_ceil, agi_add_ceil, sta_add_ceil, int_add_ceil "
+                    "FROM cfg_job LIMIT 1"
+                ).fetchone()
+        else:
+            r = c.execute(
+                "SELECT str_grow, agi_grow, sta_grow, int_grow, str_add_ceil_param, agi_add_ceil_param, sta_add_ceil_param, int_add_ceil_param, str_add_ceil, agi_add_ceil, sta_add_ceil, int_add_ceil "
+                "FROM cfg_general WHERE cfg_general_id = ?", (job_or_gid,)
+            ).fetchone()
+            if not r:
+                r = (2.5, 2.5, 2.5, 2.5, 0.25, 0.25, 0.25, 0.25, 1.0, 1.0, 1.0, 1.0)
+        conn.close()
+    except Exception:
+        r = (2.5, 2.5, 2.5, 2.5, 0.25, 0.25, 0.25, 0.25, 1.0, 1.0, 1.0, 1.0)
+
+    sg, ag, stg, ig, sap, aap, stap, iap, sac, aac, stac, iac = r
+    sg_int = round(float(sg or 2.0) * 100)
+    ag_int = round(float(ag or 2.0) * 100)
+    stg_int = round(float(stg or 2.0) * 100)
+    ig_int = round(float(ig or 2.0) * 100)
+
+    step = lvl // 10
+    max_add_str = int(step * float(sap or 0.25) * 100 + float(sac or 1.0) * 100)
+    max_add_agi = int(step * float(aap or 0.25) * 100 + float(aac or 1.0) * 100)
+    max_add_sta = int(step * float(stap or 0.25) * 100 + float(stac or 1.0) * 100)
+    max_add_int = int(step * float(iap or 0.25) * 100 + float(iac or 1.0) * 100)
+
+    return {
+        "str_grow": sg_int, "agi_grow": ag_int, "sta_grow": stg_int, "int_grow": ig_int,
+        "strength_ceil": max_add_str / 100.0, "agility_ceil": max_add_agi / 100.0,
+        "stamina_ceil": max_add_sta / 100.0, "intellect_ceil": max_add_int / 100.0,
+        "max_add_str": max_add_str, "max_add_agi": max_add_agi,
+        "max_add_sta": max_add_sta, "max_add_int": max_add_int,
+    }
+
+
 def _build_generals_list() -> bytes:
     role = _get_role()
     fig = role.get("figure", 1008)
@@ -912,6 +960,7 @@ def _build_generals_list() -> bytes:
 
     role_lvl = int(role.get("level", 1))
     proto_stats = _calc_general_stats(True, cfg["job"], role_lvl)
+    grow_info = _get_grow_limits(True, cfg["job"], role_lvl)
 
     # 严格按照从 libOnePiece.so (0x403c54) 逆向出的所有 80+ 字段下发，彻底杜绝栈内存野指针
     main_general = _amf3_object([
@@ -944,17 +993,17 @@ def _build_generals_list() -> bytes:
         ("init_intellect",    _amf3_double(float(proto_stats["intellect"]))),
         ("init_stamina",      _amf3_double(float(proto_stats["stamina"]))),
 
-        # 四维上限 (double)
-        ("strength_ceil",     _amf3_double(float(proto_stats["strength"] * 2.5))),
-        ("agility_ceil",      _amf3_double(float(proto_stats["agility"] * 2.5))),
-        ("intellect_ceil",    _amf3_double(float(proto_stats["intellect"] * 2.5))),
-        ("stamina_ceil",      _amf3_double(float(proto_stats["stamina"] * 2.5))),
+        # 四维培养上限 (double: CDlgBMPolish::init SetRange 为 str_grow + strength_ceil * 100)
+        ("strength_ceil",     _amf3_double(float(grow_info["strength_ceil"]))),
+        ("agility_ceil",      _amf3_double(float(grow_info["agility_ceil"]))),
+        ("intellect_ceil",    _amf3_double(float(grow_info["intellect_ceil"]))),
+        ("stamina_ceil",      _amf3_double(float(grow_info["stamina_ceil"]))),
 
-        # 四维成长 (int)
-        ("str_grow",          _amf3_int(int(proto_stats["str_grow"] * 10))),
-        ("agi_grow",          _amf3_int(int(proto_stats["agi_grow"] * 10))),
-        ("sta_grow",          _amf3_int(int(proto_stats["sta_grow"] * 10))),
-        ("int_grow",          _amf3_int(int(proto_stats["int_grow"] * 10))),
+        # 四维成长 (int: 百分比整数，与 cfg_general / cfg_job * 100 严格对应)
+        ("str_grow",          _amf3_int(int(grow_info["str_grow"]))),
+        ("agi_grow",          _amf3_int(int(grow_info["agi_grow"]))),
+        ("sta_grow",          _amf3_int(int(grow_info["sta_grow"]))),
+        ("int_grow",          _amf3_int(int(grow_info["int_grow"]))),
         ("str_grow_add",      _amf3_int(int(role.get("str_grow_add", 0)))),
         ("agi_grow_add",      _amf3_int(int(role.get("agi_grow_add", 0)))),
         ("sta_grow_add",      _amf3_int(int(role.get("sta_grow_add", 0)))),
@@ -1102,6 +1151,7 @@ def _make_companion_general_amf3(g: dict) -> bytes:
                 c_eq[SLOT_NAME_MAP[part]] = it["item_id"]
 
     c_stats = _calc_general_stats(False, cfg_id, level)
+    c_grow = _get_grow_limits(False, cfg_id, level)
 
     return _amf3_object([
         ("id",                _amf3_int(gid)),
@@ -1129,15 +1179,15 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("init_intellect",    _amf3_double(float(c_stats["intellect"]))),
         ("init_stamina",      _amf3_double(float(c_stats["stamina"]))),
 
-        ("strength_ceil",     _amf3_double(float(c_stats["strength"] * 2.5))),
-        ("agility_ceil",      _amf3_double(float(c_stats["agility"] * 2.5))),
-        ("intellect_ceil",    _amf3_double(float(c_stats["intellect"] * 2.5))),
-        ("stamina_ceil",      _amf3_double(float(c_stats["stamina"] * 2.5))),
+        ("strength_ceil",     _amf3_double(float(c_grow["strength_ceil"]))),
+        ("agility_ceil",      _amf3_double(float(c_grow["agility_ceil"]))),
+        ("intellect_ceil",    _amf3_double(float(c_grow["intellect_ceil"]))),
+        ("stamina_ceil",      _amf3_double(float(c_grow["stamina_ceil"]))),
 
-        ("str_grow",          _amf3_int(int(c_stats["str_grow"] * 10))),
-        ("agi_grow",          _amf3_int(int(c_stats["agi_grow"] * 10))),
-        ("sta_grow",          _amf3_int(int(c_stats["sta_grow"] * 10))),
-        ("int_grow",          _amf3_int(int(c_stats["int_grow"] * 10))),
+        ("str_grow",          _amf3_int(int(c_grow["str_grow"]))),
+        ("agi_grow",          _amf3_int(int(c_grow["agi_grow"]))),
+        ("sta_grow",          _amf3_int(int(c_grow["sta_grow"]))),
+        ("int_grow",          _amf3_int(int(c_grow["int_grow"]))),
 
         ("str_grow_add",      _amf3_int(int(g.get("str_grow_add", 0)))),
         ("agi_grow_add",      _amf3_int(int(g.get("agi_grow_add", 0)))),
@@ -3861,33 +3911,51 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
             pass
 
     target = None
-    if gen_id in (role.get("figure"), 1001, role.get("role_id")):
+    is_proto = False
+    proto_fig = role.get("figure", 1001)
+    if gen_id in (proto_fig, 1001, role.get("role_id"), 0):
         target = role
+        is_proto = True
     else:
         for g in role.get("generals", []):
             if g.get("general_id") == gen_id or g.get("cfg_general_id") == gen_id:
                 target = g
+                is_proto = False
                 break
     if target is None:
         target = role
+        is_proto = True
+
+    # 获取当前目标角色的四维培养上限 (上限值基于角色等级与配置计算)
+    lvl = int(role.get("level", 20))
+    if is_proto:
+        cfg = PROTAGONIST_CONFIG.get(proto_fig, PROTAGONIST_CONFIG[1008])
+        grow_info = _get_grow_limits(True, cfg["job"], lvl)
+    else:
+        cfg_gid = target.get("cfg_general_id", gen_id)
+        grow_info = _get_grow_limits(False, cfg_gid, lvl)
+
+    attrs = ["str", "agi", "sta", "int"]
+    max_caps = {
+        "str": grow_info["max_add_str"],
+        "agi": grow_info["max_add_agi"],
+        "sta": grow_info["max_add_sta"],
+        "int": grow_info["max_add_int"],
+    }
 
     if confirm or polish_type == 5:
-        # 替换属性: 将洗出的增量计入正式成长加成
-        target["str_grow_add"] = int(target.get("str_grow_add", 0)) + int(target.get("temp_str_grow_add", 0))
-        target["agi_grow_add"] = int(target.get("agi_grow_add", 0)) + int(target.get("temp_agi_grow_add", 0))
-        target["sta_grow_add"] = int(target.get("sta_grow_add", 0)) + int(target.get("temp_sta_grow_add", 0))
-        target["int_grow_add"] = int(target.get("int_grow_add", 0)) + int(target.get("temp_int_grow_add", 0))
-        target["temp_str_grow_add"] = 0
-        target["temp_agi_grow_add"] = 0
-        target["temp_sta_grow_add"] = 0
-        target["temp_int_grow_add"] = 0
-        print(f"  [POLISH] Replaced grow stats for gen={gen_id}: str={target['str_grow_add']} agi={target['agi_grow_add']} sta={target['sta_grow_add']} int={target['int_grow_add']}", flush=True)
+        # 替换属性: 将洗出的增量计入正式成长加成, 严格限制在 [0, cap]
+        for a in attrs:
+            cur = int(target.get(f"{a}_grow_add", 0))
+            delta = int(target.get(f"temp_{a}_grow_add", 0))
+            cap = max_caps[a]
+            target[f"{a}_grow_add"] = max(0, min(cap, cur + delta))
+            target[f"temp_{a}_grow_add"] = 0
+        print(f"  [POLISH] Replaced grow stats for gen={gen_id}: str={target['str_grow_add']}/{max_caps['str']} agi={target['agi_grow_add']} sta={target['sta_grow_add']} int={target['int_grow_add']}", flush=True)
     elif polish_type == 6:
-        # 维持属性: 放弃本次洗练增量
-        target["temp_str_grow_add"] = 0
-        target["temp_agi_grow_add"] = 0
-        target["temp_sta_grow_add"] = 0
-        target["temp_int_grow_add"] = 0
+        # 维持原属性: 放弃本次洗练增量
+        for a in attrs:
+            target[f"temp_{a}_grow_add"] = 0
         print(f"  [POLISH] Kept original grow stats for gen={gen_id}", flush=True)
     else:
         # 培养消耗: 1: 普通(1000银币), 2: 加强(4000银币+2金币), 3: 白金(10金币), 4: 至尊(20金币)
@@ -3902,11 +3970,35 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
         role["gold"] = max(0, int(role.get("gold", 5000)) - c_gold)
 
         import random
-        # 确保洗练增量至少有一项为正数，以满足客户端 SetNewAttVisible 触发显示
-        target["temp_str_grow_add"] = random.randint(1, 5)
-        target["temp_agi_grow_add"] = random.randint(1, 5)
-        target["temp_sta_grow_add"] = random.randint(1, 5)
-        target["temp_int_grow_add"] = random.randint(1, 5)
+        # 档位浮动范围（原版梯度逻辑）:
+        # 1: 普通: -3 ~ +4 (均值略偏正向，低级洗练经常有升有降)
+        # 2: 加强: -2 ~ +6 (正向概率明显偏高)
+        # 3: 白金: -1 ~ +10 (极少扣减，大幅提升)
+        # 4: 至尊: +2 ~ +15 (全正保底，快速冲顶)
+        RANGES = {
+            1: (-3, 4),
+            2: (-2, 6),
+            3: (-1, 10),
+            4: (2, 15),
+        }
+        low, high = RANGES.get(polish_type, (-2, 4))
+        for a in attrs:
+            cur = int(target.get(f"{a}_grow_add", 0))
+            cap = max_caps[a]
+            raw_delta = random.randint(low, high)
+            # 钳位：cur + delta 必须在 [0, cap] 之间，即 delta 在 [-cur, cap - cur] 之间
+            clamped = max(-cur, min(raw_delta, cap - cur))
+            target[f"temp_{a}_grow_add"] = clamped
+
+        # 保证至少有一项为正数，以满足客户端 SetNewAttVisible(true) 触发显示
+        if all(int(target.get(f"temp_{a}_grow_add", 0)) <= 0 for a in attrs):
+            for a in attrs:
+                cur = int(target.get(f"{a}_grow_add", 0))
+                cap = max_caps[a]
+                if cur < cap:
+                    target[f"temp_{a}_grow_add"] = random.randint(1, max(1, high))
+                    break
+
         print(f"  [POLISH] Cultivated gen={gen_id} deltas=(+{target['temp_str_grow_add']}, +{target['temp_agi_grow_add']}, +{target['temp_sta_grow_add']}, +{target['temp_int_grow_add']})", flush=True)
 
         # 若当前任务为属性培养(110004)，标记完成
@@ -3931,6 +4023,7 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
         ("int_grow_add",       _amf3_int(int(target.get("int_grow_add", 0)))),
         ("gold",               _amf3_int(int(role.get("gold", 5000)))),
         ("copper",             _amf3_double(float(role.get("copper", 100000)))),
+        ("generals",           _build_generals_list()),   # ★ 注入顶层 generals，同步刷新客户端 OPDataManager 缓存，立即可见！
         ("role_data",          _build_role_data()),
         ("general_data",       _build_general_data()),
         ("task_data",          _build_task_data()),

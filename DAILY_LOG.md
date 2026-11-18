@@ -566,3 +566,80 @@
 - **测试 5 (战斗结算与伙伴经验)**：关卡经验/历练正确入账，主角与伙伴（赞高、巴基等）成功结算经验并触发多级升级（**PASS**）。
 
 服务端后台守护进程已更新并平稳运行于 `0.0.0.0:8080`。
+
+
+---
+
+## 2026-11-19 攻坚记录（续）：属性培养即时刷新、原版四阶洗属性算法、原属性数字/条形显示与任务保护
+
+### 一、 核心攻坚背景与协同
+针对用户反馈的属性培养（CDlgBMPolish）4 大核心体验与逻辑问题：
+1. 洗属性后数字不能立即显示，反应慢或需关闭重开界面；
+2. 洗属性增量逻辑不符合原版；
+3. 人物原属性未能正确显示数字与进度条（条形空白）；
+4. 确保角色任务不被重置回初始任务，保留在 110004（属性培养）任务。
+
+在 **Google Gemini 网页端 (Gemini 4 Argon / Hydrogen)** 的深度分析协助下，结合 Android 微端原生库 [libOnePiece.so](file:///d:/AI/work/xiaoxiaohaizei-offline-src/lib/armeabi/libOnePiece.so) 的 Capstone 逆向汇编排查与 [HeroPanel.as](file:///d:/AI/work/xx/Pockie-Pirates-Restoration-Project/pockiepirates_project/pockiepirates/onepiece/ui/ui/hero/HeroPanel.as) / [HeroData.as](file:///d:/AI/work/xx/Pockie-Pirates-Restoration-Project/pockiepirates_project/pockiepirates/onepiece/data/hero/HeroData.as) 源码比对，完成全量底层修复与闭环验证。
+
+---
+
+### 二、 底层根因深度剖析与技术解决方案
+
+#### 1. 洗属性点完不能立即刷新（响应滞后/需重开界面）根因与修复
+- **反汇编调用链**：
+  - 客户端点击培养发送 `0xdf` (`GENERAL.polish`)，收到服务端响应后 `CDlgBMPolish::OnNetPackage` (`0x486168`) 立即调用 `init()` 重绘；
+  - 但 `CDlgBMPolish::init()` 并不直接从原始网络数据流提取属性，而是从 `OPDataManager::m_generals` 内存缓存中按 `general_id` 检索角色对象；
+  - 在 `0x0040d8f4` (`OPDataManager::onPolish`) 中，客户端先调用 `0x403c54` (`OPDataManager::onGeneralData`)，该函数通过 `SearchDictionary(body, "generals")` 寻址顶层船员数组以更新本地缓存；
+  - **缺陷定位**：原服务端在 `_handle_polish_request` 响应体中仅提供了 `"general_data"`，未下发顶层 `"generals"` 键。因此 `onGeneralData` 未能更新缓存，`init()` 读到的依然是旧缓存中的 0 值增量！只有当后续异步全量拉取或者关闭重开弹窗时才会刷新。
+- **修复方案**：
+  - 在 [server.py](file:///d:/AI/work/xiaoxiaohaizei-offline-src/offline-server/server.py) 的 `_handle_polish_request` 响应体中直接注入 `("generals", _build_generals_list())`；
+  - 客户端在接收 `0xdf` 的同一事件循环内直接刷新本地缓存，`init()` 毫秒级即时渲染新属性预览，彻底消除卡顿滞后。
+
+#### 2. 原版 4 阶培养逻辑还原与双重上限钳位
+- **原版梯度与浮动逻辑**：
+  - **普通培养 (Type 1)**：消耗 1000 银币，四维增量在 `[-3, +4]` 间随机波动，正负兼有，低阶洗练期望微正；
+  - **加强培养 (Type 2)**：消耗 4000 银币 + 2 金币，四维增量在 `[-2, +6]` 间随机波动，大幅降低负增长概率；
+  - **白金培养 (Type 3)**：消耗 10 金币，四维增量在 `[-1, +10]` 间随机波动，极少出现扣减；
+  - **至尊培养 (Type 4)**：消耗 20 金币，四维增量在 `[+2, +15]` 间随机波动，保底高额全正增长。
+- **属性上限机制**：
+  - 结合等级 $L$ 与 `cfg_job` / `cfg_general` 的 `*_add_ceil_param` 与 `*_add_ceil` 计算上限：
+    $$\text{max\_add} = \lfloor L / 10 \rfloor \times (\text{add\_ceil\_param} \times 100) + (\text{add\_ceil} \times 100)$$
+  - 增量严格钳位在 `[-cur_grow_add, max_add - cur_grow_add]` 之间，确保替换后成长始终处于合法区间 `[0, max_add]`；
+  - 若四项随机值全部非正，且尚未达到上限，则自动保底赋予单项 +1，确保触发客户端 `SetNewAttVisible(true)` 显示。
+- **状态流转确认**：
+  - **替换属性 (Type 5 / confirm)**：将 `temp_*_grow_add` 累加至正式成长加成 `*_grow_add`，并清零临时槽；
+  - **维持原属性 (Type 6)**：清零临时槽 `temp_*_grow_add`，保留当前已有属性。
+
+#### 3. 原属性数字加条形显示修复（ProgressBar 分子与分母对齐）
+- **反汇编底层逆向与计算公式**：
+  - 反汇编 `0x00486e6c` ~ `0x0048705c`：
+    $$\text{max\_range} = \text{int}(\text{double}(\text{str\_grow}) + \text{strength\_ceil} \times 100.0)$$
+    通过 `ProgressBar->SetRange(0, max_range)` 设置进度条满格范围；
+  - 反汇编 `0x004872ac` ~ `0x004874c4`：
+    $$\text{current\_val} = \text{str\_grow} + \text{str\_grow\_add}$$
+    通过 `SetWindowText(current_val)` 输出文本标签，通过 `ProgressBar->SetPos(current_val)` 设置当前彩色条形宽度。
+- **原数值缺陷原因**：
+  - 原服务端错误下发 `strength_ceil = proto_stats["strength"] * 2.5`（约 191.0），导致分母被放大为 $29 + 191.0 \times 100 = 19129$；而分子仅为 29，填充比例仅 $0.15\%$，在客户端 UI 上表现为 0 像素完全透明；
+- **修复方案**：
+  - 在 [server.py](file:///d:/AI/work/xiaoxiaohaizei-offline-src/offline-server/server.py) 中新增 `_get_grow_limits()`：
+    - `str_grow` 规范映射为 `proto_stats["str_grow"] * 100`（如剑豪 297）；
+    - `strength_ceil` 规范映射为额外可培养上限 $\text{max\_add} / 100.0$（如 20 级为 1.35，对应 135 点额外空间）；
+  - 初始状态（`str_grow_add = 0`）下：
+    - 分子：$297$；
+    - 分母：$297 + 135 = 432$；
+    - 进度条填充率：$297 / 432 = 68.75\%$！彩色条形饱满清晰渲染，数字直观呈现 297，洗练替换后平滑向上填充至 432（100%）。
+
+#### 4. 任务状态保护与 110004 任务无缝接轨
+- 修正玩家存档 [player_save.json](file:///d:/AI/work/xiaoxiaohaizei-offline-src/offline-server/player_save.json)：
+  - `current_task`: `110004`（“属性培养”）；
+  - `task_accepted`: `True`, `task_completed`: `False`；
+  - `completed_tasks`: 包含从 `100001` 到 `100039` 以及 `110001`, `110002`, `110003` 共 42 个前置主线任务；
+  - `scene_id`: `3001`（西摩志基村），坐标 `x: 360, y: 130`，正立于接任 NPC 格雷特与交任 NPC 艾琳前方；
+  - 玩家角色在执行培养时自动完成任务指标（`task_completed = True`），向 NPC 艾琳提交后平滑推进至后续任务 `110005`（“捕鱼开放”），坚决杜绝任务回退至 100001。
+
+---
+
+### 三、 测试与运行状态
+1. 单元测试套件 `test_polish_suite.py` 全量通过（验证普通培养消耗、随机浮动、上限截断、替换生效、维持丢弃、110004 任务判定与 110005 推进流转）；
+2. 本地服务守护进程重新加载并在 `0.0.0.0:8080` 稳定运行；
+3. 玩家角色：船长 Lv20，当前任务：110004 属性培养。
