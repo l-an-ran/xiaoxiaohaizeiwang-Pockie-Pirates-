@@ -623,6 +623,7 @@ def _build_role_data() -> bytes:
         ("is_in_team",              _amf3_bool(False)),
 
         ("login_days",              _amf3_int(role["login_days"])),
+        ("daily_login",             _amf3_int(int(role.get("daily_login", role.get("login_days", 1))))),
 
         ("vip_charge",              _amf3_int(0)),
 
@@ -930,14 +931,14 @@ def _build_generals_list() -> bytes:
         ("agi_grow",          _amf3_int(int(proto_stats["agi_grow"] * 10))),
         ("sta_grow",          _amf3_int(int(proto_stats["sta_grow"] * 10))),
         ("int_grow",          _amf3_int(int(proto_stats["int_grow"] * 10))),
-        ("str_grow_add",      _amf3_int(0)),
-        ("agi_grow_add",      _amf3_int(0)),
-        ("sta_grow_add",      _amf3_int(0)),
-        ("int_grow_add",      _amf3_int(0)),
-        ("temp_str_grow_add", _amf3_int(0)),
-        ("temp_agi_grow_add", _amf3_int(0)),
-        ("temp_sta_grow_add", _amf3_int(0)),
-        ("temp_int_grow_add", _amf3_int(0)),
+        ("str_grow_add",      _amf3_int(int(role.get("str_grow_add", 0)))),
+        ("agi_grow_add",      _amf3_int(int(role.get("agi_grow_add", 0)))),
+        ("sta_grow_add",      _amf3_int(int(role.get("sta_grow_add", 0)))),
+        ("int_grow_add",      _amf3_int(int(role.get("int_grow_add", 0)))),
+        ("temp_str_grow_add", _amf3_int(int(role.get("temp_str_grow_add", 0)))),
+        ("temp_agi_grow_add", _amf3_int(int(role.get("temp_agi_grow_add", 0)))),
+        ("temp_sta_grow_add", _amf3_int(int(role.get("temp_sta_grow_add", 0)))),
+        ("temp_int_grow_add", _amf3_int(int(role.get("temp_int_grow_add", 0)))),
 
         # 体力与生命 (int)
         ("health_point",      _amf3_int(proto_stats["hp"])),
@@ -1095,15 +1096,37 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("skill_point",       _amf3_int(0)),
         ("skills",            _amf3_array(skills_list)),
         ("strength",          _amf3_double(float(c_stats["strength"]))),
-        ("agile",             _amf3_double(float(c_stats["agility"]))),
-        ("intelligence",      _amf3_double(float(c_stats["intellect"]))),
-        ("spirit",            _amf3_double(float(c_stats["stamina"]))),
-        ("strength_grow",     _amf3_double(float(c_stats["str_grow"]))),
-        ("agile_grow",        _amf3_double(float(c_stats["agi_grow"]))),
-        ("intelligence_grow", _amf3_double(float(c_stats["int_grow"]))),
-        ("spirit_grow",       _amf3_double(float(c_stats["sta_grow"]))),
-        ("hp",                _amf3_int(c_stats["hp"])),
-        ("max_hp",            _amf3_int(c_stats["hp_max"])),
+        ("agility",           _amf3_double(float(c_stats["agility"]))),
+        ("intellect",         _amf3_double(float(c_stats["intellect"]))),
+        ("stamina",           _amf3_double(float(c_stats["stamina"]))),
+
+        ("init_strength",     _amf3_double(float(c_stats["strength"]))),
+        ("init_agility",      _amf3_double(float(c_stats["agility"]))),
+        ("init_intellect",    _amf3_double(float(c_stats["intellect"]))),
+        ("init_stamina",      _amf3_double(float(c_stats["stamina"]))),
+
+        ("strength_ceil",     _amf3_double(float(c_stats["strength"] * 2.5))),
+        ("agility_ceil",      _amf3_double(float(c_stats["agility"] * 2.5))),
+        ("intellect_ceil",    _amf3_double(float(c_stats["intellect"] * 2.5))),
+        ("stamina_ceil",      _amf3_double(float(c_stats["stamina"] * 2.5))),
+
+        ("str_grow",          _amf3_int(int(c_stats["str_grow"] * 10))),
+        ("agi_grow",          _amf3_int(int(c_stats["agi_grow"] * 10))),
+        ("sta_grow",          _amf3_int(int(c_stats["sta_grow"] * 10))),
+        ("int_grow",          _amf3_int(int(c_stats["int_grow"] * 10))),
+
+        ("str_grow_add",      _amf3_int(int(g.get("str_grow_add", 0)))),
+        ("agi_grow_add",      _amf3_int(int(g.get("agi_grow_add", 0)))),
+        ("sta_grow_add",      _amf3_int(int(g.get("sta_grow_add", 0)))),
+        ("int_grow_add",      _amf3_int(int(g.get("int_grow_add", 0)))),
+
+        ("temp_str_grow_add", _amf3_int(int(g.get("temp_str_grow_add", 0)))),
+        ("temp_agi_grow_add", _amf3_int(int(g.get("temp_agi_grow_add", 0)))),
+        ("temp_sta_grow_add", _amf3_int(int(g.get("temp_sta_grow_add", 0)))),
+        ("temp_int_grow_add", _amf3_int(int(g.get("temp_int_grow_add", 0)))),
+
+        ("health_point",      _amf3_int(c_stats["hp"])),
+        ("health_point_max",  _amf3_int(c_stats["hp_max"])),
         ("physical_attack",   _amf3_int(c_stats["physical_attack"])),
         ("physical_defence",  _amf3_int(c_stats["physical_defence"])),
         ("spell_attack",      _amf3_int(c_stats["spell_attack"])),
@@ -1113,7 +1136,7 @@ def _make_companion_general_amf3(g: dict) -> bytes:
         ("dodge",             _amf3_int(10)),
         ("critic",            _amf3_int(15)),
         ("anti_critic",       _amf3_int(5)),
-        ("parry",             _amf3_int(10)),
+        ("parray",            _amf3_int(10)),
         ("anti_parry",        _amf3_int(5)),
         ("weapon",            _amf3_int(c_eq.get("weapon", 0))),
         ("armor",             _amf3_int(c_eq.get("armor", 0))),
@@ -1198,28 +1221,40 @@ def _build_formations_list() -> bytes:
 
 
 
-def _build_general_data() -> bytes:
-
-    """Build general data container object expected by onGeneral / opLoginData."""
-
+def _build_star_general_object(general_id: int = 10042230, exp: int = 0, free_times: int = 5):
     role = _get_role()
+    if general_id == 10042230 and role.get("generals"):
+        first_gen = role["generals"][0]
+        if isinstance(first_gen, dict) and first_gen.get("cfg_general_id"):
+            general_id = int(first_gen["cfg_general_id"])
+    fields = [
+        ("star",        _amf3_int(2)),
+        ("exp",         _amf3_int(exp)),
+        ("max_exp",     _amf3_int(100)),
+        ("free_times",  _amf3_int(free_times)),
+        ("cd_time",     _amf3_int(0)),
+        ("silver_cost", _amf3_int(1000)),
+        ("gold_cost",   _amf3_int(10)),
+        ("general_id",  _amf3_int(general_id)),
+    ]
+    return _amf3_object(fields)
+
+
+def _build_general_data() -> bytes:
+    """Build general data container object expected by onGeneral / opLoginData."""
+    role = _get_role()
+    star_gen = _build_star_general_object()
 
     fields = [
-
         ("generals",        _build_generals_list()),
-
         ("formations",      _build_formations_list()),
-
         ("formation_level", _amf3_int(1)),
-
         ("copper",          _amf3_double(role.get("copper", 100000))),
-
         ("gold",            _amf3_int(role.get("gold", 5000))),
-
         ("exploit",         _amf3_int(role.get("exploit", 1000))),
-
+        ("star_general",    star_gen),
+        ("STAR_GENERAL",    star_gen),
         ("request_code",    _amf3_int(0)),
-
     ]
 
     return _amf3_object(fields)
@@ -2962,6 +2997,9 @@ def _build_general_body_amf3() -> bytes:
         ("star_general",    star_gen),
         ("request_code",    _amf3_int(0)),
         ("error_code",      _amf3_int(0)),
+        ("status",          _amf3_int(1)),
+        ("role_data",       _build_role_data()),
+        ("task_data",       _build_task_data()),
     ]
     return _amf3_object(fields)
 
@@ -2975,10 +3013,13 @@ def _handle_talent_request(operation: str, body: Any, correlation_id: str) -> by
     role.setdefault("awakened_talents", {})
     talent_id = None
     if isinstance(body, list):
-        for item in body:
-            if isinstance(item, int) and item > 100:
-                talent_id = item
-                break
+        if len(body) > 2 and body[2] is not None and str(body[2]).isdigit():
+            talent_id = int(body[2])
+        else:
+            for item in body:
+                if isinstance(item, int) and item > 0 and item != 100001:
+                    talent_id = item
+                    break
     elif isinstance(body, dict):
         talent_id = body.get("3_tanentId") or body.get("tanentId") or body.get("3_talentId") or body.get("talentId") or body.get("cfg_talent_id")
     elif isinstance(body, str):
@@ -2988,21 +3029,36 @@ def _handle_talent_request(operation: str, body: Any, correlation_id: str) -> by
         except Exception:
             pass
 
-    if talent_id:
+    if talent_id is not None:
         try:
             tid_int = int(talent_id)
             cur_lvl = int(role["awakened_talents"].get(str(tid_int), 0))
-            role["awakened_talents"][str(tid_int)] = cur_lvl + 1
-            print(f"  [TALENT] Upgraded talent {tid_int} to level {cur_lvl + 1}", flush=True)
+            next_lvl = cur_lvl + 1
 
-            # 检查若当前任务为学习天赋(100031)，自动标记完成
-            if role.get("current_task") == 100031:
+            # 扣除消耗
+            cost_val = 10000
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                row = conn.execute("SELECT cost_value FROM cfg_talent_level WHERE cfg_talent_id = ? AND level = ?", (tid_int, next_lvl)).fetchone()
+                conn.close()
+                if row and row[0]:
+                    cost_val = int(row[0])
+            except Exception:
+                cost_val = 10000
+
+            role["copper"] = max(0.0, float(role.get("copper", 100000)) - cost_val)
+            role["awakened_talents"][str(tid_int)] = next_lvl
+            print(f"  [TALENT] Upgraded talent {tid_int} to level {next_lvl} (cost {cost_val})", flush=True)
+
+            # 检查任务 100031 或 100037
+            if role.get("current_task") in (100031, 100037):
                 role["task_completed"] = True
-                print("  [TASK] Task 100031 学习天赋 marked completed via talent upgrade", flush=True)
+                print(f"  [TASK] Task {role.get('current_task')} 学习天赋 marked completed via talent upgrade", flush=True)
             _save()
         except Exception as e:
             print(f"  [TALENT] Error upgrading talent {talent_id}: {e}", flush=True)
 
+    # 返回同时满足 ROLE.talentUp 和 general 刷新结构的回包
     return _build_general_response(correlation_id)
 
 
@@ -3143,20 +3199,6 @@ def _build_tavern_generals_array():
         is_rec = 1 if gid in recruited_ids else 0
         tavern_list.append(_make_tavern_general_amf3(gid, name, qual, star, job, silver, gold, is_rec))
     return _amf3_array(tavern_list)
-
-
-def _build_star_general_object(general_id: int = 10042230, exp: int = 0, free_times: int = 5):
-    fields = [
-        ("star",        _amf3_int(2)),
-        ("exp",         _amf3_int(exp)),
-        ("max_exp",     _amf3_int(100)),
-        ("free_times",  _amf3_int(free_times)),
-        ("cd_time",     _amf3_int(0)),
-        ("silver_cost", _amf3_int(1000)),
-        ("gold_cost",   _amf3_int(10)),
-        ("general_id",  _amf3_int(general_id)),
-    ]
-    return _amf3_object(fields)
 
 
 def _make_treat_general_amf3(gid: int, name: str, job: int, qual: int, face: int, fig: int, cost: int,
@@ -3458,20 +3500,333 @@ def _build_tavern_info_response(correlation_id: str) -> bytes:
 
 
 def _build_activity_response(correlation_id: str) -> bytes:
-
     fields = [
-
         ("activity_data", b"\x09\x01\x01"),
-
         ("request_code",  _amf3_int(0)),
-
         ("error_code",    _amf3_int(0)),
+    ]
+    body_amf3 = _amf3_object(fields)
+    return _make_ack_message(correlation_id, body_amf3)
 
+
+def _handle_reward_login(correlation_id: str) -> bytes:
+    role = _get_role()
+    daily_login = int(role.get("daily_login", role.get("login_days", 1)))
+    claimed = role.get("claimed_login_rewards", [])
+    max_claimed_step = max(claimed) if claimed else 0
+
+    reward_list = [
+        _amf3_object([
+            ("type", _amf3_int(2)),
+            ("step", _amf3_int(max_claimed_step)),
+        ]),
+        _amf3_object([
+            ("type", _amf3_int(1)),
+            ("step", _amf3_int(0)),
+        ])
     ]
 
-    body_amf3 = _amf3_object(fields)
+    reward_list2 = []
+    if daily_login in claimed:
+        reward_list2.append(_amf3_object([
+            ("item_id", _amf3_int(300076)),
+            ("amount",  _amf3_int(2)),
+        ]))
 
-    return _make_ack_message(correlation_id, body_amf3)
+    fields = [
+        ("online_time",   _amf3_int(7200)),
+        ("reward_list",   _amf3_array(reward_list)),
+        ("reward_list2",  _amf3_array(reward_list2)),
+        ("daily_login",   _amf3_int(daily_login)),
+        ("pay_first",     _amf3_int(0)),
+        ("copper",        _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",          _amf3_int(int(role.get("gold", 5000)))),
+        ("reward_copper", _amf3_int(0)),
+        ("reward_gold",   _amf3_int(0)),
+        ("error_code",    _amf3_int(0)),
+        ("request_code",  _amf3_int(0)),
+        ("status",        _amf3_int(1)),
+        ("role_data",     _build_role_data()),
+    ]
+    print(f"  -> ACTIVITY.rewardLogin OK: daily_login={daily_login} claimed={claimed}", flush=True)
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_get_reward(correlation_id: str, body: Any = None) -> bytes:
+    role = _get_role()
+    daily_login = int(role.get("daily_login", role.get("login_days", 1)))
+    claimed = role.setdefault("claimed_login_rewards", [])
+    step_to_claim = daily_login
+
+    # Query cfg_reward for type 2, step = step_to_claim
+    items = _get_player_items()
+    reward_items_given = []
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        row = conn.execute("SELECT cfg_item_id, amount, cfg_item_id_2, amount_2 FROM cfg_reward WHERE type = 2 AND step = ?", (step_to_claim,)).fetchone()
+        conn.close()
+        if row:
+            if row[0] and row[1]:
+                reward_items_given.append((int(row[0]), int(row[1])))
+            if row[2] and row[3]:
+                reward_items_given.append((int(row[2]), int(row[3])))
+    except Exception as e:
+        print(f"  [GETREWARD DB ERROR] {e}", flush=True)
+
+    if not reward_items_given:
+        reward_items_given = [(300076, 2)]
+
+    for item_id, amt in reward_items_given:
+        found = False
+        for it in items:
+            if it.get("cfg_item_id") == item_id:
+                it["amount"] = it.get("amount", 0) + amt
+                found = True
+                break
+        if not found:
+            new_id = max([it.get("item_id", 1000) for it in items] or [1000]) + 1
+            items.append({
+                "item_id": new_id,
+                "cfg_item_id": item_id,
+                "amount": amt,
+                "level": 1,
+                "star": 0,
+                "rise": 0,
+                "equiped": 0,
+                "general_id": 0,
+                "part": 0
+            })
+
+    if step_to_claim not in claimed:
+        claimed.append(step_to_claim)
+    _save()
+
+    reward_list = [
+        _amf3_object([
+            ("type", _amf3_int(2)),
+            ("step", _amf3_int(step_to_claim)),
+        ]),
+        _amf3_object([
+            ("type", _amf3_int(1)),
+            ("step", _amf3_int(0)),
+        ])
+    ]
+    reward_list2 = [
+        _amf3_object([
+            ("item_id", _amf3_int(iid)),
+            ("amount",  _amf3_int(amt)),
+        ]) for iid, amt in reward_items_given
+    ]
+
+    fields = [
+        ("online_time",   _amf3_int(7200)),
+        ("reward_list",   _amf3_array(reward_list)),
+        ("reward_list2",  _amf3_array(reward_list2)),
+        ("daily_login",   _amf3_int(daily_login)),
+        ("pay_first",     _amf3_int(0)),
+        ("copper",        _amf3_double(float(role.get("copper", 100000)))),
+        ("gold",          _amf3_int(int(role.get("gold", 5000)))),
+        ("reward_copper", _amf3_int(0)),
+        ("reward_gold",   _amf3_int(0)),
+        ("error_code",    _amf3_int(0)),
+        ("request_code",  _amf3_int(0)),
+        ("status",        _amf3_int(1)),
+        ("role_data",     _build_role_data()),
+        ("bag_list",      _build_player_items_amf3()),
+        ("item_data",     _build_item_data()),
+    ]
+    print(f"  -> ACTIVITY.getreward OK: claimed day={step_to_claim} items={reward_items_given}", flush=True)
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_reward_check(correlation_id: str) -> bytes:
+    role = _get_role()
+    daily_login = int(role.get("daily_login", role.get("login_days", 1)))
+    claimed = role.get("claimed_login_rewards", [])
+    has_unclaimed = 1 if daily_login not in claimed else 0
+    fields = [
+        ("status",          _amf3_int(1)),
+        ("error_code",      _amf3_int(0)),
+        ("has_reward",      _amf3_int(has_unclaimed)),
+        ("login_reward",    _amf3_int(has_unclaimed)),
+        ("online_reward",   _amf3_int(0)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> bytes:
+    role = _get_role()
+    gen_id = 1001
+    polish_type = 1
+    confirm = False
+
+    if "CONFIRM" in operation.upper():
+        confirm = True
+
+    if isinstance(body, list):
+        if len(body) > 2 and body[2] is not None and str(body[2]).isdigit():
+            gen_id = int(body[2])
+        if len(body) > 3 and body[3] is not None and str(body[3]).isdigit():
+            polish_type = int(body[3])
+    elif isinstance(body, dict):
+        gen_id = int(body.get("3_generalId", body.get("generalId", 1001)))
+        polish_type = int(body.get("4_type", body.get("type", 1)))
+    elif isinstance(body, str):
+        try:
+            j = json.loads(body)
+            gen_id = int(j.get("3_generalId", j.get("generalId", 1001)))
+            polish_type = int(j.get("4_type", j.get("type", 1)))
+        except Exception:
+            pass
+
+    target = None
+    if gen_id in (role.get("figure"), 1001, role.get("role_id")):
+        target = role
+    else:
+        for g in role.get("generals", []):
+            if g.get("general_id") == gen_id or g.get("cfg_general_id") == gen_id:
+                target = g
+                break
+    if target is None:
+        target = role
+
+    if confirm or polish_type == 5:
+        # 替换属性
+        target["str_grow_add"] = target.get("temp_str_grow_add", target.get("str_grow_add", 0))
+        target["agi_grow_add"] = target.get("temp_agi_grow_add", target.get("agi_grow_add", 0))
+        target["sta_grow_add"] = target.get("temp_sta_grow_add", target.get("sta_grow_add", 0))
+        target["int_grow_add"] = target.get("temp_int_grow_add", target.get("int_grow_add", 0))
+        target["temp_str_grow_add"] = 0
+        target["temp_agi_grow_add"] = 0
+        target["temp_sta_grow_add"] = 0
+        target["temp_int_grow_add"] = 0
+        print(f"  [POLISH] Replaced grow stats for gen={gen_id}", flush=True)
+    elif polish_type == 6:
+        # 维持属性
+        target["temp_str_grow_add"] = 0
+        target["temp_agi_grow_add"] = 0
+        target["temp_sta_grow_add"] = 0
+        target["temp_int_grow_add"] = 0
+        print(f"  [POLISH] Kept original grow stats for gen={gen_id}", flush=True)
+    else:
+        # 培养消耗: 1: 普通(1000银币), 2: 加强(4000银币+2金币), 3: 白金(10金币), 4: 至尊(20金币)
+        COSTS = {
+            1: (1000, 0),
+            2: (4000, 2),
+            3: (0, 10),
+            4: (0, 20),
+        }
+        c_silver, c_gold = COSTS.get(polish_type, (1000, 0))
+        role["copper"] = max(0.0, float(role.get("copper", 100000)) - c_silver)
+        role["gold"] = max(0, int(role.get("gold", 5000)) - c_gold)
+
+        import random
+        ranges = {
+            1: (-2, 3),
+            2: (-1, 4),
+            3: (1, 5),
+            4: (2, 6),
+        }
+        low, high = ranges.get(polish_type, (-2, 3))
+        old_s = target.get("str_grow_add", 0)
+        old_a = target.get("agi_grow_add", 0)
+        old_t = target.get("sta_grow_add", 0)
+        old_i = target.get("int_grow_add", 0)
+
+        target["temp_str_grow_add"] = max(0, old_s + random.randint(low, high))
+        target["temp_agi_grow_add"] = max(0, old_a + random.randint(low, high))
+        target["temp_sta_grow_add"] = max(0, old_t + random.randint(low, high))
+        target["temp_int_grow_add"] = max(0, old_i + random.randint(low, high))
+
+        # 若当前任务为属性培养(110004)，标记完成
+        if role.get("current_task") == 110004:
+            role["task_completed"] = True
+            print("  [TASK] Task 110004 属性培养 marked completed via polish", flush=True)
+
+    _save()
+
+    resp_fields = [
+        ("status",          _amf3_int(1)),
+        ("error_code",      _amf3_int(0)),
+        ("role_data",       _build_role_data()),
+        ("general_data",    _build_general_data()),
+        ("task_data",       _build_task_data()),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(resp_fields))
+
+
+def _handle_treasure_request(operation: str, body: Any, correlation_id: str) -> bytes:
+    role = _get_role()
+    items = _get_player_items()
+    body_dict = {}
+    if isinstance(body, dict):
+        body_dict = body
+    elif isinstance(body, list) and body and isinstance(body[0], dict):
+        body_dict = body[0]
+    elif isinstance(body, list) and len(body) > 3 and isinstance(body[3], int):
+        body_dict = {"anyCount": body[3]}
+
+    count = int(body_dict.get("anyCount", body_dict.get("count", 1)))
+    if count <= 0: count = 1
+
+    # 寻找宝藏打捞绳 300010
+    rope_item = None
+    for it in items:
+        if it.get("cfg_item_id") == 300010 and it.get("amount", 0) > 0:
+            rope_item = it
+            break
+
+    ropes_used = 0
+    if rope_item:
+        ropes_used = min(rope_item["amount"], count)
+        rope_item["amount"] -= ropes_used
+        if rope_item["amount"] <= 0:
+            items.remove(rope_item)
+
+    needed_gold = count - ropes_used
+    gold_cost = needed_gold * 10
+    if gold_cost > 0:
+        role["gold"] = max(0, int(role.get("gold", 0)) - gold_cost)
+
+    # 奖励银币与道具
+    copper_reward = 10000.0 * count
+    role["copper"] = float(role.get("copper", 0)) + copper_reward
+
+    reward_item_id = 300053
+    found_rew = False
+    for it in items:
+        if it.get("cfg_item_id") == reward_item_id:
+            it["amount"] = it.get("amount", 0) + 2 * count
+            found_rew = True
+            break
+    if not found_rew:
+        new_id = max([it.get("item_id", 1000) for it in items] or [1000]) + 1
+        items.append({
+            "item_id": new_id,
+            "cfg_item_id": reward_item_id,
+            "amount": 2 * count,
+            "level": 1,
+            "star": 0,
+            "rise": 0,
+            "equiped": 0,
+            "general_id": 0,
+            "part": 0
+        })
+
+    _save()
+    print(f"  -> MANOR.treasure OK: count={count} ropes_used={ropes_used} gold_cost={gold_cost}", flush=True)
+
+    resp_fields = [
+        ("status",          _amf3_int(1)),
+        ("error_code",      _amf3_int(0)),
+        ("copper",          _amf3_double(float(role.get("copper", 0)))),
+        ("gold",            _amf3_int(int(role.get("gold", 0)))),
+        ("role_data",       _build_role_data()),
+        ("general_data",    _build_general_data()),
+        ("bag_list",        _build_player_items_amf3()),
+        ("item_data",       _build_item_data()),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(resp_fields))
 
 
 
@@ -4541,6 +4896,10 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             print(f"  -> tavern info handler: {operation}", flush=True)
             return _build_tavern_info_response(correlation_id)
 
+        if "POLISH" in op_upper:
+            print(f"  -> general polish handler: {operation} body={body}", flush=True)
+            return _handle_polish_request(operation, body, correlation_id)
+
         print("  -> general data", flush=True)
         return _build_general_response(correlation_id)
 
@@ -4567,10 +4926,17 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
 
     # ── ACTIVITY ───────────────────────────────────────────────────────────────
 
-    if "ACTIVITY" in op_upper:
-
+    if "ACTIVITY" in op_upper or "REWARDLOGIN" in op_upper or "GETREWARD" in op_upper or "REWARDCHECK" in op_upper:
+        op_name = op_upper.split(".")[-1]
+        if "REWARDLOGIN" in op_name:
+            return _handle_reward_login(correlation_id)
+        if "GETREWARD" in op_name:
+            return _handle_get_reward(correlation_id, body)
+        if "REWARDCHECK" in op_name:
+            return _handle_reward_check(correlation_id)
+        if "REWARDONLINE" in op_name:
+            return _handle_reward_login(correlation_id)
         print("  -> activity ACK", flush=True)
-
         return _build_activity_response(correlation_id)
 
 
@@ -4738,12 +5104,26 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             print(f"  -> manor.trainingStatus/slot OK", flush=True)
             return _build_training_response(correlation_id)
 
+        if "TREASURE" in op_upper_check:
+            print(f"  -> manor.treasure handler: {operation} body={body}", flush=True)
+            return _handle_treasure_request(operation, body, correlation_id)
+
         if "FORGE" in op_name:
             print(f"  -> forge handler: {operation}", flush=True)
             return _handle_forge_request(_extract_body(envelope), correlation_id)
 
         print(f"  -> manor training response fallback for {operation}", flush=True)
         return _build_training_response(correlation_id)
+
+    # ── POLISH / CULTIVATE ─────────────────────────────────────────────────────
+    if "POLISH" in op_upper:
+        print(f"  -> polish handler: {operation} body={body}", flush=True)
+        return _handle_polish_request(operation, body, correlation_id)
+
+    # ── TREASURE ───────────────────────────────────────────────────────────────
+    if "TREASURE" in op_upper:
+        print(f"  -> treasure handler: {operation} body={body}", flush=True)
+        return _handle_treasure_request(operation, body, correlation_id)
 
     # ── TALENT ─────────────────────────────────────────────────────────────────
     if "TALENT" in op_upper or "TANENT" in op_upper:
@@ -4755,12 +5135,8 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
         print(f"  -> item ACK for {operation}", flush=True)
         return _handle_item_request(operation, _extract_body(envelope), correlation_id)
 
-
-
     # Default
-
     print(f"  -> generic ACK for {operation!r}", flush=True)
-
     return _build_simple_ack(correlation_id)
 
 

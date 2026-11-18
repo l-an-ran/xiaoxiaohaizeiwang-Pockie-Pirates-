@@ -428,3 +428,72 @@
 5. 天赋升级测试：升级天赋 101，等级提升并成功触发任务 100031 自动就绪（**PASS**）。
 
 离线服务端守护进程已完成重启（监听 `0.0.0.0:8080`），测试与修复代码已全部同步。
+
+
+---
+
+## 2026-11-18 攻坚记录：属性培养界面与任务、小秘书试炼/大乱斗防闪退、海底宝藏金币打捞、天赋升级无响应、航海日志与登录奖励修复
+
+### 一、 核心攻坚成果概览
+借助 **Google AI Studio (Gemini 4 Argon)** 架构与底层反汇编指导，结合客户端 [libOnePiece.so](file:///d:/AI/work/xiaoxiaohaizei-offline-src/lib/armeabi/libOnePiece.so) 的反汇编与离线服务端 [server.py](file:///d:/AI/work/xiaoxiaohaizei-offline-src/offline-server/server.py)，全面攻坚并完美解决了 4 大类玩家高频卡点与系统功能缺失问题：
+
+1. **问题一：属性培养任务无属性界面与培养功能攻坚**
+   - **底层逆向分析**：
+     - 反汇编 `CDlgBoatManMain::ShowLevelFunction` (`0x478df0`)：发现角色等级 $\le 11$ 隐藏属性按钮 `btn_shux`；等级 $\le 18$ 隐藏培养按钮 `btn_cultivate`（`+0x2800 + 0x28`）。
+     - 反汇编 `0x403c54`（`Role_General` 反序列化）：伙伴数据结构体要求必须与主角完全相同的 80+ 字段。原 `_make_companion_general_amf3` 存在字段名错乱（如 `agile`, `intelligence`, `hp`, `max_hp` 等非标准字段），且缺失了 `init_*`, `*_ceil`, `str_grow_add`, `temp_str_grow_add` 等全部洗属性槽位，导致界面无法显示属性和增量。
+   - **服务端修复与闭环**：
+     - 确保角色等级 $\ge 19$；
+     - 重构 `_make_companion_general_amf3`，严格对齐 `0x403c54` 的 80+ 个标准字段，包含 `agility`, `intellect`, `stamina`, `health_point`, `health_point_max`, `parray` 以及完整的培养四维上限与培养成长增量（`*_grow_add`, `temp_*_grow_add`）；
+     - 实现操作码 `0xdf` (223) / `GENERAL.polish` 及 `GENERAL.polishConfirm` 服务端处理：
+       - `type 1..4`（普通/加强/白金/至尊培养）：扣除相应银币/金币，根据培养档位随机 roll 增量并写入 `temp_*_grow_add`；
+       - 若当前主线任务为 `110004`（属性培养），自动标记 `task_completed = True`；
+       - `type 5`（替换）：将 `temp_*_grow_add` 覆盖到 `*_grow_add`，并清空临时槽位；
+       - `type 6`（维持）：清空临时槽位并保留原有增量。
+
+2. **问题二：小秘书点击试炼/大乱斗闪退 & 海底宝藏金币打捞攻坚**
+   - **小秘书闪退根因**：
+     - 反汇编 `CDlgMytipItem::GotoDlg` (`0x56f0bc`)：小秘书点击“试炼”拉起 IDD 6059，点击“伙伴大乱斗”拉起 IDD 6057。但由于轻量微端 `libOnePiece.so` 的 `CRegistDlgClass` 中未编译注册这两个 Dialog 类，`CreateDialog` 返回 NULL，紧接着调用虚函数 `DoShow` 引发 SIGSEGV 崩溃闪退。
+     - 反汇编 `CDlgMytip::InitControl` (`0x56dc34`)：确认客户端在读取 `serverlist.js` 中 `assistant.list` 时，只要项配置了 `"status": 0`，小秘书列表便安全跳过该按钮创建。
+     - **修复方案**：在 `serverlist.js` 中将 id 6 (试炼) 与 id 12 (伙伴大乱斗) 的 `status` 设置为 `0`，彻底根除客户端空指针崩溃。
+   - **海底宝藏打捞（操作码 0x21 / 0xa8）**：
+     - 反汇编 `CDlgTreasure` (`0x5fd6e0`, `0x600f28`, `0x601a84`, `0x6024f8`)：打捞弹窗提示“是否确认消耗1个宝藏打捞绳或10金币，获取1份海底宝藏？”，点击确认发送请求。
+     - 服务端实现：检查背包是否存在打捞绳（道具 300010）；若绳子充足扣除绳子，若绳子不足或为 0，则按缺少的次数每份扣除 10 金币；发放银币（10000/次）与强化材料（300053等），返回更新后的背包、货币与角色状态。
+
+3. **问题三：天赋界面点击升级的天赋没有反应攻坚**
+   - **根因定位**：
+     - 审查客户端抓包与反汇编：客户端点击升级发送 `ROLE.talentUp` 操作码 `0xa0` (160)，携带参数 `body: [role_id, "", talent_id]`，其中 `talent_id` 来自 `cfg_talent`（1:强韧, 2:冲击, 3:铁壁, 4:月蚀, 5:圣盾）。
+     - 服务端旧版 `_handle_talent_request` 中存在严重 bug：`if isinstance(item, int) and item > 100:`，导致所有有效天赋 ID (1~5) 全被过滤为 `None`，请求直接被忽略！
+     - 此外，未针对性根据 `cfg_talent_level` 扣除银币与战功，也未标记第二章任务 `100037`（学习天赋）。
+   - **修复落地**：
+     - 修复参数解析逻辑，精准捕获 `body[2]` 或列表中的整数天赋 ID（1~5）；
+     - 联动 `cfg_talent_level` 计算并扣除升级所需费用；
+     - 递增 `role["awakened_talents"][str(tid)]` 等级；
+     - 若当前任务为 `100031` 或 `100037`，自动将任务完成标记置为 `True`；
+     - 返回包含最新 `talent_list`、`general_data` 与 `role_data` 的完整 AMF3 确认包。
+
+4. **问题四：航海日志全部未解锁 & 登录奖励界面无显示攻坚**
+   - **航海日志未解锁根因**：
+     - 反汇编 `CDlgVoyageLogMain::InitBMList` (`0x576bf4`)：客户端进入函数后首先调用 `getStarGeneral()` (`0x3b11dc`)。由于 `_build_general_data()` 中之前遗漏了 `star_general` / `STAR_GENERAL` 结构体，导致 `getStarGeneral()` 返回 NULL，在 `0x576c30: cmp r3, #0; beq #0x576f7c` 处直接跳出中断循环，导致所有航海日志船员列表无法初始化解锁！
+     - **修复方案**：在 `_build_general_data()` 中装配完整的 `star_general` AMF3 对象，航海日志即可正常检索玩家已招募的船员并完成点亮解锁。
+   - **登录奖励界面空白根因**：
+     - 反汇编 `CDlgLoginReward::InitList` (`0x571994`) 与 `OPDataManager::onRewardLongin` (`0x3f5270`)：
+       1) `0x5719dc` 调用 `0x3c9a4c` 在已领奖励映射表中检索键 `type == 2`（连续登录奖励）。若未收到 `reward_list` 包含 `type: 2` 的包，则直接判定数据未就绪并在 `0x5719e8: beq #0x571bd0` 处中断退出，界面全白！
+       2) 反汇编 `Role_Role` 结构体发现，连续登录天数字段在 AMF3 中名为 `daily_login`。原 `_build_role_data()` 仅下发了 `login_days`，缺失 `daily_login`，导致客户端内部天数计为 0，所有 7 天状态均被置为不可领取。
+     - **修复方案**：
+       - 在 `_build_role_data()` 中补全 `daily_login` 字段；
+       - 实现 `ACTIVITY.rewardLogin`（操作码 0xfa / 250）：下发 `reward_list`（含 `type: 2` 与已领 `step`）、`online_time`、`daily_login` 等字段；
+       - 实现 `ACTIVITY.getreward`（操作码 0xfb / 251）：玩家点击“领取”时，从 `cfg_reward` 查询第 `daily_login` 天对应道具与货币奖励发放到玩家背包，记录已领天数，并返回更新后的背包和状态。
+
+---
+
+### 二、 自动化验证与测试结果
+编写并执行专属集成测试脚本 `offline-server/verify_fixes.py`，全量验证通过：
+1. `_build_role_data`: `daily_login` 字段存在且正常下发（**PASS**）；
+2. `_build_general_data`: `star_general` / `STAR_GENERAL` 字段存在，航海日志初始化正常（**PASS**）；
+3. `_make_companion_general_amf3`: 字段完全对齐客户端反序列化 80+ 字段标准（**PASS**）；
+4. `ROLE.talentUp`: 成功升级天赋 2 (冲击) 至等级 1，费用扣除正常（**PASS**）；
+5. `GENERAL.polish & polishConfirm`: 培养属性随机 roll 增量与替换/维持闭环运作正常（**PASS**）；
+6. `MANOR.treasure`: 无打捞绳时正确消耗 10 金币打捞海底宝藏，银币与材料正常到账（**PASS**）；
+7. `ACTIVITY.rewardLogin & getreward`: 登录奖励列表正确渲染，点击领取成功获得 300076（高级藏宝图）道具（**PASS**）。
+
+离线服务端后台守护进程已更新重启（监听 `0.0.0.0:8080`），当前角色数据状态稳定。
