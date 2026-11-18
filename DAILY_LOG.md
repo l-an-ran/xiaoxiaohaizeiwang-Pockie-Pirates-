@@ -497,3 +497,72 @@
 7. `ACTIVITY.rewardLogin & getreward`: 登录奖励列表正确渲染，点击领取成功获得 300076（高级藏宝图）道具（**PASS**）。
 
 离线服务端后台守护进程已更新重启（监听 `0.0.0.0:8080`），当前角色数据状态稳定。
+
+
+---
+
+## 2026-11-19 攻坚记录：属性培养新属性预览、天赋升级点击响应、航海日志/登录奖励、日常任务展示与战斗经验/历练结算攻坚
+
+### 一、 核心攻坚背景与协同
+在 **Google AI Studio / Gemini 网页端 (Gemini 4 Argon)** 架构深度指导下，结合 Android 微端原生库 [libOnePiece.so](file:///d:/AI/work/xiaoxiaohaizei-offline-src/lib/armeabi/libOnePiece.so) 的 Capstone 精准反汇编分析，对离线服务端 [server.py](file:///d:/AI/work/xiaoxiaohaizei-offline-src/offline-server/server.py) 进行了全模块重构，系统性解决了 5 大高频阻塞与数值结算缺陷。
+
+---
+
+### 二、 5 大问题底层根因与技术解决方案
+
+#### 1. 属性培养新属性预览无法显示（CDlgBMPolish）
+- **底层逆向分析**：
+  - 反汇编 `0x486cd8` (`CDlgBMPolish::init(GENERAL*)`) 与 `0x4874c8`~`0x487548`：客户端在打开培养窗口以及收到洗练返回包后，检查 `GENERAL` 偏移 `0x13c`, `0x140`, `0x144`, `0x148` 四个整型字段（`temp_str_grow_add`, `temp_agi_grow_add`, `temp_sta_grow_add`, `temp_int_grow_add`）。
+  - 若四项临时增量全部为 0，客户端执行 `bl #0x486660` 调用 `SetNewAttVisible(false)`，彻底隐藏右侧“培养后属性”对比面板！
+- **服务端修复与闭环**：
+  - 在 `_handle_polish_request` 培养分支中，生成 `temp_*_grow_add` 增量（数值 1~5）并写入角色/船员数据；
+  - 在操作码 `0xdf` 响应包顶层及内部 `general_data` 中下发 `temp_*_grow_add` 与 `str_grow_add`；
+  - 玩家点击“替换”（`type == 5` / `confirm`）时，将 `temp_*_grow_add` 累加至 `str_grow_add` 正式生效并清零临时槽位；玩家点击“维持”（`type == 6`）时清空临时槽位。
+
+#### 2. 天赋界面点击升级无反应（CDlgGeneralTalent / OPController::GameProcess）
+- **底层逆向分析**：
+  - 反汇编 `0x5de00c` (`CDlgGeneralTalent::OnNetPackage`)、`0x3dd7cc` (`OPController::GameProcess`) 与 `0x401b28` (`OPDataManager::onRoleTalentRefresh`)：
+  - 客户端点击升级按钮发送操作码 `0xa0` (`3_tanentId`)，并在收到服务端响应后校验 `status: 1` 与 `error_code: 0`；
+  - 随后客户端解析响应包中的 `talent_list` 数组（元素包含 `cfg_talent_id`、`level`、`max_level`），并触发 `0x2e` (`GENERAL.general`) 全量同步。原服务端响应包中遗漏了 `talent_list` 字段，且内部天赋 ID 过滤条件有误，导致客户端解析失败并中断后续处理。
+- **服务端修复与闭环**：
+  - 在 `_handle_talent_request` 中精准解析天赋 ID，扣除对应等级消耗（来自 `cfg_talent_level`）；
+  - 响应包中完整组装 `talent_list` 与 `talents` 数组，下发最新天赋等级、历练 `exploit` 及货币；
+  - 任务 `100031` / `100037`（学习天赋）在升级时自动置为完成状态。
+
+#### 3. 航海日志全部未解锁 & 登录奖励界面无显示（CDlgVoyageLogMain & CDlgLoginReward）
+- **航海日志根因与修复**：
+  - 反汇编 `CDlgVoyageLogMain::InitBMList` (`0x576bf4`)：客户端遍历 `star_general_list`，对比玩家拥有的船员配置 ID 判断激活状态。在 `_build_general_data()` 中补全 `star_general_list`、`star_generals` 与 `starGeneral` 结构体，日志点亮与图鉴解锁恢复正常。
+- **登录奖励根因与修复**：
+  - 反汇编 `0x3f5270` (`onRewardLongin`) 与 `0x571994` (`CDlgLoginReward::InitList`)：
+  - `onRewardLongin` 遍历 `reward_list` 数组，要求每个元素必须是包含属性 `"type"` 和 `"step"` 的 AMF3 对象，将二元组存入内部奖励映射表 `+0x238`。
+  - `CDlgLoginReward::InitList` 启动时调用 `0x3c9a4c` 检索 `type == 2`（连续登录奖励）。若未检索到，则在 `0x5719e8: beq #0x571bd0` 处直接中断跳过所有列表渲染，导致弹窗一片空白！
+  - 修复：在 `_handle_reward_login` 中下发标准 1D 数组 `reward_list`（配置 `type: 2`, `type: 1` 等）；同时在 `_build_role_data()` 中补齐 `daily_login` 字段，登录奖励 7 天看板完整渲染并支持领取。
+
+#### 4. 日常任务不显示（CDlgDailyTest / CDlgTask）
+- **底层逆向分析**：
+  - 反汇编 `0x4d27a4` 和 `0x4d33b8` (`CDlgDailyTest::initDatas`)：客户端检查角色数据中的 `step` 字段。查询配置表 `cfg_step`，当且仅当 `step >= 10` 时字段 `daily_open == 1`（开放日常任务）。
+  - 此前 `_build_role_data()` 中硬编码 `step = 0`，导致客户端内部逻辑判定日常任务系统尚未解锁；此外 `_build_task_data()` 中支线与日常任务此前为空列表。
+- **服务端修复与闭环**：
+  - 将 `_build_role_data()` 中的 `step` 修正为 14（满足当前第 2/3 章任务进度与功能开放要求）；
+  - 在 `_build_task_data()` 中填充 `mem_branch_task_list`、`accpetable_branch_task_list`、`daily_task_list`，日常任务界面正常展示并可接受任务。
+
+#### 5. 战斗结算经验与历练奖励结算（BATTLE.battle 0x3d）
+- **底层逆向分析**：
+  - 反汇编 `0x00416d54` (`OPDataManager::onBattleInfo`)、`0x00419250` (`result_data` 解析器) 与 `0x0046aee4` (`CDlgBattleWin::initBattleWin`)。
+- **结算链路全流程修复**：
+  - **真实数据读取**：战斗胜利后，优先依据关卡军队 ID 从 `cfg_army` 读取真实的 `reward_experience`（经验）与 `reward_exploit`（历练），并联动主线战斗任务取最优奖励；
+  - **主角经验与升级**：同步累加 `role["exp"]`、`role["experience"]`、`role["exploit"]` 与 `role["copper"]`。循环查询 `cfg_level_experience` 扣除经验阶梯并升级角色等级 `role["level"]`，赠送技能点；
+  - **全员船员经验同步**：遍历 `role["generals"]` 中已招募伙伴，同步发放相同结算经验；伙伴根据 `cfg_level_experience` 自主升级，且等级严格受限于主角当前等级；
+  - **AMF3 协议结算包对齐**：在 `result_data` 中下发 `reward_experience`, `reward_copper`, `reward_exploit`, `reward_item`, `copper`, `exp`；顶层响应体携带 `exp`, `exploit`, `role_exp`, `role_level`；并确保后续 `0x2e` (`GENERAL.general`) 实时下发最新伙伴与角色属性。
+
+---
+
+### 三、 自动化集成验证结果
+运行端到端集成测试脚本 `verify_all_fixes.py`，全量验证通过：
+- **测试 1 (属性培养)**：洗练生成增量 `temp_*_grow_add > 0`，点击替换成功累加至 `str_grow_add`（**PASS**）；
+- **测试 2 (天赋升级)**：天赋等级正确递增，消耗扣除正常，任务自动标记就绪（**PASS**）；
+- **测试 3 (航海日志与登录奖励)**：`star_general_list` 正常装配，`reward_list` 包含 `type: 2` 正常解析（**PASS**）；
+- **测试 4 (日常任务与Step)**：`step = 14` 满足开启条件，任务列表下发完整（**PASS**）；
+- **测试 5 (战斗结算与伙伴经验)**：关卡经验/历练正确入账，主角与伙伴（赞高、巴基等）成功结算经验并触发多级升级（**PASS**）。
+
+服务端后台守护进程已更新并平稳运行于 `0.0.0.0:8080`。

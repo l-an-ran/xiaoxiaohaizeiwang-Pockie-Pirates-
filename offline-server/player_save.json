@@ -4,16 +4,16 @@
     "name": "船长",
     "level": 19,
     "face": 1001,
-    "figure": 1001,
+    "figure": 1008,
     "nation": 1,
-    "gold": 96369,
-    "copper": 3976827.0,
+    "gold": 96363,
+    "copper": 2047827.0,
     "action_point": 100,
     "ap_max": 100,
-    "scene_id": 3001,
-    "scene_x": 1188,
-    "scene_y": 132,
-    "current_task": 110005,
+    "scene_id": 2003,
+    "scene_x": 1566,
+    "scene_y": 27,
+    "current_task": 110008,
     "completed_tasks": [
       100028,
       100029,
@@ -30,7 +30,10 @@
       110001,
       110002,
       110003,
-      110004
+      110004,
+      110005,
+      110006,
+      110007
     ],
     "battle_wins": {
       "10101": 2,
@@ -72,7 +75,12 @@
       "10607": 1,
       "10608": 1,
       "10609": 1,
-      "10610": 1
+      "10610": 1,
+      "10701": 2,
+      "10702": 1,
+      "10703": 1,
+      "corr_battle": 1,
+      "110001": 1
     },
     "login_days": 1,
     "created": true,
@@ -386,8 +394,8 @@
       "amulet": 0,
       "misc": 1017
     },
-    "exp": 14300,
-    "task_accepted": false,
+    "exp": 39700,
+    "task_accepted": true,
     "task_completed": false,
     "camp_stars": {
       "10101": 3,
@@ -429,7 +437,12 @@
       "10607": 3,
       "10608": 3,
       "10609": 3,
-      "10610": 3
+      "10610": 3,
+      "10701": 3,
+      "10702": 3,
+      "10703": 3,
+      "corr_battle": 3,
+      "110001": 3
     },
     "awakened_skills": {
       "1007": {
@@ -469,9 +482,10 @@
         "job": 10003,
         "figure": 10083,
         "face": 10083,
-        "level": 10,
+        "level": 17,
         "skill": 51009,
-        "experience": 213000
+        "experience": 31000,
+        "exp": 31000
       },
       {
         "general_id": 10052199,
@@ -482,9 +496,14 @@
         "job": 10002,
         "figure": 10011,
         "face": 10011,
-        "level": 8,
+        "level": 16,
         "skill": 51006,
-        "experience": 183000
+        "experience": 27500,
+        "temp_str_grow_add": 2,
+        "temp_agi_grow_add": 2,
+        "temp_sta_grow_add": 1,
+        "temp_int_grow_add": 3,
+        "exp": 27500
       }
     ],
     "tavern_round": {
@@ -541,18 +560,22 @@
     "awakened_talents": {
       "101": 1,
       "100001": 16,
-      "2": 1
+      "2": 14,
+      "4": 3,
+      "1": 2
     },
     "temp_str_grow_add": 0,
     "temp_agi_grow_add": 0,
     "temp_sta_grow_add": 0,
     "temp_int_grow_add": 0,
-    "str_grow_add": 2,
-    "agi_grow_add": 2,
-    "sta_grow_add": 1,
+    "str_grow_add": 4,
+    "agi_grow_add": 3,
+    "sta_grow_add": 5,
     "int_grow_add": 2,
     "claimed_login_rewards": [
       1
-    ]
+    ],
+    "exploit": 80,
+    "experience": 39700
   }
 }
