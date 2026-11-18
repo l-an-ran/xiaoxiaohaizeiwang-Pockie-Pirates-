@@ -2185,7 +2185,7 @@ def _get_camp_army_list(camp_id: int):
     return armies
 
 
-def _build_camp_info_response(correlation_id: str, camp_id: int = 1001) -> bytes:
+def _build_camp_info_response(correlation_id: str, camp_id: int = 1001, error_code: int = -1) -> bytes:
     """Reply to CAMP.camp matching OPDataManager::onCampInfo."""
     role = _get_role()
     camp_stars = role.setdefault("camp_stars", {})
@@ -2240,7 +2240,7 @@ def _build_camp_info_response(correlation_id: str, camp_id: int = 1001) -> bytes
         ("army_star_list",  _amf3_array(stars)),
         ("raid_score_list", _amf3_array([])),
         ("request_code",    _amf3_int(0)),
-        ("error_code",      _amf3_int(0)),
+        ("error_code",      _amf3_int(error_code)),
     ]
     body_amf3 = _amf3_object(fields)
     return _make_ack_message(correlation_id, body_amf3)
@@ -2251,6 +2251,61 @@ def _build_camp_reward_response(correlation_id: str) -> bytes:
     """Reply to CAMP.campReward matching OPDataManager::onCampRewardInfo."""
     body_amf3 = _amf3_array([])
     return _make_ack_message(correlation_id, body_amf3)
+
+
+def _build_camp_elite_response(correlation_id: str) -> bytes:
+    """Reply to campService.campElite matching EnterCopyWarPanel::resolveEliteInfo."""
+    ELITE_CAMP_IDS = [
+        2006, 2008, 2010, 2012, 2014, 2016, 2019, 2022, 2024, 2026, 2029,
+        2032, 2034, 2036, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2049,
+        2050, 2053, 2055, 2057, 2060
+    ]
+    elite_items = []
+    for cid in ELITE_CAMP_IDS:
+        elite_items.append(_amf3_object([
+            ("cfg_camp_id",   _amf3_int(cid)),
+            ("memcamp_score", _amf3_int(3)),
+            ("camp_score",    _amf3_int(3)),
+            ("is_finish",     _amf3_bool(True)),
+        ]))
+    fields = [
+        ("error_code",     _amf3_int(-1)),
+        ("all_elite_camp", _amf3_array(elite_items)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _build_raid_check_response(correlation_id: str) -> bytes:
+    """Reply to campService.raidCheck matching EnterCopyWarPanel::resolveWars."""
+    mem_raids = []
+    for rid in [3001, 3002, 3003, 3004, 3005, 3006]:
+        mem_raids.append(_amf3_object([
+            ("cfg_raid_id",  _amf3_int(rid)),
+            ("count",        _amf3_int(0)),
+            ("bonus_count",  _amf3_int(0)),
+        ]))
+    fields = [
+        ("error_code",        _amf3_int(-1)),
+        ("raid_bonus_count",  _amf3_int(3)),
+        ("current_raid_id",   _amf3_int(3001)),
+        ("finished_raids",    _amf3_array([])),
+        ("mem_raid_list",     _amf3_array(mem_raids)),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
+
+
+def _build_raid_enter_response(correlation_id: str, raid_id: int = 3001) -> bytes:
+    """Reply to campService.raidEnter matching EnterCopyWarPanel::enterResult."""
+    return _build_camp_info_response(correlation_id, camp_id=raid_id, error_code=-1)
+
+
+def _build_camp_thumb_response(correlation_id: str) -> bytes:
+    """Reply to campService.campThumb matching SelectWarPanel::resolveWars."""
+    fields = [
+        ("error_code", _amf3_int(-1)),
+        ("camp_list",  _amf3_array([])),
+    ]
+    return _make_ack_message(correlation_id, _amf3_object(fields))
 
 
 def _build_scene_change_response(correlation_id: str, target_scene: int, x: int, y: int) -> bytes:
@@ -3453,28 +3508,44 @@ def _make_treat_general_amf3(gid: int, name: str, job: int, qual: int, face: int
     return _amf3_object(fields)
 
 
-# 东海谢尔兹镇酒馆正式卡池 (场景 2002, 初始等级 1~20)
-# A级品质伙伴 (Quality 4, 紫色, 招募消耗 500 铜币)
-# 贝鲁梅伯 10042230 为任务 100024 "新船员加入" 剧情指定招募伙伴
-EAST_BLUE_POOL = [
-    # cfg_id, name, job, qual, face, fig, cost, str_g, agi_g, sta_g, int_g, str_c, agi_c, sta_c, int_c
-    (10042230, "贝鲁梅伯", 10002, 4, 10073, 10073,  500, 33, 38, 16, 13,  40, 46, 19, 16),
-    (10041220, "亚尔丽塔", 10001, 4, 10012, 10012,  500, 30, 19, 39, 12,  36, 23, 47, 14),
-    (10041228, "蒙卡",     10001, 4, 10010, 10010,  500, 27, 16, 46, 11,  32, 19, 55, 13),
-    (10041229, "卡巴吉",   10001, 4, 10074, 10074,  500, 29, 32, 25, 14,  35, 38, 30, 17),
-    (10041231, "摩奇",     10001, 4, 10078, 10078,  500, 26, 25, 32, 17,  31, 30, 38, 20),
-    (10043235, "赞高",     10003, 4, 10083, 10083,  500, 13, 30, 20, 37,  16, 36, 24, 44),
-    (10042233, "山姆",     10002, 4, 10090, 10090,  500, 27, 45, 15, 13,  32, 54, 18, 16),
-    (10041234, "布奇",     10001, 4, 10089, 10089,  500, 31, 15, 44, 10,  37, 18, 53, 12),
-]
+def _get_tavern_pool_for_scene(scene_id: int):
+    """Retrieve all generals for a given tavern sea/scene from SQLite cfg_general."""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT cfg_general_id, name, job, quality, face, figure, 500,
+               str_grow, agi_grow, sta_grow, int_grow,
+               str_ceil, agi_ceil, sta_ceil, int_ceil
+        FROM cfg_general
+        WHERE scene_id = ?
+        ORDER BY quality ASC, cfg_general_id ASC
+    """, (scene_id,))
+    rows = c.fetchall()
+    if not rows:
+        c.execute("""
+            SELECT cfg_general_id, name, job, quality, face, figure, 500,
+                   str_grow, agi_grow, sta_grow, int_grow,
+                   str_ceil, agi_ceil, sta_ceil, int_ceil
+            FROM cfg_general
+            WHERE scene_id = 1
+            ORDER BY quality ASC, cfg_general_id ASC
+        """)
+        rows = c.fetchall()
+    conn.close()
 
-# 东海酒馆传奇伙伴预览池 (Quality 5 S级橙色，用于 tavern_epic 展示，800 铜币)
-EAST_BLUE_EPIC = [
-    (10052199, "巴基",     10002, 5, 10011, 10011,  800, 42, 48, 18, 12,  50, 58, 22, 14),
-    (10051237, "阿金",     10001, 5, 10087, 10087,  800, 37, 21, 38, 24,  44, 25, 46, 29),
-]
-
-ALL_TAVERN_MAP = {c[0]: c for c in EAST_BLUE_POOL + EAST_BLUE_EPIC}
+    formatted = []
+    for r in rows:
+        gid, name, job, qual, face, fig, cost, sg, ag, stag, ig, sc, ac, stac, ic = r
+        sg_i = int(round(float(sg) * 10)) if float(sg) < 15 else int(round(float(sg)))
+        ag_i = int(round(float(ag) * 10)) if float(ag) < 15 else int(round(float(ag)))
+        stag_i = int(round(float(stag) * 10)) if float(stag) < 15 else int(round(float(stag)))
+        ig_i = int(round(float(ig) * 10)) if float(ig) < 15 else int(round(float(ig)))
+        sc_i = int(round(float(sc) * 10)) if float(sc) < 20 else int(round(float(sc)))
+        ac_i = int(round(float(ac) * 10)) if float(ac) < 20 else int(round(float(ac)))
+        stac_i = int(round(float(stac) * 10)) if float(stac) < 20 else int(round(float(stac)))
+        ic_i = int(round(float(ic) * 10)) if float(ic) < 20 else int(round(float(ic)))
+        formatted.append((gid, name, job, qual, face, fig, cost, sg_i, ag_i, stag_i, ig_i, sc_i, ac_i, stac_i, ic_i))
+    return formatted
 
 
 def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recruit: bool = False, is_open_card: bool = False, open_idx: int = 0) -> bytes:
@@ -3483,35 +3554,61 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
 
     # Determine if this is a fresh draw request (clicked 召集令)
     req_type = 0
-    if body and isinstance(body, list) and len(body) >= 3 and isinstance(body[2], int):
-        req_type = body[2]
+    target_scene = 0
+    if body and isinstance(body, list):
+        if len(body) >= 3 and isinstance(body[2], int):
+            req_type = body[2]
+        if len(body) >= 4 and isinstance(body[3], int):
+            target_scene = body[3]
+        elif len(body) >= 3 and req_type == 0 and isinstance(body[2], int):
+            target_scene = body[2]
+
+    # Current sea/scene ID (1=东海, 2=南海, 3=西海, 4=北海, 5/6=伟大航道)
+    if target_scene > 0:
+        cur_scene = target_scene
+    elif round_state and "scene_id" in round_state:
+        cur_scene = round_state["scene_id"]
+    else:
+        cur_scene = 1
+
+    scene_pool = _get_tavern_pool_for_scene(cur_scene)
+    scene_map = {c[0]: c for c in scene_pool}
 
     # Case 1: Player clicked 召集令 (req_type in [1, 2, 3])
     if req_type in [1, 2, 3] and not is_open_card and not is_recruit:
-        # Guarantee 贝鲁梅伯 (10042230) for Task 100024
-        guarantee_id = 10042230 if role.get("current_task") == 100024 else None
-        
-        # Pick 5 unique candidate cards from East Blue pool
-        pool_ids = [c[0] for c in EAST_BLUE_POOL]
-        epic_ids = [c[0] for c in EAST_BLUE_EPIC]
+        # Guarantee 贝鲁梅伯 (10042230) for Task 100024 in East Blue
+        guarantee_id = 10042230 if (role.get("current_task") == 100024 and cur_scene == 1) else None
+
+        all_ids = [c[0] for c in scene_pool]
+        pool_ids = [c[0] for c in scene_pool if c[3] <= 5]
+        if len(pool_ids) < 5:
+            pool_ids = list(all_ids)
+        epic_ids = [c[0] for c in scene_pool if c[3] >= 5]
+
         drawn = []
         if guarantee_id and guarantee_id in pool_ids:
             drawn.append(guarantee_id)
             pool_ids.remove(guarantee_id)
-        
-        # Add 1 epic preview or pool card
+
         import random
-        if epic_ids:
+        if req_type in (2, 3) and epic_ids:
             epic_pick = random.choice(epic_ids)
-            drawn.append(epic_pick)
-        
-        # Fill rest from pool
+            if epic_pick not in drawn:
+                drawn.append(epic_pick)
+
         random.shuffle(pool_ids)
         while len(drawn) < 5 and pool_ids:
-            drawn.append(pool_ids.pop())
-        
+            pick = pool_ids.pop()
+            if pick not in drawn:
+                drawn.append(pick)
+
+        while len(drawn) < 5 and all_ids:
+            pick = random.choice(all_ids)
+            if pick not in drawn or len(all_ids) < 5:
+                drawn.append(pick)
+
         random.shuffle(drawn)
-        
+
         # Deduct cost
         if req_type == 1:
             role["copper"] = max(role.get("copper", 100000) - 1000, 0)
@@ -3521,20 +3618,23 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
             role["gold"] = max(role.get("gold", 5000) - 100, 0)
 
         round_state = {
+            "scene_id": cur_scene,
             "cfg_ids": drawn,
             "open_generals": [0, 0, 0, 0, 0],
             "open_count": 0,
             "type": req_type,
         }
         role["tavern_round"] = round_state
-        print(f"  [TAVERN TREAT] Fresh draw type={req_type}, cards={drawn}", flush=True)
+        print(f"  [TAVERN TREAT] Fresh draw scene={cur_scene} type={req_type}, cards={drawn}", flush=True)
         _save()
 
     # Case 2: Player flipped a card (GENERAL.openCard, 0xd6)
     elif is_open_card:
         if not round_state or "cfg_ids" not in round_state:
+            default_drawn = [c[0] for c in scene_pool[:5]]
             round_state = {
-                "cfg_ids": [10042230, 10041220, 10041228, 10041229, 10052199],
+                "scene_id": cur_scene,
+                "cfg_ids": default_drawn,
                 "open_generals": [0, 0, 0, 0, 0],
                 "open_count": 0,
                 "type": 1,
@@ -3549,31 +3649,44 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
             print(f"  [TAVERN OPEN] Flipped slot {slot + 1} -> {revealed} (open_count={round_state['open_count']})", flush=True)
             _save()
 
-    # Default / Init: if no active round, initialize preview
+    # Default / Init
     if not round_state or "cfg_ids" not in round_state:
+        default_drawn = [c[0] for c in scene_pool[:5]]
         round_state = {
-            "cfg_ids": [10042230, 10041220, 10041228, 10041229, 10052199],
+            "scene_id": cur_scene,
+            "cfg_ids": default_drawn,
             "open_generals": [0, 0, 0, 0, 0],
             "open_count": 0,
             "type": 1,
         }
         role["tavern_round"] = round_state
 
-    cfg_ids = round_state.get("cfg_ids", [10042230, 10041220, 10041228, 10041229, 10052199])
+    cfg_ids = round_state.get("cfg_ids", [c[0] for c in scene_pool[:5]])
     open_gens = round_state.get("open_generals", [0, 0, 0, 0, 0])
     open_cnt = round_state.get("open_count", 0)
     current_type = round_state.get("type", 1)
+    res_scene = round_state.get("scene_id", cur_scene)
 
     # Build tavern generals array from candidate info
     gen_objs = []
     for gid in cfg_ids:
-        c_info = ALL_TAVERN_MAP.get(gid)
+        c_info = scene_map.get(gid)
+        if not c_info:
+            conn = sqlite3.connect(DB_PATH)
+            r = conn.execute("SELECT cfg_general_id, name, job, quality, face, figure, 500, str_grow, agi_grow, sta_grow, int_grow, str_ceil, agi_ceil, sta_ceil, int_ceil FROM cfg_general WHERE cfg_general_id = ?", (gid,)).fetchone()
+            conn.close()
+            if r:
+                c_info = (r[0], r[1], r[2], r[3], r[4], r[5], r[6], int(round(float(r[7])*10)), int(round(float(r[8])*10)), int(round(float(r[9])*10)), int(round(float(r[10])*10)), int(round(float(r[11])*10)), int(round(float(r[12])*10)), int(round(float(r[13])*10)), int(round(float(r[14])*10)))
         if c_info:
             gen_objs.append(_make_treat_general_amf3(*c_info))
         else:
             gen_objs.append(_make_treat_general_amf3(gid, "船员", 10001, 4, 10012, 10012, 500))
     tavern_generals_arr = _amf3_array(gen_objs)
-    tavern_epic_arr = _amf3_array([_amf3_int(10052199), _amf3_int(10051237)])
+
+    top_epics = [c[0] for c in scene_pool if c[3] >= 5][:2]
+    if not top_epics:
+        top_epics = [c[0] for c in scene_pool[:2]]
+    tavern_epic_arr = _amf3_array([_amf3_int(x) for x in top_epics])
 
     star_gen_id = cfg_ids[0]
     star_gen = _build_star_general_object(star_gen_id, 0, 5)
@@ -3583,11 +3696,8 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         _amf3_object([("talent_id", _amf3_int(102)), ("level", _amf3_int(1))]),
     ]
 
-    # recruit 必须是一个完整的 AMF3 对象结构（包含 scene_id=1、5张卡牌ID与翻牌状态），
-    # 否则 OPDataManager::onTreat 会跳过解析，导致 tavernData->scene_id 保持为 -1，
-    # CDlgTavern::UpdateRecruitListEv 检测到 -1 会直接终止卡牌渲染造成画面空白！
     recruit_dict = [
-        ("scene_id",        _amf3_int(1)),
+        ("scene_id",        _amf3_int(res_scene)),
         ("type",            _amf3_int(current_type)),
         ("open_count",      _amf3_int(open_cnt)),
         ("cfg_general_id1", _amf3_int(cfg_ids[0])),
@@ -3603,7 +3713,6 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
     ]
     recruit_obj = _amf3_object(recruit_dict)
 
-    # Exactly match all required fields in OPDataManager::onTreat in libOnePiece.so
     fields = [
         ("gold",            _amf3_int(int(role.get("gold", 5000)))),
         ("copper",          _amf3_double(float(role.get("copper", 100000)))),
@@ -3611,7 +3720,7 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         ("middle_token",    _amf3_int(5)),
         ("advance_token",   _amf3_int(2)),
         ("free_token",      _amf3_int(1)),
-        ("scene_id",        _amf3_int(1)),
+        ("scene_id",        _amf3_int(res_scene)),
         ("recruit",         recruit_obj),
         ("type",            _amf3_int(current_type)),
         ("open_count",      _amf3_int(open_cnt)),
@@ -3638,16 +3747,15 @@ def _build_tavern_treat_response(correlation_id: str, body: list = None, is_recr
         ("TAVERN_GENERALS", tavern_generals_arr),
         ("STAR_GENERAL",    star_gen),
         ("star_general",    star_gen),
-        ("error_code",      _amf3_int(0)),
+        ("error_code",      _amf3_int(-1)),
         ("request_code",    _amf3_int(0)),
     ]
 
-    # For openCard response, also include index and revealed general id
     if is_open_card and 0 <= open_idx < 5:
         fields.extend([
             ("index",          _amf3_int(open_idx + 1)),
-            ("general_id",     _amf3_int(open_gens[open_idx])),
-            ("cfg_general_id", _amf3_int(open_gens[open_idx])),
+            ("general_id",     _amf3_int(cfg_ids[open_idx])),
+            ("cfg_general_id", _amf3_int(cfg_ids[open_idx])),
         ])
 
     return _make_ack_message(correlation_id, _amf3_object(fields))
@@ -3679,16 +3787,13 @@ def _build_tavern_recruit_response(correlation_id: str, body: list) -> bytes:
             elif isinstance(body[0], int) and body[0] > 100:
                 target_gid = body[0]
 
-    c_info = ALL_TAVERN_MAP.get(target_gid, EAST_BLUE_POOL[0])
-    gid, g_name, g_job, g_qual, g_face, g_fig, cost, *_ = c_info
-
-    gen_skill = 51001
+    gid, g_name, g_job, g_qual, g_face, g_fig, cost, gen_skill = target_gid, "船员", 10001, 4, 10012, 10012, 500, 51001
     try:
         conn = sqlite3.connect(DB_PATH)
-        row = conn.execute("SELECT cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (target_gid,)).fetchone()
+        row = conn.execute("SELECT cfg_general_id, name, job, quality, face, figure, 500, cfg_skill_id FROM cfg_general WHERE cfg_general_id = ?", (target_gid,)).fetchone()
         conn.close()
-        if row and row[0]:
-            gen_skill = int(row[0])
+        if row:
+            gid, g_name, g_job, g_qual, g_face, g_fig, cost, gen_skill = row[0], row[1], row[2], row[3], row[4], row[5], row[6], (int(row[7]) if row[7] else 51001)
     except Exception:
         pass
 
@@ -4045,7 +4150,7 @@ MALL_PRODUCTS = [
     {"product_id": 9,  "cfg_item_id": 300185, "cost_type": 1, "cost_value": 10},   # 银酒杯
     {"product_id": 10, "cfg_item_id": 300186, "cost_type": 1, "cost_value": 20},   # 金酒杯
     {"product_id": 11, "cfg_item_id": 300061, "cost_type": 1, "cost_value": 20},   # 打捞绳
-    {"product_id": 12, "cfg_item_id": 200002, "cost_type": 1, "cost_value": 100},  # 名刀·斩月
+    {"product_id": 12, "cfg_item_id": 300057, "cost_type": 1, "cost_value": 50},   # 突飞令
 ]
 
 def _build_mall_response(correlation_id: str) -> bytes:
@@ -4190,16 +4295,15 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
     }
 
     if confirm or polish_type == 5:
-        # 替换属性: 将洗出的增量计入正式成长加成, 严格限制在 [0, cap]
+        # 替换属性: 将洗出的 temp 绝对累加值应用到正式成长加成
         for a in attrs:
-            cur = int(target.get(f"{a}_grow_add", 0))
-            delta = int(target.get(f"temp_{a}_grow_add", 0))
-            cap = max_caps[a]
-            target[f"{a}_grow_add"] = max(0, min(cap, cur + delta))
+            new_val = int(target.get(f"temp_{a}_grow_add", 0))
+            if new_val > 0:
+                target[f"{a}_grow_add"] = min(max_caps[a], max(0, new_val))
             target[f"temp_{a}_grow_add"] = 0
         print(f"  [POLISH] Replaced grow stats for gen={gen_id}: str={target['str_grow_add']}/{max_caps['str']} agi={target['agi_grow_add']} sta={target['sta_grow_add']} int={target['int_grow_add']}", flush=True)
     elif polish_type == 6:
-        # 维持原属性: 放弃本次洗练增量
+        # 维持原属性: 放弃本次洗练增量, 清空 temp
         for a in attrs:
             target[f"temp_{a}_grow_add"] = 0
         print(f"  [POLISH] Kept original grow stats for gen={gen_id}", flush=True)
@@ -4232,20 +4336,19 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
             cur = int(target.get(f"{a}_grow_add", 0))
             cap = max_caps[a]
             raw_delta = random.randint(low, high)
-            # 钳位：cur + delta 必须在 [0, cap] 之间，即 delta 在 [-cur, cap - cur] 之间
-            clamped = max(-cur, min(raw_delta, cap - cur))
-            target[f"temp_{a}_grow_add"] = clamped
+            new_val = max(0, min(cap, cur + raw_delta))
+            target[f"temp_{a}_grow_add"] = new_val
 
-        # 保证至少有一项为正数，以满足客户端 SetNewAttVisible(true) 触发显示
-        if all(int(target.get(f"temp_{a}_grow_add", 0)) <= 0 for a in attrs):
+        # 保证至少有一项比当前值高（除非已全部达到上限）
+        if all(int(target.get(f"temp_{a}_grow_add", 0)) <= int(target.get(f"{a}_grow_add", 0)) for a in attrs):
             for a in attrs:
                 cur = int(target.get(f"{a}_grow_add", 0))
                 cap = max_caps[a]
                 if cur < cap:
-                    target[f"temp_{a}_grow_add"] = random.randint(1, max(1, high))
+                    target[f"temp_{a}_grow_add"] = min(cap, cur + random.randint(1, max(1, high)))
                     break
 
-        print(f"  [POLISH] Cultivated gen={gen_id} deltas=(+{target['temp_str_grow_add']}, +{target['temp_agi_grow_add']}, +{target['temp_sta_grow_add']}, +{target['temp_int_grow_add']})", flush=True)
+        print(f"  [POLISH] Cultivated gen={gen_id} absolute new totals: str={target['temp_str_grow_add']} agi={target['temp_agi_grow_add']} sta={target['temp_sta_grow_add']} int={target['temp_int_grow_add']}", flush=True)
 
         # 若当前任务为属性培养(110004)，标记完成
         if role.get("current_task") == 110004:
@@ -4256,7 +4359,7 @@ def _handle_polish_request(operation: str, body: Any, correlation_id: str) -> by
 
     resp_fields = [
         ("status",             _amf3_int(1)),
-        ("error_code",         _amf3_int(0)),
+        ("error_code",         _amf3_int(-1)),
         ("general_id",         _amf3_int(gen_id)),
         ("type",               _amf3_int(polish_type)),
         ("temp_str_grow_add",  _amf3_int(int(target.get("temp_str_grow_add", 0)))),
@@ -4837,10 +4940,30 @@ def _extract_body(envelope: dict) -> list:
 
 
 def _build_role_response(correlation_id: str) -> bytes:
+    role = _get_role()
+    fig = role.get("figure", 1008)
+    if fig < 1000:
+        fig = FIGURE_MAP.get(fig, 1008)
+    cfg = PROTAGONIST_CONFIG.get(fig, PROTAGONIST_CONFIG[1008])
+
     fields = [
-        ("role_data",    _build_role_data()),
-        ("request_code", _amf3_int(0)),
-        ("error_code",   _amf3_int(0)),
+        ("error_code",              _amf3_int(-1)),
+        ("request_code",            _amf3_int(0)),
+        ("role_id",                 _amf3_int(role["role_id"])),
+        ("name",                    _amf3_string(role["name"])),
+        ("level",                   _amf3_int(role["level"])),
+        ("face",                    _amf3_int(cfg["face"])),
+        ("figure",                  _amf3_int(cfg["figure"])),
+        ("nation",                  _amf3_int(role["nation"])),
+        ("vip_level",               _amf3_int(int(role.get("vip_level", 10)))),
+        ("vip_charge",              _amf3_int(int(role.get("vip_charge", 500000)))),
+        ("gold",                    _amf3_int(int(role.get("gold", 100000)))),
+        ("copper",                  _amf3_double(float(role.get("copper", 100000)))),
+        ("area_title",              _amf3_string("小小海贼王")),
+        ("server_url",              _amf3_string("http://127.0.0.1:8080/messagebroker/amf")),
+        ("server_name",             _amf3_string("单机冒险服")),
+        ("server_id",               _amf3_int(1)),
+        ("role_data",               _build_role_data()),
     ]
     body_amf3 = _amf3_object(fields)
     return _make_ack_message(correlation_id, body_amf3)
@@ -5122,6 +5245,25 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
 
     if "CAMP" in op_upper:
         op_name = op_upper.split(".")[-1]
+
+        if "CAMPELITE" in op_name:
+            print("  -> camp elite info (EnterCopyWarPanel)", flush=True)
+            return _build_camp_elite_response(correlation_id)
+
+        if "RAIDCHECK" in op_name:
+            print("  -> raid check info (EnterCopyWarPanel)", flush=True)
+            return _build_raid_check_response(correlation_id)
+
+        if "RAIDENTER" in op_name:
+            raid_id = 3001
+            if isinstance(body, list) and len(body) > 2 and body[2] and str(body[2]).isdigit():
+                raid_id = int(body[2])
+            print(f"  -> raid enter raid_id={raid_id}", flush=True)
+            return _build_raid_enter_response(correlation_id, raid_id)
+
+        if "CAMPTHUMB" in op_name:
+            print("  -> camp thumb ACK", flush=True)
+            return _build_camp_thumb_response(correlation_id)
 
         if "CAMPBYSCENE" in op_name:
             role = _get_role()

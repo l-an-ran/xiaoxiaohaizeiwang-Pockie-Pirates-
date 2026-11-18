@@ -6,58 +6,20 @@
     "face": 1001,
     "figure": 1001,
     "nation": 1,
-    "gold": 300000,
-    "copper": 3136327.0,
+    "gold": 319128,
+    "copper": 5990838.0,
     "action_point": 100,
     "ap_max": 100,
-    "scene_id": 3001,
-    "scene_x": 251,
-    "scene_y": 345,
+    "scene_id": 2003,
+    "scene_x": 1375,
+    "scene_y": 33,
     "current_task": 110004,
     "completed_tasks": [
       100001,
       100002,
       100003,
       100004,
-      100005,
-      100006,
-      100007,
-      100008,
-      100009,
-      100010,
-      100011,
-      100012,
-      100013,
-      100014,
-      100015,
-      100016,
-      100017,
-      100018,
-      100019,
-      100020,
-      100021,
-      100022,
-      100023,
-      100024,
-      100025,
-      100026,
-      100027,
-      100028,
-      100029,
-      100030,
-      100031,
-      100032,
-      100033,
-      100034,
-      100035,
-      100036,
-      100037,
-      100038,
-      100039,
-      110001,
-      110002,
-      110003,
-      110004
+      100005
     ],
     "battle_wins": {
       "10101": 2,
@@ -112,7 +74,8 @@
       "10707": 1,
       "10708": 1,
       "10709": 1,
-      "10710": 1
+      "10710": 1,
+      "100001": 1
     },
     "login_days": 1,
     "created": true,
@@ -124,22 +87,11 @@
         "item_id": 1001,
         "cfg_item_id": 200327,
         "amount": 1,
-        "level": 66,
-        "star": 66,
+        "level": 69,
+        "star": 69,
         "rise": 0,
         "equiped": 1,
         "general_id": 10043235,
-        "part": 1
-      },
-      {
-        "item_id": 1002,
-        "cfg_item_id": 200328,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
         "part": 1
       },
       {
@@ -198,28 +150,6 @@
         "part": 5
       },
       {
-        "item_id": 1013,
-        "cfg_item_id": 200327,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 1
-      },
-      {
-        "item_id": 1015,
-        "cfg_item_id": 200328,
-        "amount": 1,
-        "level": 4,
-        "star": 4,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 1
-      },
-      {
         "item_id": 1016,
         "cfg_item_id": 200330,
         "amount": 1,
@@ -229,17 +159,6 @@
         "equiped": 1,
         "general_id": 10052199,
         "part": 3
-      },
-      {
-        "item_id": 1017,
-        "cfg_item_id": 200332,
-        "amount": 1,
-        "level": 2,
-        "star": 2,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 5
       },
       {
         "item_id": 1021,
@@ -264,39 +183,6 @@
         "part": 5
       },
       {
-        "item_id": 1027,
-        "cfg_item_id": 200332,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 5
-      },
-      {
-        "item_id": 1033,
-        "cfg_item_id": 200328,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 1
-      },
-      {
-        "item_id": 1034,
-        "cfg_item_id": 200330,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 3
-      },
-      {
         "item_id": 1038,
         "cfg_item_id": 200002,
         "amount": 1,
@@ -306,17 +192,6 @@
         "equiped": 1,
         "general_id": 10052199,
         "part": 1
-      },
-      {
-        "item_id": 1039,
-        "cfg_item_id": 200329,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 2
       },
       {
         "item_id": 1044,
@@ -361,39 +236,6 @@
         "equiped": 1,
         "general_id": 1001,
         "part": 1
-      },
-      {
-        "item_id": 1053,
-        "cfg_item_id": 200329,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 2
-      },
-      {
-        "item_id": 1054,
-        "cfg_item_id": 200329,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 2
-      },
-      {
-        "item_id": 1055,
-        "cfg_item_id": 200331,
-        "amount": 1,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 4
       },
       {
         "item_id": 1058,
@@ -475,7 +317,7 @@
       {
         "item_id": 1069,
         "cfg_item_id": 300185,
-        "amount": 999,
+        "amount": 99,
         "level": 1,
         "star": 1,
         "rise": 0,
@@ -487,17 +329,6 @@
         "item_id": 1070,
         "cfg_item_id": 300186,
         "amount": 999,
-        "level": 1,
-        "star": 1,
-        "rise": 0,
-        "equiped": 0,
-        "general_id": 0,
-        "part": 0
-      },
-      {
-        "item_id": 1071,
-        "cfg_item_id": 300162,
-        "amount": 2,
         "level": 1,
         "star": 1,
         "rise": 0,
@@ -518,14 +349,36 @@
       },
       {
         "item_id": 1073,
-        "cfg_item_id": 300053,
-        "amount": 10,
+        "cfg_item_id": 200048,
+        "amount": 2,
         "level": 1,
         "star": 1,
         "rise": 0,
         "equiped": 0,
         "general_id": 0,
-        "part": 0
+        "part": 2
+      },
+      {
+        "item_id": 1077,
+        "cfg_item_id": 200002,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 1
+      },
+      {
+        "item_id": 1078,
+        "cfg_item_id": 200048,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 2
       }
     ],
     "equipments": {
@@ -536,7 +389,7 @@
       "amulet": 0,
       "misc": 1064
     },
-    "exp": 8000,
+    "exp": 135000,
     "task_accepted": true,
     "task_completed": false,
     "camp_stars": {
@@ -592,7 +445,8 @@
       "10707": 3,
       "10708": 3,
       "10709": 3,
-      "10710": 3
+      "10710": 3,
+      "100001": 3
     },
     "awakened_skills": {
       "1007": {
@@ -634,8 +488,8 @@
         "face": 10083,
         "level": 100,
         "skill": 51009,
-        "experience": 64950,
-        "exp": 0,
+        "experience": 500,
+        "exp": 500,
         "temp_str_grow_add": 4,
         "temp_agi_grow_add": 2,
         "temp_sta_grow_add": 3,
@@ -656,34 +510,34 @@
         "face": 10011,
         "level": 100,
         "skill": 51006,
-        "experience": 17750,
+        "experience": 500,
         "temp_str_grow_add": 0,
         "temp_agi_grow_add": 0,
         "temp_sta_grow_add": 0,
         "temp_int_grow_add": 0,
-        "exp": 0,
-        "str_grow_add": 81,
-        "agi_grow_add": 63,
-        "sta_grow_add": 62,
-        "int_grow_add": 48
+        "exp": 500,
+        "str_grow_add": 353,
+        "agi_grow_add": 341,
+        "sta_grow_add": 215,
+        "int_grow_add": 144
       }
     ],
     "tavern_round": {
       "cfg_ids": [
+        10041228,
+        10041231,
         10052199,
         10042230,
-        10041234,
-        10043235,
         10042233
       ],
       "open_generals": [
-        1,
         0,
         0,
         1,
-        1
+        0,
+        0
       ],
-      "open_count": 3,
+      "open_count": 1,
       "type": 2
     },
     "formation": {
@@ -724,22 +578,24 @@
       "100001": 16,
       "2": 14,
       "4": 3,
-      "1": 2
+      "1": 7
     },
-    "temp_str_grow_add": 0,
-    "temp_agi_grow_add": 0,
-    "temp_sta_grow_add": 0,
-    "temp_int_grow_add": 0,
-    "str_grow_add": 82,
-    "agi_grow_add": 61,
-    "sta_grow_add": 90,
-    "int_grow_add": 75,
+    "temp_str_grow_add": 117,
+    "temp_agi_grow_add": 101,
+    "temp_sta_grow_add": 129,
+    "temp_int_grow_add": 105,
+    "str_grow_add": 119,
+    "agi_grow_add": 97,
+    "sta_grow_add": 126,
+    "int_grow_add": 107,
     "claimed_login_rewards": [
       1
     ],
-    "exploit": 1343,
-    "experience": 8000,
+    "exploit": 1383,
+    "experience": 135000,
     "vip_level": 10,
-    "vip_charge": 500000
+    "vip_charge": 500000,
+    "task_step": 8,
+    "task_progress": 0
   }
 }

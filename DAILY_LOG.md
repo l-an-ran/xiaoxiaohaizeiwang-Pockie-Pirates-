@@ -1,3 +1,47 @@
+# 《小小海贼王》离线服务端核心业务深度修复日志 (2026-11-19)
+
+---
+
+## 一、 今日攻关核心与问题修复总结（Gemini 4 Argon 深度协同）
+
+### 1. 属性培养（洗属性）临时值显示与确认逻辑修复
+- **问题定位**：客户端 `TrainPanel.as` 中显示新属性的逻辑是：`差值 = temp_grow_add - grow_add`，若差值大于 0 则显示绿色加成，小于 0 则显示红色扣减。原服务端将洗出的“单次增量（例如 +3）”直接赋值给 `temp_grow_add`，导致客户端算出的差值变成 `3 - 110 = -107`，界面显示巨大负数；且确认替换后没有正确累加，维持属性后没有清空暂存值。此外，回包缺失 `error_code = -1` 导致界面更新阻滞。
+- **修复方案**：
+  - `_handle_polish_request` 改造：每次培养生成的目标值直接为**绝对目标累加值**（`new_total = base + random_delta`，且保证下限不低于初始值）。
+  - 当客户端执行 `POLISH_CONFIRM`（替换）时，将 `temp_*` 正式同步赋值给 `*_grow_add`，并清空所有 `temp_*`；执行 `POLISH_CANCEL`（维持）时直接清空所有 `temp_*`。
+  - 回包统一带上 `error_code = -1`，确保客户端界面立即响应并实时显示正负增量变化。
+
+### 2. VIP 商店/商城打开立即崩溃问题彻底根治
+- **崩溃根源**：客户端 `VipPanel.as` 在打开时会触发 `roleService.role` 请求，通过 `resolveRoleData` 期望在回包根对象上直接读取 `info.result.vip_level` 与 `vip_charge`。此前服务端将这些属性包裹在内部的 `role_data` 结构中，导致顶层取值为 `undefined`，进而触发 `totalCharge = 0` 的 Flex 绑定除零异常（`288 * charge / totalCharge` -> NaN/Crash）。
+- **商城道具防护**：此前商城商品列表中配置了武器类装备（如 200002 斩月），因装备需走 `ItemBase` 复杂属性解析而引发空引用。
+- **修复方案**：
+  - 在 `_build_role_response` 顶层展平并注入 `vip_level: 10`、`vip_charge: 500000`、`area_title`、`server_url`、`server_name` 及 `error_code: -1`。
+  - 将 `MALL_PRODUCTS` 中的 200002 替换为安全的纯消耗品（300057 突飞令），确保所有 12 件商品全部为安全可消费物品，彻底解决 VIP 面板与商城面板的崩溃。
+
+### 3. 精英战役界面不显示与副本进不去问题修复
+- **问题定位**：
+  - `EnterCopyWarPanel.as` 的 `enterResult` 方法中存在严格条件：`if (e.result.error_code == -1)`。此前服务端一律回包普通战役数据且 `error_code = 0`，被客户端直接丢弃。
+  - 副本（3001~3006）对应的战役关卡与怪物配置在数据库 `cfg_army` 中缺失，导致关卡无法实例化。
+- **修复方案**：
+  - 编写并执行迁移脚本 `import_raid_armies.py`，从原始配置 `gameData.sg` 中解析出全部 6 大副本（3001~3006）对应的 120 支战役军队及九宫格怪物布局，完整导入 `onepiece.db` 的 `cfg_army` 表，并补齐 `cfg_camp` 3006 数据。
+  - 补全 AMF 协议响应：
+    - `_build_camp_elite_response`：返回 27 个精英战役的 `all_elite_camp` 配置。
+    - `_build_raid_check_response`：返回副本信息 `raid_bonus_count`、`current_raid_id: 3001` 与副本列表。
+    - `_build_raid_enter_response`：精准按副本 ID 下发 20 支关卡军队及星级数据，所有接口统一设置 `error_code: -1`。
+
+### 4. 四大海域酒馆招募逻辑完善（多海域自由切换）
+- **问题定位**：原服务端酒馆逻辑写死了东海（`scene_id=1`）伙伴池，客户端在切换到南海、西海、北海或伟大航道点击召集令时，服务端仍返回东海伙伴，且回包中未回传 `scene_id`，导致客户端卡牌渲染被阻断。
+- **修复方案**：
+  - 实现 `_get_tavern_pool_for_scene(scene_id)`，动态从 `cfg_general` 数据库中按海域提取全部 312 位英雄的资质、四维与成长数据。
+  - 客户端通过 AMF body 传递 `[role_id, '', treat_type, scene_id]`，服务端动态解析 `scene_id`，正确执行消耗与伙伴抽取，回包中正确封装 `scene_id`、`recruit.scene_id`、`tavern_epic` 与 `tavern_generals`。
+
+### 5. 任务与角色状态恢复
+- 更新 `player_save.json`：
+  - 任务重置回主线第 2 章 110004（“属性培养”），设置 `task_accepted = True`、`task_completed = False`、`task_step = 8`、`task_progress = 0`。
+  - 角色等级保持 100 级，VIP 10 级，便于完整测试主线推进。
+
+---
+
 # 《小小海贼王》全平台资产打捞与单机服务端重构日志 (2026-11-16)
 
 ---
