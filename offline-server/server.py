@@ -702,15 +702,15 @@ def _build_task_data() -> bytes:
 
 
 PROTAGONIST_CONFIG = {
-    1001: {"cfg_id": 10031001, "job": 10001, "skill": 11004, "name": "男剑豪", "figure": 1001, "face": 1001},
-    1002: {"cfg_id": 10031009, "job": 10001, "skill": 11004, "name": "女剑豪", "figure": 1002, "face": 1002},
-    1003: {"cfg_id": 10032010, "job": 10002, "skill": 12023, "name": "男狙击", "figure": 1003, "face": 1003},
-    1004: {"cfg_id": 10032002, "job": 10002, "skill": 12023, "name": "女狙击", "figure": 1004, "face": 1004},
-    1005: {"cfg_id": 10033011, "job": 10003, "skill": 13044, "name": "男航海", "figure": 1005, "face": 1005},
-    1006: {"cfg_id": 10033003, "job": 10003, "skill": 13044, "name": "女航海", "figure": 1006, "face": 1006},
+    1001: {"cfg_id": 10031001, "job": 10001, "skill": 11003, "name": "男剑豪", "figure": 1001, "face": 1001},
+    1002: {"cfg_id": 10031009, "job": 10001, "skill": 11003, "name": "女剑豪", "figure": 1002, "face": 1002},
+    1003: {"cfg_id": 10032010, "job": 10002, "skill": 12021, "name": "男狙击", "figure": 1003, "face": 1003},
+    1004: {"cfg_id": 10032002, "job": 10002, "skill": 12021, "name": "女狙击", "figure": 1004, "face": 1004},
+    1005: {"cfg_id": 10033011, "job": 10003, "skill": 13042, "name": "男航海", "figure": 1005, "face": 1005},
+    1006: {"cfg_id": 10033003, "job": 10003, "skill": 13042, "name": "女航海", "figure": 1006, "face": 1006},
     1007: {"cfg_id": 10034004, "job": 10004, "skill": 14067, "name": "男船医", "figure": 1007, "face": 1007},
     1008: {"cfg_id": 10034020, "job": 10004, "skill": 14067, "name": "女船医", "figure": 1008, "face": 1008},
-    10004: {"cfg_id": 10031001, "job": 10001, "skill": 11004, "name": "男剑豪", "figure": 1001, "face": 1001},
+    10004: {"cfg_id": 10031001, "job": 10001, "skill": 11003, "name": "男剑豪", "figure": 1001, "face": 1001},
     10005: {"cfg_id": 10034020, "job": 10004, "skill": 14067, "name": "女船医", "figure": 1008, "face": 1008},
 }
 
@@ -2222,13 +2222,15 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ).fetchone()
                 if row:
                     ctype, ccat = int(row[0]), int(row[1])
-                    # For battle tasks, complete_category IS the army_id (which equals our camp_id arg)
-                    if ctype == 4 and ccat == camp_id:
+                    army_row = cur.execute("SELECT cfg_camp_id FROM cfg_army WHERE cfg_army_id = ?", (ccat,)).fetchone()
+                    t_camp = int(army_row[0]) if army_row and army_row[0] else 0
+                    # For battle tasks, complete_category IS the army_id (which equals camp_id arg or belongs to camp_id)
+                    if ctype == 4 and (ccat == camp_id or (t_camp > 0 and camp_id == t_camp)):
                         reward_copper = int(row[2] or 500)
                         reward_experience = int(row[3] or 100)
                         reward_item_1 = int(row[4] or 0)
                         reward_item_amt_1 = int(row[5] or 0)
-                        print(f"  [BATTLE] Task {cur_task} battle match → copper={reward_copper} exp={reward_experience} item={reward_item_1}", flush=True)
+                        print(f"  [BATTLE] Task {cur_task} battle match (army={ccat}, camp={t_camp}) → copper={reward_copper} exp={reward_experience} item={reward_item_1}", flush=True)
                     else:
                         # Not a task battle — give base camp reward
                         reward_copper = 500
@@ -2604,12 +2606,15 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     # 3. Combat rounds: Alternating attack rounds between player and enemy
     # In libOnePiece.so:
     #   - Regular attack: action_type = 1, action_value = dmg
-    #   - Rage skill:     action_type = 2, action_value = skill_id (looked up by FindCfg_Skill)
+    #   - Rage skill:     action_type = 2, action_value = valid_skill_id (FindCfg_Skill)
     #   - Morale update:  must send effect_targets for BOTH target and caster.
     #     When target_side == caster_side, client skips hurt animation and calls heroMoraleChange!
     combat_rounds = []
     alive_enemies = [dict(u) for u in def_units]
     alive_players = [dict(u) for u in atk_units]
+
+    # Valid open battle skills with complete animations/shades in client
+    VALID_OPEN_SKILLS = {11001, 11003, 12021, 13042, 13044, 14061, 14067, 51001, 51006, 51009}
 
     # Run up to 15 alternating combat exchanges
     turn = 0
@@ -2624,7 +2629,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             is_skill = (atk.get("morale", 50) >= 100)
             if is_skill:
                 cur_action_type = 2
-                cur_action_val = atk.get("skill_id", 11003)
+                cur_skill_cand = int(atk.get("skill_id") or 11003)
+                cur_action_val = cur_skill_cand if cur_skill_cand in VALID_OPEN_SKILLS else 11003
                 atk_new_morale = 0
                 dmg_mult = 1.8
             else:
@@ -2653,7 +2659,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("target_morale",         _amf3_int(target_new_morale)),
                 ("target_buff_list",      _amf3_array([])),
             ])
-            # 2. Attacking caster effect (updates attacker's morale & triggers morale change float)
+            # 2. Attacking caster effect (updates attacker's morale & triggers floating morale update)
             atk_effect = _amf3_object([
                 ("target_accident_status",_amf3_int(0)),
                 ("counter_skill_id",      _amf3_int(0)),
@@ -2678,6 +2684,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("battle_id",             _amf3_int(1)),
                 ("caster_side",           _amf3_int(1)),
                 ("caster_position",       _amf3_int(atk["pos"])),
+                ("morale",                _amf3_int(atk_new_morale)),
                 ("defend_pet_morale",     _amf3_int(0)),
                 ("attack_pet_morale",     _amf3_int(0)),
                 ("caster_round_action",   round_action),
@@ -2697,7 +2704,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             e_is_skill = (enemy.get("morale", 50) >= 100)
             if e_is_skill:
                 e_action_type = 2
-                e_action_val = enemy.get("skill_id", 11003)
+                e_skill_cand = int(enemy.get("skill_id") or 11003)
+                e_action_val = e_skill_cand if e_skill_cand in VALID_OPEN_SKILLS else 11003
                 e_new_morale = 0
                 e_mult = 1.5
             else:
@@ -2750,6 +2758,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("battle_id",             _amf3_int(1)),
                 ("caster_side",           _amf3_int(2)),
                 ("caster_position",       _amf3_int(enemy["pos"])),
+                ("morale",                _amf3_int(e_new_morale)),
                 ("defend_pet_morale",     _amf3_int(0)),
                 ("attack_pet_morale",     _amf3_int(0)),
                 ("caster_round_action",   e_action),
@@ -4494,6 +4503,9 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
                     t_entry["experience"] = int(g.get("experience", 0))
                     t_entry["level"] = int(g.get("level", 1))
                     break
+            if role.get("current_task") == 100025:
+                role["task_completed"] = True
+                print("  [TASK 100025] Crew training started -> Task completed and ready to submit!", flush=True)
             _save()
             print(f"  -> manor.trainingStart OK (gen={gen_id}, ratio={rate}, exp={exp_awarded}, end={now_ts + duration})", flush=True)
             return _build_training_response(correlation_id)
