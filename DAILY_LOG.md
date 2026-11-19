@@ -851,3 +851,53 @@
    - 战船九宫格严格断言测试通过：阵型中配置主角（2号位）、船员A（6号位）、船员B（8号位），实际进入战斗严格为 `[(2, '主角'), (6, '测试船员A'), (8, '测试船员B')]`，空位保持为空，替补船员未进入战斗。
    - 虚拟 SWF 兜底测试通过（HTTP 200，539 字节）。
 2. 本地服务已以 Daemon 模式启动并平稳运行于 `0.0.0.0:8080`，状态健康（`/health` 响应正常）。
+
+
+## 2026-11-19 网页版 Gemini 4 Neon 协助修复客户端与 APK 重打包专项日志
+
+### 一、任务目标与协同背景
+在 `https://gemini.google.com` 启用 **Gemini 4 Neon** 模型进行协同架构推演与逆向指导，进入 `D:\AI\work\xiaoxiaohaizei-offline-repack` 目录，阅读 `Pockie Pirates - Assets Restoration` 资产恢复规格，完成客户端加固修复、零压缩保护机制配置与全新 APK 打包签名。
+
+---
+
+### 二、美术资产与贴图恢复规格深度调研（Pockie Pirates - Assets Restoration）
+1. **缺失资产规格全景（`Pockie_Pirates_missing_assets.xlsx`）**：
+   - 包含 `README`、`Textures`、`Frames`、`Characters`、`Skill_Effects`、`Skill_Banners` 六大完整规范表。
+   - 梳理确认缺失图集共 464 个（战斗 Sprite 图集 235 个、大地图 Sprite 12 个、技能特效图集 137 个、技能名横幅 80 个），涉及 4626 个动画帧矩形坐标（top-left origin，标准 1024x1024 尺寸）。
+   - 涉及 150 个角色/单位模型与 226 个技能特效动画。
+2. **恢复流水线设计（Prompts.txt）**：
+   - Prompt A（工具校验与对齐规则）：验证 PVRv2/v3 编码与 1024x1024 画布边界，解析 `battleperson.xml` / `normalperson.xml` 锚点对齐。
+   - Prompt B（技能横幅与技能特效）：汉字描边发光、8 帧展开动画与透明特效图集。
+   - Prompt C（角色骨骼帧重建）：基于存留同职业与同人物帧进行基准映射。
+3. **引擎底层数据包格式（网龙 TQFramework TPD/TPI）**：
+   - 原版资源存储于 `assets/Env/data.tpi`（索引表）与 `assets/Env/data.tpd.1 ~ 56`（虚拟分卷包，单卷约 1MB）中。
+   - `extracted_assets_with_png\extracted_assets\data\` 包含了已提取的 1747 个现存有效图集、UI 贴图与动画文件。
+
+---
+
+### 三、客户端核心修复与加固落地
+
+#### 1. 免崩溃原生加固 SO 替换与集成
+- 将打过免崩溃防御与脱机网络补丁的 `libOnePiece.so`（SHA256: `c66480e1b13a7627d6536b4f97394fe73bb66259399adbccb335217e10d9353a`）精确替换至 `xiaoxiaohaizei-offline-repack/lib/armeabi/libOnePiece.so`。
+- 修复 `CDlgTavern::InitRecruitList` 在 `0x005ee6ec` 处的空指针崩溃隐患（`beq #0x5ee964` 自动跳过未定义伙伴 ID），并在底层完成脱机端口重定向。
+
+#### 2. `apktool.yml` 关键零压缩（`doNotCompress`）加固
+- **规避核心闪退风险**：
+  针对现代 Android 与 Cocos/TQ 引擎对底层资产（AAsset / mmap）随机读取的特性，严禁将数据包与二进制做 DEFLATE 压缩。
+- **补全保护列表**：
+  在 `doNotCompress` 列表中显式补全了 `data.tpd.37`、`data.tpi`、`splites.xml`、`pvr`、`ani`、`so`、`xml`、`jpg` 等，确保打包后全部分卷包与动态库以 100% STORED（0% 压缩率）模式存储。
+
+#### 3. APK 自动化回编译与标准签名流水线（`build_client_apk.py`）
+- 编写一键构建脚本 `D:\AI\work\xiaoxiaohaizei-offline-repack\build_client_apk.py`：
+  1. 调用 `apktool 2.12.1`（结合 OpenJDK 17）执行 `apktool b`，成功编译源码与资源。
+  2. 自动化压缩模式体检：验证 `data.tpi`、`data.tpd.1`、`data.tpd.37` 与 `libOnePiece.so` 均为 `STORED`（零压缩）。
+  3. 使用 `game-offline.keystore`（别名 `offline`，密码 `123456`，SHA256withRSA）完成权威签名。
+  4. 生成最终发布版 APK：`D:\AI\work\xiaoxiaohaizei-offline-repack\xiaoxiaohaizei-offline-release.apk`（87,994,716 字节，约 83.92 MB）。
+
+---
+
+### 四、验证结果
+1. APK 完整性校验脚本 `verify_apk_integrity.py` 断言全部通过：
+   - 包含全部 504 个核心打包文件。
+   - `lib/armeabi/libOnePiece.so` 散列值严格匹配加固版 SO。
+   - `META-INF/OFFLINE.SF` 与 `META-INF/OFFLINE.RSA` 签名校验有效。
