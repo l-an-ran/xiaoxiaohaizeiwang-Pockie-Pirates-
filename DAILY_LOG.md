@@ -1,3 +1,25 @@
+# 《小小海贼王》小丑巴基 (10011) 专属图集重构与原皮端到端恢复日志 (2026-11-19)
+
+---
+
+## 一、 今日攻关核心：首个标杆角色小丑巴基 (10011) 专属图集重构与恢复
+在网页版 **Gemini 4 Neon** 的深度协助指导下，我们成功打通了“原始 FLA/SWF 提取 $\rightarrow$ 官方帧尺寸规范对齐 $\rightarrow$ RGBA4444 PVRv2 二进制编码 $\rightarrow$ personbattle.ani 动作重定向 $\rightarrow$ APK 资产打包注入 $\rightarrow$ 服务端解锁原生原皮直通”的端到端全流程！
+
+1. **巴基动作帧规格与资产拆解**：
+   - 战斗动画共 4 大动作、15 个关键帧（待机 stop 2帧、普攻 attack 3帧、受击 hurt 1帧、奥义 skill 9帧）。
+   - 官方存留真图：`personbattle_19.pvr`（attack frame 2 收刀）、`personbattle_21.pvr`（skill frame 4）、`personbattle_22.pvr`（skill frame 5）。
+   - 缺失补全：从 `D:\AI\work\xx\Pockie-Pirates-Restoration-Project\pockiepirates_project\pockiepirates\assets\images\Person\10011.fla`（XFL 格式）中提取出 12 张无损原始高清切片（`Bitmap 1~23.png`），并按照 `Pockie_Pirates_missing_assets.xlsx` 的矩形与脚步锚点精确居中对齐。
+2. **专属独立图集生成 (`personbattle_10011.pvr`)**：
+   - 尺寸 1024×1024，格式为标准的 Cocos2d-x / TQFramework 原生 **RGBA4444 PVRv2**（52 字节 Header + 2,097,152 字节像素体，总大小 2,097,204 字节）。
+   - 将 15 个动作切片无重叠、高精度贴入画布，彻底摆脱旧共享图集的冲突与 0 字节脏索引拦截。
+3. **动画骨骼与服务端直通联动**：
+   - 更新 `assets/Env/ani/personbattle.ani`：将 `soldier10011_*` 全部 15 帧的引用路径重定向至专属图集 `data/personbattle/personbattle_10011.pvr` 对应坐标。
+   - 更新 `offline-server/server.py`：将 `10011` 加入 `ANDROID_COMPLETE_FIGURES` 原生直通白名单，战斗中 100% 派发原生巴基模型！
+4. **Android APK 重编译与签名交付**：
+   - 产出已签名全新安装包：[xiaoxiaohaizei-offline-release.apk](file:///D:/AI/work/xiaoxiaohaizei-offline-repack/xiaoxiaohaizei-offline-release.apk)（90,092,233 字节，约 85.92 MB）。
+
+---
+
 # 《小小海贼王》Android 安卓端船员模型核验与高阶映射引擎落地日志 (2026-11-19)
 
 ---
