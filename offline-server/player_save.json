@@ -7,12 +7,12 @@
     "figure": 1001,
     "nation": 1,
     "gold": 417758,
-    "copper": 10796038.0,
+    "copper": 10834838.0,
     "action_point": 100,
     "ap_max": 100,
     "scene_id": 2004,
-    "scene_x": 1831,
-    "scene_y": 170,
+    "scene_x": 1793,
+    "scene_y": 152,
     "current_task": 110037,
     "completed_tasks": [
       100001,
@@ -148,7 +148,7 @@
       "11109": 1,
       "11110": 1,
       "11111": 1,
-      "11112": 1,
+      "11112": 2,
       "11113": 1,
       "11114": 1,
       "11115": 1,
@@ -591,7 +591,7 @@
       "amulet": 0,
       "misc": 1064
     },
-    "exp": 221100,
+    "exp": 240500,
     "task_accepted": true,
     "task_completed": false,
     "camp_stars": {
@@ -754,44 +754,44 @@
         "cfg_general_id": 10011,
         "name": "小丑巴基",
         "figure": 10011,
-        "level": 20,
+        "level": 21,
         "job": 10002,
         "quality": 4,
-        "exp": 79700,
-        "experience": 79700
+        "exp": 16100,
+        "experience": 16100
       },
       {
         "general_id": 10012,
         "cfg_general_id": 10012,
         "name": "亚尔丽塔",
         "figure": 10012,
-        "level": 20,
+        "level": 21,
         "job": 10003,
         "quality": 4,
-        "exp": 79700,
-        "experience": 79700
+        "exp": 16100,
+        "experience": 16100
       },
       {
         "general_id": 10013,
         "cfg_general_id": 10013,
         "name": "恶龙阿龙",
         "figure": 10013,
-        "level": 20,
+        "level": 21,
         "job": 10001,
         "quality": 4,
-        "exp": 79700,
-        "experience": 79700
+        "exp": 16100,
+        "experience": 16100
       },
       {
         "general_id": 10022,
         "cfg_general_id": 10022,
         "name": "百计克洛",
         "figure": 10022,
-        "level": 20,
+        "level": 21,
         "job": 10001,
         "quality": 4,
-        "exp": 79700,
-        "experience": 79700
+        "exp": 16100,
+        "experience": 16100
       }
     ],
     "tavern_round": {
@@ -864,8 +864,8 @@
     "claimed_login_rewards": [
       1
     ],
-    "exploit": 13306,
-    "experience": 221100,
+    "exploit": 13519,
+    "experience": 240500,
     "vip_level": 10,
     "vip_charge": 500000,
     "task_step": 8,
