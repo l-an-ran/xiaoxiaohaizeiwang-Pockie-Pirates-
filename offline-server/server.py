@@ -2682,24 +2682,64 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         10088: 10009,  # 鬼人阿金 -> 10009
         10091: 10012,  # 铁壁巴拉 -> 10012
         10097: 10004,  # 黑带克罗欧比 -> 10004
-        10098: 10001,  # 六刀流小八 -> 10001
-        10099: 10003,  # 啾 -> 10003
+        10098: 10004,  # 六刀流小八 -> 10004
+        10099: 10021,  # 啾 -> 10021
         10101: 10042,  # 多鲁顿 -> 10042
         10103: 10021,  # 白铁瓦尔波 -> 10021
         10034: 10021,  # 杰斯/克罗马利蒙 -> 10021
     }
 
-    ARCHETYPE_POOLS = {
-        10001: (10001, 10004, 10009, 10014, 10061),
-        10002: (10003, 10021),
-        10003: (10005, 10009, 10070),
-        10004: (10008, 10070),
+    # 1. 已核验 100% 拥有完整非空 PVR 动作的原生真贴图集合 (17套)
+    #    后续随着 data.tpd.57 补齐新图集，只需把新 figure ID 加进此集合即可自动解锁原皮！
+    ANDROID_COMPLETE_FIGURES = {
+        1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008,  # 主角全职业/性别
+        10012,                                           # 亚尔丽塔 (personbattle_33~35.pvr 全满)
+        10004, 10009, 10014, 10019, 10021, 10042, 10061, 10070,  # 8套高级职业通用真贴图
     }
 
-    NAME_KEYWORD_FALLBACKS = [
-        ("海军", 10014), ("炮手", 10021), ("枪手", 10021), ("剑士", 10004),
-        ("航海士", 10009), ("船医", 10070),
-    ]
+    # 2. 高人气/主线知名船员“特征精准代打表” (外观与武器风格最贴合的完整真贴图，绝不降级为普通小兵)
+    ANDROID_ICONIC_FIGURE_MAP = {
+        10010: 10061,  # 蒙卡 (斧手巨汉)       -> 重武器巨汉 (10061)
+        10011: 10021,  # 小丑巴基 (巴基弹)     -> 重炮头目 (10021)
+        10013: 10042,  # 阿龙 (鱼人狂战)       -> 野牛多鲁顿 (10042)
+        10022: 10019,  # 克洛 (百计猫爪)       -> 猫爪十刃刺客 (10019)
+        10029: 10021,  # 乌索普 (狙击手)       -> 重炮头目 (10021)
+        10030: 10012,  # 娜美 (女性航海士)     -> 亚尔丽塔 (10012)
+        10033: 10019,  # 罗布·路奇 (敏捷刺客)  -> 猫爪十刃刺客 (10019)
+        10039: 10014,  # 斯摩格 (海军上校)     -> 海军剑士长 (10014)
+        10154: 10009,  # 黄猿 (海军大将)       -> 佛萨/高阶重剑 (10009)
+        10078: 10009,  # 摩奇                 -> 10009
+        10074: 10061,  # 卡巴吉               -> 10061
+        10062: 10021,  # 狡诈神枪手           -> 10021
+        10063: 10070,  # 嗜血船医             -> 10070
+        10058: 10009,  # 航海士队长           -> 10009
+        10089: 10004,  # 布奇                 -> 10004
+        10090: 10019,  # 山姆                 -> 10019
+        10087: 10014,  # 铁拳芬布迪           -> 10014
+        10088: 10009,  # 鬼人阿金             -> 10009
+        10091: 10012,  # 铁壁巴拉             -> 10012
+        10097: 10004,  # 黑带克罗欧比         -> 10004
+        10098: 10004,  # 六刀流小八           -> 10004
+        10099: 10021,  # 啾                   -> 10021
+        10101: 10042,  # 多鲁顿               -> 10042
+        10103: 10021,  # 白铁瓦尔波           -> 10021
+        10034: 10021,  # 杰斯/克罗马利蒙      -> 10021
+    }
+
+    # 3. 全量酒馆招募船员: (职业 job, 品质 quality) 高阶真贴图分级表
+    #    job:     1=剑豪, 2=狙击手, 3=船医, 4=航海士 (以及 10001~10004)
+    #    quality: 1=绿(C), 2=蓝(B), 3=紫(A), 4=金/橙(S), 5=红(SS)
+    #    彻底杜绝 10001/10002 普通小兵！
+    ANDROID_JOB_QUALITY_MAP = {
+        # 1 = 剑豪 (前排近战/刀剑/重武)
+        1: {1: 10014, 2: 10019, 3: 10061, 4: 10009, 5: 10004},
+        # 2 = 狙击手 (敏捷/远程/刺杀)
+        2: {1: 10019, 2: 10021, 3: 10021, 4: 10042, 5: 10004},
+        # 3 = 船医 (治疗/辅助)
+        3: {1: 10070, 2: 10070, 3: 10070, 4: 10012, 5: 10070},
+        # 4 = 航海士 (法系/群攻/控场)
+        4: {1: 10070, 2: 10012, 3: 10012, 4: 10009, 5: 10004},
+    }
 
     def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False, unit_name="", is_companion=False) -> int:
         try:
@@ -2710,34 +2750,32 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         if fv <= 0:
             return 1001
 
-        # ★ 核心原则：玩家招募的真实船员，凡在真实模型库（SWF/完整PVR）中存在，绝对不再降级为小兵！
-        if is_companion:
-            # 只要在 Flash 真实人物 SWF 库中（如巴基 10011、亚尔丽塔 10012、克洛 10022、阿龙 10013、乌索普 10029、娜美 10030 等），直接下发真实模型！
-            if fv in FLASH_VALID_FIGURES or fv in ANDROID_VALID_FIGURES:
-                return fv
-            # 若其 figure > 1000 且非通用小怪，保留其原版 figure
-            if fv > 1000:
-                return fv
-
-        # 针对通用怪物与敌方军队
-        if fv in FLASH_VALID_FIGURES or fv in ANDROID_VALID_FIGURES:
+        # Tier 1: 主角全系 (1001~1008) 或已拥有完整非空 PVR 的原生真贴图 (如 10012 亚尔丽塔等) -> 100% 直通
+        if fv in ANDROID_COMPLETE_FIGURES:
             return fv
-        if fv in SPECIAL_BATTLE_FIGURE_MAP:
-            return SPECIAL_BATTLE_FIGURE_MAP[fv]
-        if unit_name:
-            for kw, mapped_fig in NAME_KEYWORD_FALLBACKS:
-                if kw in unit_name and mapped_fig in ANDROID_VALID_FIGURES:
-                    return mapped_fig
+        if is_companion and (1001 <= fv <= 1008):
+            return fv
 
-        if 1 <= job <= 4:
-            job += 10000
-        pool = ARCHETYPE_POOLS.get(job)
-        if pool:
-            for chosen in pool:
-                if chosen in ANDROID_VALID_FIGURES:
-                    return chosen
+        # Tier 2: 知名角色特征精准代打表 (杜绝 Blank.png 隐形同时杜绝变成小兵)
+        if fv in ANDROID_ICONIC_FIGURE_MAP:
+            return ANDROID_ICONIC_FIGURE_MAP[fv]
 
-        return 10012 if (job == 10003) else (10014 if job == 10002 else 10004)
+        # Tier 3: 职业 × 品质 高阶真贴图分级映射
+        j = int(job) if str(job).isdigit() else 1
+        if j > 10000:
+            j -= 10000
+        if j not in ANDROID_JOB_QUALITY_MAP:
+            j = 1
+
+        q = 3
+        try:
+            q = int(quality)
+        except Exception:
+            q = 3
+        q = max(1, min(5, q))
+
+        mapped = ANDROID_JOB_QUALITY_MAP[j].get(q, 10014)
+        return mapped
 
     # Valid open battle skills with complete animations/shades in client
     VALID_OPEN_SKILLS = {

@@ -6,13 +6,13 @@
     "face": 1001,
     "figure": 1001,
     "nation": 1,
-    "gold": 418108,
-    "copper": 10433638.0,
+    "gold": 417758,
+    "copper": 10592638.0,
     "action_point": 100,
     "ap_max": 100,
     "scene_id": 2004,
-    "scene_x": 1832,
-    "scene_y": 171,
+    "scene_x": 1716,
+    "scene_y": 149,
     "current_task": 110035,
     "completed_tasks": [
       100001,
@@ -54,7 +54,7 @@
       110035
     ],
     "battle_wins": {
-      "10101": 4,
+      "10101": 7,
       "10102": 1,
       "10103": 1,
       "10104": 1,
@@ -165,15 +165,15 @@
       "11212": 1,
       "11213": 1,
       "11214": 1,
-      "11215": 1,
+      "11215": 2,
       "11301": 1,
       "11302": 1,
       "11303": 1,
       "11304": 1,
       "11305": 1,
       "11306": 1,
-      "11307": 1,
-      "11308": 1
+      "11307": 2,
+      "11308": 3
     },
     "login_days": 1,
     "created": true,
@@ -185,8 +185,8 @@
         "item_id": 1001,
         "cfg_item_id": 200327,
         "amount": 1,
-        "level": 75,
-        "star": 75,
+        "level": 76,
+        "star": 76,
         "rise": 0,
         "equiped": 1,
         "general_id": 10043235,
@@ -543,6 +543,28 @@
         "equiped": 0,
         "general_id": 0,
         "part": 0
+      },
+      {
+        "item_id": 1086,
+        "cfg_item_id": 200067,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 3
+      },
+      {
+        "item_id": 1087,
+        "cfg_item_id": 200067,
+        "amount": 1,
+        "level": 1,
+        "star": 1,
+        "rise": 0,
+        "equiped": 0,
+        "general_id": 0,
+        "part": 3
       }
     ],
     "equipments": {
@@ -553,7 +575,7 @@
       "amulet": 0,
       "misc": 1064
     },
-    "exp": 21000,
+    "exp": 101900,
     "task_accepted": true,
     "task_completed": true,
     "camp_stars": {
@@ -708,35 +730,46 @@
     },
     "generals": [
       {
-        "general_id": 1002,
-        "cfg_general_id": 1002,
-        "name": "测试船员A",
-        "level": 10,
-        "job": 10001,
-        "figure": 1002,
-        "quality": 3,
-        "exp": 500,
-        "experience": 500
-      },
-      {
-        "general_id": 1003,
-        "cfg_general_id": 1003,
-        "name": "测试船员B",
-        "level": 10,
+        "general_id": 10011,
+        "cfg_general_id": 10011,
+        "name": "小丑巴基",
+        "figure": 10011,
+        "level": 20,
         "job": 10002,
-        "figure": 1003,
-        "quality": 3,
+        "quality": 4,
         "exp": 500,
         "experience": 500
       },
       {
-        "general_id": 1004,
-        "cfg_general_id": 1004,
-        "name": "替补船员C(未上阵)",
-        "level": 10,
+        "general_id": 10012,
+        "cfg_general_id": 10012,
+        "name": "亚尔丽塔",
+        "figure": 10012,
+        "level": 20,
         "job": 10003,
-        "figure": 1004,
-        "quality": 3,
+        "quality": 4,
+        "exp": 500,
+        "experience": 500
+      },
+      {
+        "general_id": 10013,
+        "cfg_general_id": 10013,
+        "name": "恶龙阿龙",
+        "figure": 10013,
+        "level": 20,
+        "job": 10001,
+        "quality": 4,
+        "exp": 500,
+        "experience": 500
+      },
+      {
+        "general_id": 10022,
+        "cfg_general_id": 10022,
+        "name": "百计克洛",
+        "figure": 10022,
+        "level": 20,
+        "job": 10001,
+        "quality": 4,
         "exp": 500,
         "experience": 500
       }
@@ -744,16 +777,16 @@
     "tavern_round": {
       "scene_id": 4,
       "cfg_ids": [
-        10051255,
-        10051215,
         10043252,
-        10054254,
-        10053253
+        10041251,
+        10051215,
+        10053253,
+        10054254
       ],
       "open_generals": [
         0,
-        1,
         0,
+        1,
         0,
         0
       ],
@@ -761,14 +794,14 @@
       "type": 3
     },
     "formation": {
-      "1": 0,
-      "2": 1001,
-      "3": 0,
-      "4": 0,
-      "5": 0,
-      "6": 1002,
+      "1": 1001,
+      "2": 10011,
+      "3": 10012,
+      "4": 10013,
+      "5": 10022,
+      "6": 0,
       "7": 0,
-      "8": 1003,
+      "8": 0,
       "9": 0
     },
     "training_list": [
@@ -811,8 +844,8 @@
     "claimed_login_rewards": [
       1
     ],
-    "exploit": 11685,
-    "experience": 21000,
+    "exploit": 12724,
+    "experience": 101900,
     "vip_level": 10,
     "vip_charge": 500000,
     "task_step": 8,

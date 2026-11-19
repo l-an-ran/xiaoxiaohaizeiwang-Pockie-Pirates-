@@ -1,3 +1,45 @@
+# 《小小海贼王》Android 安卓端船员模型核验与高阶映射引擎落地日志 (2026-11-19)
+
+---
+
+## 一、 今日核心攻关目标（网页版 Gemini 4 Neon 深度协同）
+1. **明确目标平台与工程范围**：
+   - 确立核心目标为 **Android 安卓端**，涉及核心工程：
+     - `D:\AI\work\xiaoxiaohaizei-offline-repack`（客户端 APK 解包与回编译工程）
+     - `D:\AI\work\xiaoxiaohaizei-offline-src`（源码及本地服务端工程）
+   - 底层由原生 C++ 架构 `libOnePiece.so` + TQFramework / Cocos2d-x 驱动。
+2. **资产库深度审计（Pockie Pirates - Assets Restoration）**：
+   - 查阅 `xiaoxiaohaizei-offline-repack\Pockie Pirates - Assets Restoration\Prompts.txt`、`Pockie_Pirates_missing_assets.xlsx` 与 `extracted_assets_with_png`。
+   - 查明官方遗留的 287 个 `personbattle` 战斗 PVR 贴图中，仅有 **52 个为非空真贴图（>=1KB）**，其余 235 个为 0 字节占位符（原工程计划通过 AI Prompt A/B/C 逐帧补齐，目前尚未产出 restored 图集）。
+   - 解析 `personbattle.ani` 确认：**17 套模型拥有 100% 完整真贴图**（主角 1001~1008、亚尔丽塔 10012，以及 10004、10009、10014、10019、10021、10042、10061、10070 职业通用高阶真贴图）。巴基 10011、克洛 10022、阿龙 10013 缺少部分动作帧，若原样下发会触发 `DynDefAni.ani -> Blank.png` 导致角色隐形。
+
+---
+
+## 二、 核心架构论证与 Gemini 4 Neon 技术结论
+在 `https://gemini.google.com/app/789b65733a98e8c5`（Gemini 4 Neon）深度协助下，达成关键技术共识：
+1. **VFS 优先级与资产打包铁律**：
+   - `libOnePiece.so` 的虚拟文件系统首先匹配 `assets/Env/data.tpi` 索引。因为 235 个缺失 PVR 在原版 `data.tpi` 中已存在 0 字节条目，若直接拷入散文件 `assets/data/*.pvr`，底层将直接命中 0 字节索引并回退至 `Blank.png` 隐形，根本不会进入散文件逻辑。
+   - 现阶段保持 `data.tpd.1~56` 原生纯净，严禁将 0 字节散文件打入 APK，既保护 APK 紧凑体积，又杜绝隐形与闪退。
+2. **高阶模型三层确定性路由机制**：
+   - **Tier 1 (真贴图 100% 直通)**：主角 1001~1008 全职业性别、亚尔丽塔 10012（`personbattle_33~35.pvr` 全满），以及 10004/10009/10014/10019/10021/10042/10061/10070 等 17 套真贴图直通下发原皮。
+   - **Tier 2 (知名角色特征精准代打)**：对主线与酒馆知名名将进行外观、体态、武器风格 1:1 专属高阶真贴图绑定（蒙卡->10061重武器巨汉、巴基/乌索普->10021重炮头目、克洛/路奇->10019猫爪十刃刺客、阿龙->10042野牛兽人狂战、娜美->10012亚尔丽塔/法系、斯摩格->10014海军剑士长等），坚决杜绝粗暴降级为小兵。
+   - **Tier 3 (全量酒馆招募船员 职业 × 品质 分级映射)**：根据职业（剑豪/狙击/船医/航海士）与酒馆品质（绿/蓝/紫/金/红），分层映射为 9 种以上高阶英姿，彻底告别 10001/10002 普通小兵千人一面。
+
+---
+
+## 三、 落地与编译交付
+1. **服务端核心重构**：
+   - 更新 `xiaoxiaohaizei-offline-src/offline-server/server.py` 中的 `_get_safe_battle_figure`、`ANDROID_COMPLETE_FIGURES`、`ANDROID_ICONIC_FIGURE_MAP` 与 `ANDROID_JOB_QUALITY_MAP`。
+   - 热重启 `server.py` 守护进程，运行状态健康，配置加载完整。
+2. **Android 客户端自动化重新打包**：
+   - 运行 `build_client_apk.py`，保持 `Env/` 关键资产与 `libOnePiece.so` 的 `STORED` (0% 压缩) 安全配置。
+   - 成功生成全新已签名 Android 客户端：
+     `D:\AI\work\xiaoxiaohaizei-offline-repack\xiaoxiaohaizei-offline-release.apk`
+     - 文件大小：87,994,717 字节（83.92 MB）
+     - 签名证书：`game-offline.keystore`（alias `offline`）
+
+---
+
 # 《小小海贼王》离线服务端核心业务深度修复日志 (2026-11-19)
 
 ---
