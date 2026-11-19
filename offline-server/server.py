@@ -1738,30 +1738,20 @@ def _build_scene_response(correlation_id: str, scene_id: int, x: int, y: int) ->
 
 
 def _build_scenecheck_response(correlation_id: str) -> bytes:
-
     """Reply to SCENE.scenecheck matching OPDataManager::onScenceCheck."""
-
-    can_pass = [
-        2001, 2002, 2003, 2004, 2005, 2006, 2007,
-        1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008
-    ]
-
+    can_pass = (
+        list(range(2001, 2014)) + [3001, 3002] +
+        list(range(1001, 1051)) +
+        [2006, 2008, 2010, 2012, 2014, 2016, 2019, 2022, 2024, 2026, 2029, 2032, 2034, 2036, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2049, 2050]
+    )
     fields = [
-
         ("can_pass_list",    _amf3_array([_amf3_int(sid) for sid in can_pass])),
-
         ("need_camp_list",   _amf3_array([])),
-
         ("unavailable_list", _amf3_array([])),
-
         ("error_code",       _amf3_int(0)),
-
         ("request_code",     _amf3_int(0)),
-
     ]
-
     body_amf3 = _amf3_object(fields)
-
     return _make_ack_message(correlation_id, body_amf3)
 
 
@@ -2254,7 +2244,7 @@ def _build_camp_reward_response(correlation_id: str) -> bytes:
 
 
 def _build_camp_elite_response(correlation_id: str) -> bytes:
-    """Reply to campService.campElite matching EnterCopyWarPanel::resolveEliteInfo."""
+    """Reply to campService.campElite matching EnterCopyWarPanel::resolveEliteInfo and OPDataManager::onCampElite."""
     ELITE_CAMP_IDS = [
         2006, 2008, 2010, 2012, 2014, 2016, 2019, 2022, 2024, 2026, 2029,
         2032, 2034, 2036, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2049,
@@ -2263,14 +2253,24 @@ def _build_camp_elite_response(correlation_id: str) -> bytes:
     elite_items = []
     for cid in ELITE_CAMP_IDS:
         elite_items.append(_amf3_object([
-            ("cfg_camp_id",   _amf3_int(cid)),
-            ("memcamp_score", _amf3_int(3)),
-            ("camp_score",    _amf3_int(3)),
-            ("is_finish",     _amf3_bool(True)),
+            ("cfg_camp_id",       _amf3_int(cid)),
+            ("elite_cfg_camp_id", _amf3_int(cid)),
+            ("camp_id",           _amf3_int(cid)),
+            ("memcamp_score",     _amf3_int(3)),
+            ("camp_score",        _amf3_int(3)),
+            ("is_finish",         _amf3_bool(True)),
+            ("is_open",           _amf3_bool(True)),
+            ("can_attack",        _amf3_int(1)),
+            ("remain_num",        _amf3_int(5)),
+            ("max_num",           _amf3_int(5)),
         ]))
     fields = [
         ("error_code",     _amf3_int(-1)),
         ("all_elite_camp", _amf3_array(elite_items)),
+        ("elite_list",     _amf3_array(elite_items)),
+        ("remain_num",     _amf3_int(5)),
+        ("max_num",        _amf3_int(5)),
+        ("is_open",        _amf3_bool(True)),
     ]
     return _make_ack_message(correlation_id, _amf3_object(fields))
 
@@ -2410,26 +2410,46 @@ def _complete_current_task() -> None:
         nat = role.get("nation", 1) or 1
         next_task = get_next_task(current, nation=nat)
 
-        # 章节场景平滑切换与位置更新
-        if current == 100039:
-            # 阵营选择完成 -> 传送到对应主城
-            if not role.get("nation"):
-                role["nation"] = 1
-            if role["nation"] == 2:
-                role["scene_id"] = 3002  # 圣克洛伊岛 (海军)
-                role["scene_x"] = 33
-                role["scene_y"] = 292
-            else:
-                role["scene_id"] = 3001  # 西摩志基村 (海贼)
-                role["scene_x"] = 251
-                role["scene_y"] = 345
-            print(f"  [CHAPTER 3] Nation chosen: {role['nation']} -> Teleport to scene {role['scene_id']}", flush=True)
-        elif current in (110006, 120006):
-            # 前往桔子镇 -> 传送到桔子镇
-            role["scene_id"] = 2003
-            role["scene_x"] = 170
-            role["scene_y"] = 256
-            print(f"  [CHAPTER 3] Teleport to Orange Town (scene 2003)!", flush=True)
+        # 章节跨城镇场景平滑切换与安全出生坐标更新
+        CROSS_SCENE_TASK_SPAWNS = {
+            100039: (3002 if role.get("nation") == 2 else 3001, 33 if role.get("nation") == 2 else 251, 292 if role.get("nation") == 2 else 345),
+            110006: (2003, 170, 256),   # 前往桔子镇 -> 桔子镇 (NPC 17 镇长)
+            120006: (2003, 170, 256),
+            110021: (3001, 600, 130),   # 巴基大决斗完成 -> 返回海贼首领(西摩志基村)
+            120021: (3002, 600, 130),
+            110022: (2003, 900, 36),    # 镇长的答谢 -> 桔子镇镇长
+            120022: (2003, 900, 36),
+            110024: (2004, 1680, 20),   # 补充物资 -> 西罗布村 (NPC 23 乌索普)
+            120024: (2004, 1680, 20),
+            110041: (2005, 1200, 50),   # 前往巴拉迪 -> 海上餐厅巴拉迪 (NPC 27 香吉士)
+            120041: (2005, 1200, 50),
+            110059: (2006, 280, 45),    # 可可亚西村 -> 可可亚西村 (NPC 31 诺琪高)
+            120059: (2006, 280, 45),
+            110077: (2007, 757, 45),    # 登陆罗格镇 -> 罗格镇 (NPC 33 镇长)
+            120077: (2007, 757, 45),
+            110090: (2008, 1563, 44),   # 脱离罗格镇 -> 磁鼓岛 (NPC 39 多鲁顿)
+            120090: (2008, 1563, 44),
+            110107: (2009, 400, 50),    # 阿拉巴斯坦 -> 阿拉巴斯坦 (NPC 41)
+            120107: (2009, 400, 50),
+            110126: (2010, 400, 50),    # 再次启航 -> 加雅岛 (NPC 45)
+            120126: (2010, 400, 50),
+            110147: (2011, 400, 50),    # 前往空岛 -> 空岛 (NPC 56)
+            120147: (2011, 400, 50),
+            110168: (2012, 400, 50),    # 新的冒险 -> 长链岛 (NPC 92)
+            120168: (2012, 400, 50),
+            110192: (2013, 400, 50),    # 七水之都 -> 七水之都 (NPC 97)
+            120192: (2013, 400, 50),
+        }
+
+        if current in CROSS_SCENE_TASK_SPAWNS:
+            t_sid, t_sx, t_sy = CROSS_SCENE_TASK_SPAWNS[current]
+            role["scene_id"] = t_sid
+            role["scene_x"] = t_sx
+            role["scene_y"] = t_sy
+            unlocked = role.setdefault("unlocked_scenes", [2001, 2002, 2003, 2004])
+            if t_sid not in unlocked:
+                unlocked.append(t_sid)
+            print(f"  [CROSS-SCENE TRANSITION] Task {current} completed -> Teleport to Scene {t_sid} ({t_sx}, {t_sy})!", flush=True)
     except Exception as e:
         print(f"  [TASK] error completing task {current}: {e}", flush=True)
         next_task = current + 1
@@ -2502,14 +2522,21 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
 
-            # 优先从 cfg_army 读取对应军队/关卡的标准经验与历练
+            # 优先从 cfg_army 读取对应军队/关卡的真实经验、历练与掉落物品
             army_row = cur.execute("SELECT * FROM cfg_army WHERE cfg_army_id = ?", (camp_id,)).fetchone()
             if not army_row:
                 army_row = cur.execute("SELECT * FROM cfg_army WHERE cfg_camp_id = ? ORDER BY cfg_army_id ASC LIMIT 1", (camp_id,)).fetchone()
             if army_row:
-                reward_experience = int(army_row["reward_experience"] or 500)
-                reward_exploit = int(army_row["reward_exploit"] or 40)
+                keys = army_row.keys()
+                reward_experience = int(army_row["reward_experience"] or 500) if "reward_experience" in keys else 500
+                reward_exploit = int(army_row["reward_exploit"] or 40) if "reward_exploit" in keys else 40
                 reward_copper = reward_experience * 2
+                
+                drop_item_id = int(army_row["reward_item"] or 0) if "reward_item" in keys else 0
+                drop_ratio = float(army_row["drop_ratio"] or 0.0) if "drop_ratio" in keys else 0.0
+                if drop_item_id > 0 and (random.random() <= drop_ratio or drop_ratio >= 1.0 or wins.get(str(camp_id), 0) <= 1):
+                    reward_item_1 = drop_item_id
+                    reward_item_amt_1 = 1
             else:
                 reward_experience = 500
                 reward_exploit = 40
@@ -2532,8 +2559,10 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                             reward_copper = max(reward_copper, int(row["reward_copper"]))
                         if row["reward_experience"]:
                             reward_experience = max(reward_experience, int(row["reward_experience"]))
-                        reward_item_1 = int(row["reward_item_1"] or 0)
-                        reward_item_amt_1 = int(row["reward_item_amount_1"] or 0)
+                        t_item = int(row["reward_item_1"] or 0)
+                        if t_item > 0:
+                            reward_item_1 = t_item
+                            reward_item_amt_1 = int(row["reward_item_amount_1"] or 1)
                         print(f"  [BATTLE] Task {cur_task} battle match (army={ccat}, camp={t_camp}) → copper={reward_copper} exp={reward_experience} item={reward_item_1}", flush=True)
             conn.close()
         except Exception as e:
@@ -2624,6 +2653,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         10004, 10009, 10012, 10014, 10019, 10021, 10042, 10061, 10070
     }
     SPECIAL_BATTLE_FIGURE_MAP = {
+        # --- Windmill Village & Shells Town (Chapter 1) ---
         10011: 10021,  # 小丑巴基 (红鼻子大炮狙击手) -> 10021 (海贼重炮头目)
         10083: 10009,  # 赞高 (催眠师/航海士) -> 10009 (见习航海士/魔导法师)
         10012: 10012,  # 铁棒亚尔丽塔 (自带原生完整模型) -> 10012
@@ -2636,6 +2666,45 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         10062: 10021,  # 狡诈神枪手 -> 10021 (重炮头目)
         10063: 10070,  # 嗜血船医 -> 10070 (船医)
         10058: 10009,  # 航海士队长 -> 10009 (魔导法师)
+
+        # --- Syrup Village (West Village, Scene 2004, Camp 1011~1013) ---
+        10084: 10019,  # 克洛船长 (无声步/猫爪十刃敏捷刺客) -> 10019 (敏捷刺客)
+        10089: 10004,  # 布奇 (猫贼体术重拳) -> 10004 (格斗体术)
+        10090: 10019,  # 山姆 (猫贼飞刃偷袭) -> 10019 (敏捷刺客)
+
+        # --- Baratie Restaurant (Scene 2005, Camp 1014~1016) ---
+        10087: 10014,  # 铁拳芬布迪 (海军少尉铁拳) -> 10014 (海军制服精英)
+        10088: 10009,  # 鬼人阿金 (狂野双拐近战) -> 10009 (狂野海贼刀客)
+        10091: 10012,  # 铁壁巴拉 (铁壁盾牌肉盾) -> 10012 (重甲盾卫)
+        10092: 10021,  # 东海霸主克利克 (重装战甲全身火炮) -> 10021 (重装火炮霸主)
+
+        # --- Cocoyasi Village (Scene 2006, Camp 1017~1019) ---
+        10097: 10004,  # 黑带克罗欧比 (鱼人空手道格斗) -> 10004 (近战格斗体术)
+        10098: 10001,  # 六刀流小八 (六刀斩击剑客) -> 10001 (男剑豪)
+        10099: 10003,  # 啾 (水铁炮远程狙击) -> 10003 (男狙击手)
+        10105: 10061,  # 恶龙锯齿阿龙 (锯齿大刀狂暴霸主) -> 10061 (重武器霸主)
+
+        # --- Loguetown (Scene 2007, Camp 1020~1022) ---
+        10106: 10002,  # 达斯琪 (海军女剑士时雨) -> 10002 (女剑豪)
+        10107: 10070,  # 白猎人斯摩格 (冒烟果实自然系控制) -> 10070 (异能魔导BOSS)
+
+        # --- Drum Island (Scene 2008, Camp 1023~1025) ---
+        10101: 10042,  # 多鲁顿 (牛牛果实野牛重装冲锋) -> 10042 (兽型霸体重击)
+        10103: 10021,  # 白铁瓦尔波 (吞吞果实大炮重装) -> 10021 (重装大炮)
+        10034: 10021,  # 杰斯/克罗马利蒙 (弓箭/爆炸毛球远程) -> 10021 (狙击/重炮)
+
+        # --- Elite Captains & Soldiers in Camp 1011~1025 ---
+        10036: 10009,  # 航海士队长 -> 10009 (法系)
+        10018: 10070,  # 船医队长 -> 10070 (船医)
+        10006: 10021,  # 神枪手队长 -> 10021 (重炮)
+        10005: 10070,  # 冷酷船医 -> 10070 (船医)
+        10060: 10009,  # 冷酷航海士 -> 10009 (法系)
+        10071: 10070,  # 狡诈船医 -> 10070 (船医)
+        10077: 10021,  # 嗜血神枪手 -> 10021 (重炮)
+        10022: 10014,  # 精英海军士兵 -> 10014 (海军)
+        10023: 10014,  # 精英海军少尉 -> 10014 (海军)
+        10013: 10012,  # 蒙卡 (重装斧手) -> 10012 (重甲肉盾)
+        10039: 10014,  # 海军上尉 -> 10014 (海军)
     }
 
     # Valid open battle skills with complete animations/shades in client
@@ -2644,7 +2713,23 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         13042, 13044, 13047, 14061, 14067, 51001, 51004, 51005, 51006, 51009
     }
 
-    def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False) -> int:
+    ARCHETYPE_POOLS = {
+        10001: (10001, 10004, 10009, 10014, 10061),  # 剑士/刀客/近战
+        10002: (10003, 10021),                        # 狙击/炮手
+        10003: (10005, 10009, 10070),                 # 航海士/魔导
+        10004: (10008, 10070),                        # 船医/辅助
+    }
+
+    NAME_KEYWORD_FALLBACKS = [
+        ("克洛", 10019), ("芬布迪", 10014), ("阿金", 10009), ("巴拉", 10012),
+        ("克利克", 10021), ("黑带", 10004), ("克罗欧比", 10004), ("小八", 10001),
+        ("啾", 10003), ("阿龙", 10061), ("达斯琪", 10002), ("斯摩格", 10070),
+        ("多鲁顿", 10042), ("瓦尔波", 10021), ("山姆", 10019), ("布奇", 10004),
+        ("海军", 10014), ("炮手", 10021), ("枪手", 10021), ("剑士", 10004),
+        ("航海士", 10009), ("船医", 10070),
+    ]
+
+    def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False, unit_name="") -> int:
         try:
             fv = int(f_val)
         except Exception:
@@ -2653,8 +2738,17 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             return fv
         if fv in SPECIAL_BATTLE_FIGURE_MAP:
             return SPECIAL_BATTLE_FIGURE_MAP[fv]
+        if unit_name:
+            for kw, mapped_fig in NAME_KEYWORD_FALLBACKS:
+                if kw in unit_name and mapped_fig in VALID_BATTLE_FIGURES:
+                    return mapped_fig
         if 1 <= job <= 4:
             job += 10000
+        pool = ARCHETYPE_POOLS.get(job)
+        if pool:
+            chosen = pool[abs(fv) % len(pool)]
+            if chosen in VALID_BATTLE_FIGURES:
+                return chosen
         if is_enemy:
             if quality >= 4:
                 return 10014 if (fv % 2 == 0) else 10019
@@ -2675,16 +2769,17 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 return 10008
             else:
                 return 10061 if (quality >= 4) else 10004
+                return 10061 if (quality >= 4) else 10004
 
-    # 1. Player team (attack_generals)
+    # 1. Player team (attack_generals) - 严格忠实于 role["formation"]，未上阵伙伴不进入战斗
     fmt_dict = _get_formation_dict(role)
     proto_fig = cfg["figure"]
     proto_pos = 1
+    # 查找主角在阵型中的指定位置
     for k, v in fmt_dict.items():
         if int(v) in (proto_fig, cfg["cfg_id"], 1001, 1007, 1008) or (0 < int(v) < 1000):
             proto_pos = int(k)
             break
-    used_positions = {proto_pos}
 
     proto_lvl = int(role.get("level", 1))
     proto_stats = _calc_general_stats(True, cfg["job"], proto_lvl)
@@ -2718,14 +2813,35 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         "pa": proto_stats["physical_attack"],
     }]
 
-    # Add all recruited companions to the player's battle team!
+    # 构建已招募伙伴的快速查找表
+    recruited_map = {}
+    for g in role.get("generals", []):
+        if isinstance(g, dict) and (g.get("general_id") or g.get("cfg_general_id")):
+            gid = int(g.get("general_id", 0))
+            cid = int(g.get("cfg_general_id", gid))
+            if gid > 0:
+                recruited_map[gid] = g
+            if cid > 0:
+                recruited_map[cid] = g
+
+    # 严格按照阵型 1..9 槽位放置伙伴（空位必须保持为空，未上阵伙伴绝对不上场！）
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    for idx, comp in enumerate(role.get("generals", [])):
-        if not isinstance(comp, dict):
-            continue
-        c_gid = int(comp.get("general_id", 0))
+    for pos_num in range(1, 10):
+        if pos_num == proto_pos:
+            continue  # 主角已经在此位
+        val = int(fmt_dict.get(str(pos_num), fmt_dict.get(pos_num, 0)))
+        if val <= 0:
+            continue  # 空位，保持为空
+        if val in (proto_fig, cfg["cfg_id"], 1001, 1007, 1008) or (0 < val < 1000):
+            continue  # 主角占位符跳过
+
+        comp = recruited_map.get(val)
+        if not comp:
+            continue  # 未招募或不存在该单位，绝不强塞
+
+        c_gid = int(comp.get("general_id", val))
         c_cfg_id = int(comp.get("cfg_general_id", c_gid))
         c_level = int(comp.get("level", 1))
         c_name = str(comp.get("name", "船员"))
@@ -2744,24 +2860,11 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
             if not c_skill or (c_skill == 51001 and c_cfg_id != 10041220): c_skill = int(row[4] or 51001)
             c_job = int(row[5] or 10001)
 
-        # Look up assigned position in formation
-        assigned_pos = None
-        for k, v in fmt_dict.items():
-            if int(v) in (c_gid, c_cfg_id):
-                assigned_pos = int(k)
-                break
-        if not assigned_pos or assigned_pos in used_positions:
-            for p in range(1, 10):
-                if p not in used_positions:
-                    assigned_pos = p
-                    break
-        used_positions.add(assigned_pos)
-
         comp_stats = _calc_general_stats(False, c_cfg_id, c_level)
         c_hp = comp_stats["hp"]
-        c_render_fig = _get_safe_battle_figure(c_fig, job=c_job, quality=c_qual, is_enemy=False)
+        c_render_fig = _get_safe_battle_figure(c_fig, job=c_job, quality=c_qual, is_enemy=False, unit_name=c_name)
         c_gen_obj = _amf3_object([
-            ("position",         _amf3_int(assigned_pos)),
+            ("position",         _amf3_int(pos_num)),
             ("health_point",     _amf3_int(c_hp)),
             ("face",             _amf3_int(c_face)),
             ("morale",           _amf3_int(50)),
@@ -2777,7 +2880,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ])
         attack_generals.append(c_gen_obj)
         atk_units.append({
-            "pos": assigned_pos,
+            "pos": pos_num,
             "hp": c_hp,
             "hp_max": c_hp,
             "face": c_face,
@@ -2877,7 +2980,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 else:
                     m_skill_id = 11003
 
-            m_render_fig = _get_safe_battle_figure(m_fig, job=m_job, quality=m_qual, is_enemy=True)
+            m_render_fig = _get_safe_battle_figure(m_fig, job=m_job, quality=m_qual, is_enemy=True, unit_name=m_name)
             def_gen_elem = _amf3_object([
                 ("position",         _amf3_int(p_slot)),
                 ("health_point",     _amf3_int(m_hp)),
@@ -3156,6 +3259,8 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         ("winner",            _amf3_int(1 if win else 0)),
         ("score",             _amf3_int(5)),
         ("can_skip",          _amf3_int(1)),
+        ("is_skip",           _amf3_int(1)),
+        ("speed",             _amf3_int(3)),
         ("is_npc",            _amf3_int(1)),
         ("reward_copper",     _amf3_int(reward_copper)),
         ("reward_experience", _amf3_int(reward_experience)),
@@ -5508,7 +5613,7 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
             return _build_general_response(correlation_id)
 
         if "FORMATION" in op_name.upper():
-            # 阵型设置
+            # 阵型设置（支持船员互换位置与下阵）
             role = _get_role()
             fmt_dict = _get_formation_dict(role)
             # body: [role_id, code, general_id, cfg_formation_id, pos, on]
@@ -5531,17 +5636,26 @@ def _dispatch_operation(operation: str, correlation_id: str, body: Any, envelope
                     pass
 
             if pos in range(1, 10):
+                old_pos_of_gen = None
+                for k, v in fmt_dict.items():
+                    if int(v) == gen_id:
+                        old_pos_of_gen = str(k)
+                        break
+
                 if on:
-                    for k in list(fmt_dict.keys()):
-                        if int(fmt_dict[k]) == gen_id:
-                            fmt_dict[k] = 0
+                    prev_occupant = int(fmt_dict.get(str(pos), 0))
+                    if old_pos_of_gen and old_pos_of_gen != str(pos):
+                        fmt_dict[old_pos_of_gen] = prev_occupant
                     fmt_dict[str(pos)] = gen_id
                 else:
+                    if old_pos_of_gen:
+                        fmt_dict[old_pos_of_gen] = 0
                     if int(fmt_dict.get(str(pos), 0)) == gen_id:
                         fmt_dict[str(pos)] = 0
+
                 role["formation"] = fmt_dict
                 _save()
-                print(f"  [FORMATION] Updated pos {pos} -> {gen_id} (on={on})", flush=True)
+                print(f"  [FORMATION] Updated pos {pos} -> {gen_id} (on={on}), result={fmt_dict}", flush=True)
             return _build_general_response(correlation_id)
 
         if "TRAINING" in op_name.upper():
@@ -5931,6 +6045,44 @@ class Handler(BaseHTTPRequestHandler):
 
             self._send(200, "text/plain; charset=utf-8", info.encode("utf-8"))
 
+            return
+
+        # 静态文件服务与虚拟空 SWF 响应（彻底防止客户端 404 / IOError 崩溃）
+        clean_path = path.lstrip("/").replace("../", "")
+        # 尝试从 ROOT 或工作目录查找
+        candidates = [
+            ROOT / clean_path,
+            Path(r"d:\AI\work\xiaoxiaohaizei-offline-src\assets") / clean_path,
+            Path(r"d:\AI\work\xiaoxiaohaizei-offline-src\client-patch") / clean_path,
+            Path(r"d:\AI\work\xx") / clean_path,
+        ]
+        for cand in candidates:
+            if cand.is_file():
+                ext = cand.suffix.lower()
+                mime = "application/octet-stream"
+                if ext == ".swf": mime = "application/x-shockwave-flash"
+                elif ext == ".png": mime = "image/png"
+                elif ext in (".jpg", ".jpeg"): mime = "image/jpeg"
+                elif ext == ".json": mime = "application/json; charset=utf-8"
+                elif ext == ".js": mime = "application/javascript; charset=utf-8"
+                elif ext == ".txt": mime = "text/plain; charset=utf-8"
+                self._send(200, mime, cand.read_bytes())
+                return
+
+        if path.lower().endswith(".swf"):
+            fallback_swf = Path(r"d:\AI\work\xx\temp_empty.swf")
+            if fallback_swf.is_file():
+                self._send(200, "application/x-shockwave-flash", fallback_swf.read_bytes())
+                return
+            else:
+                empty_header = b"FWS\x08\x22\x00\x00\x00x\x00\x05p\x00\x00\x0f\xa0\x00\x00\x18\x01\x00B\x44\x00\x00\x00\x00"
+                self._send(200, "application/x-shockwave-flash", empty_header)
+                return
+
+        if path.lower().endswith((".png", ".jpg")):
+            # 1x1 透明 PNG 避免图片加载报错崩溃
+            transparent_png = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+            self._send(200, "image/png", transparent_png)
             return
 
         self._send(404, "text/plain; charset=utf-8", b"not found\n")
