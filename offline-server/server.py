@@ -33,6 +33,7 @@ import argparse
 import json
 
 import os
+import re
 
 import random
 import sqlite3
@@ -2646,130 +2647,103 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         fig = 1008
     cfg = PROTAGONIST_CONFIG[fig]
 
-    # The client package only bundles textures for these 17 complete soldier models:
-    # Any other figure is redirected to Blank.png by DynDefAni.ani and becomes invisible.
-    VALID_BATTLE_FIGURES = {
+    # 动态扫描与加载双端合法角色贴图白名单（Flash SWF 库与 Android PVR 真贴图）
+    FLASH_PERSON_DIR = Path(r"D:\AI\work\xx\Pockie Pirates Stuff\pockiepirates\assets\images\Person")
+    FLASH_VALID_FIGURES = {
+        1006, 10154,
+        *(range(1001, 1009)),
+        *(range(10001, 10042)),
+    }
+    if FLASH_PERSON_DIR.exists():
+        for f in FLASH_PERSON_DIR.glob("*.swf"):
+            m = re.match(r"^(\d+)\.swf$", f.name, re.I)
+            if m:
+                FLASH_VALID_FIGURES.add(int(m.group(1)))
+
+    ANDROID_VALID_FIGURES = {
         1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008,
         10004, 10009, 10012, 10014, 10019, 10021, 10042, 10061, 10070
     }
+
+    # 特殊首领在缺乏独立模型时的精细同系化回退
     SPECIAL_BATTLE_FIGURE_MAP = {
-        # --- Windmill Village & Shells Town (Chapter 1) ---
-        10011: 10021,  # 小丑巴基 (红鼻子大炮狙击手) -> 10021 (海贼重炮头目)
-        10083: 10009,  # 赞高 (催眠师/航海士) -> 10009 (见习航海士/魔导法师)
-        10012: 10012,  # 铁棒亚尔丽塔 (自带原生完整模型) -> 10012
-        10076: 10042,  # 海军剑士 -> 10042 (见习剑士/刀客小兵)
-        10075: 10014,  # 贝鲁梅伯 -> 10014 (剑士队长)
-        10073: 10021,  # 斧手亲卫/警卫 -> 10021 (海贼头目)
-        10080: 10014,  # 利基 (驯兽/剑士) -> 10014 (剑士队长)
-        10078: 10009,  # 摩奇 (驯兽师/航海) -> 10009 (魔导法师)
-        10074: 10061,  # 卡巴吉 (曲艺剑士) -> 10061 (精锐刀客)
-        10062: 10021,  # 狡诈神枪手 -> 10021 (重炮头目)
-        10063: 10070,  # 嗜血船医 -> 10070 (船医)
-        10058: 10009,  # 航海士队长 -> 10009 (魔导法师)
-
-        # --- Syrup Village (West Village, Scene 2004, Camp 1011~1013) ---
-        10084: 10019,  # 克洛船长 (无声步/猫爪十刃敏捷刺客) -> 10019 (敏捷刺客)
-        10089: 10004,  # 布奇 (猫贼体术重拳) -> 10004 (格斗体术)
-        10090: 10019,  # 山姆 (猫贼飞刃偷袭) -> 10019 (敏捷刺客)
-
-        # --- Baratie Restaurant (Scene 2005, Camp 1014~1016) ---
-        10087: 10014,  # 铁拳芬布迪 (海军少尉铁拳) -> 10014 (海军制服精英)
-        10088: 10009,  # 鬼人阿金 (狂野双拐近战) -> 10009 (狂野海贼刀客)
-        10091: 10012,  # 铁壁巴拉 (铁壁盾牌肉盾) -> 10012 (重甲盾卫)
-        10092: 10021,  # 东海霸主克利克 (重装战甲全身火炮) -> 10021 (重装火炮霸主)
-
-        # --- Cocoyasi Village (Scene 2006, Camp 1017~1019) ---
-        10097: 10004,  # 黑带克罗欧比 (鱼人空手道格斗) -> 10004 (近战格斗体术)
-        10098: 10001,  # 六刀流小八 (六刀斩击剑客) -> 10001 (男剑豪)
-        10099: 10003,  # 啾 (水铁炮远程狙击) -> 10003 (男狙击手)
-        10105: 10061,  # 恶龙锯齿阿龙 (锯齿大刀狂暴霸主) -> 10061 (重武器霸主)
-
-        # --- Loguetown (Scene 2007, Camp 1020~1022) ---
-        10106: 10002,  # 达斯琪 (海军女剑士时雨) -> 10002 (女剑豪)
-        10107: 10070,  # 白猎人斯摩格 (冒烟果实自然系控制) -> 10070 (异能魔导BOSS)
-
-        # --- Drum Island (Scene 2008, Camp 1023~1025) ---
-        10101: 10042,  # 多鲁顿 (牛牛果实野牛重装冲锋) -> 10042 (兽型霸体重击)
-        10103: 10021,  # 白铁瓦尔波 (吞吞果实大炮重装) -> 10021 (重装大炮)
-        10034: 10021,  # 杰斯/克罗马利蒙 (弓箭/爆炸毛球远程) -> 10021 (狙击/重炮)
-
-        # --- Elite Captains & Soldiers in Camp 1011~1025 ---
-        10036: 10009,  # 航海士队长 -> 10009 (法系)
-        10018: 10070,  # 船医队长 -> 10070 (船医)
-        10006: 10021,  # 神枪手队长 -> 10021 (重炮)
-        10005: 10070,  # 冷酷船医 -> 10070 (船医)
-        10060: 10009,  # 冷酷航海士 -> 10009 (法系)
-        10071: 10070,  # 狡诈船医 -> 10070 (船医)
-        10077: 10021,  # 嗜血神枪手 -> 10021 (重炮)
-        10022: 10014,  # 精英海军士兵 -> 10014 (海军)
-        10023: 10014,  # 精英海军少尉 -> 10014 (海军)
-        10013: 10012,  # 蒙卡 (重装斧手) -> 10012 (重甲肉盾)
-        10039: 10014,  # 海军上尉 -> 10014 (海军)
+        10076: 10042,  # 海军剑士 -> 10042
+        10075: 10014,  # 贝鲁梅伯 -> 10014
+        10073: 10021,  # 斧手亲卫 -> 10021
+        10080: 10014,  # 利基 -> 10014
+        10078: 10009,  # 摩奇 -> 10009
+        10074: 10061,  # 卡巴吉 -> 10061
+        10062: 10021,  # 狡诈神枪手 -> 10021
+        10063: 10070,  # 嗜血船医 -> 10070
+        10058: 10009,  # 航海士队长 -> 10009
+        10089: 10004,  # 布奇 -> 10004
+        10090: 10019,  # 山姆 -> 10019
+        10087: 10014,  # 铁拳芬布迪 -> 10014
+        10088: 10009,  # 鬼人阿金 -> 10009
+        10091: 10012,  # 铁壁巴拉 -> 10012
+        10097: 10004,  # 黑带克罗欧比 -> 10004
+        10098: 10001,  # 六刀流小八 -> 10001
+        10099: 10003,  # 啾 -> 10003
+        10101: 10042,  # 多鲁顿 -> 10042
+        10103: 10021,  # 白铁瓦尔波 -> 10021
+        10034: 10021,  # 杰斯/克罗马利蒙 -> 10021
     }
+
+    ARCHETYPE_POOLS = {
+        10001: (10001, 10004, 10009, 10014, 10061),
+        10002: (10003, 10021),
+        10003: (10005, 10009, 10070),
+        10004: (10008, 10070),
+    }
+
+    NAME_KEYWORD_FALLBACKS = [
+        ("海军", 10014), ("炮手", 10021), ("枪手", 10021), ("剑士", 10004),
+        ("航海士", 10009), ("船医", 10070),
+    ]
+
+    def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False, unit_name="", is_companion=False) -> int:
+        try:
+            fv = int(f_val)
+        except Exception:
+            fv = 0
+
+        if fv <= 0:
+            return 1001
+
+        # ★ 核心原则：玩家招募的真实船员，凡在真实模型库（SWF/完整PVR）中存在，绝对不再降级为小兵！
+        if is_companion:
+            # 只要在 Flash 真实人物 SWF 库中（如巴基 10011、亚尔丽塔 10012、克洛 10022、阿龙 10013、乌索普 10029、娜美 10030 等），直接下发真实模型！
+            if fv in FLASH_VALID_FIGURES or fv in ANDROID_VALID_FIGURES:
+                return fv
+            # 若其 figure > 1000 且非通用小怪，保留其原版 figure
+            if fv > 1000:
+                return fv
+
+        # 针对通用怪物与敌方军队
+        if fv in FLASH_VALID_FIGURES or fv in ANDROID_VALID_FIGURES:
+            return fv
+        if fv in SPECIAL_BATTLE_FIGURE_MAP:
+            return SPECIAL_BATTLE_FIGURE_MAP[fv]
+        if unit_name:
+            for kw, mapped_fig in NAME_KEYWORD_FALLBACKS:
+                if kw in unit_name and mapped_fig in ANDROID_VALID_FIGURES:
+                    return mapped_fig
+
+        if 1 <= job <= 4:
+            job += 10000
+        pool = ARCHETYPE_POOLS.get(job)
+        if pool:
+            for chosen in pool:
+                if chosen in ANDROID_VALID_FIGURES:
+                    return chosen
+
+        return 10012 if (job == 10003) else (10014 if job == 10002 else 10004)
 
     # Valid open battle skills with complete animations/shades in client
     VALID_OPEN_SKILLS = {
         11001, 11003, 11005, 11007, 11008, 12021, 12022, 12024,
         13042, 13044, 13047, 14061, 14067, 51001, 51004, 51005, 51006, 51009
     }
-
-    ARCHETYPE_POOLS = {
-        10001: (10001, 10004, 10009, 10014, 10061),  # 剑士/刀客/近战
-        10002: (10003, 10021),                        # 狙击/炮手
-        10003: (10005, 10009, 10070),                 # 航海士/魔导
-        10004: (10008, 10070),                        # 船医/辅助
-    }
-
-    NAME_KEYWORD_FALLBACKS = [
-        ("克洛", 10019), ("芬布迪", 10014), ("阿金", 10009), ("巴拉", 10012),
-        ("克利克", 10021), ("黑带", 10004), ("克罗欧比", 10004), ("小八", 10001),
-        ("啾", 10003), ("阿龙", 10061), ("达斯琪", 10002), ("斯摩格", 10070),
-        ("多鲁顿", 10042), ("瓦尔波", 10021), ("山姆", 10019), ("布奇", 10004),
-        ("海军", 10014), ("炮手", 10021), ("枪手", 10021), ("剑士", 10004),
-        ("航海士", 10009), ("船医", 10070),
-    ]
-
-    def _get_safe_battle_figure(f_val, job=0, quality=1, is_enemy=False, unit_name="") -> int:
-        try:
-            fv = int(f_val)
-        except Exception:
-            fv = 0
-        if fv in VALID_BATTLE_FIGURES:
-            return fv
-        if fv in SPECIAL_BATTLE_FIGURE_MAP:
-            return SPECIAL_BATTLE_FIGURE_MAP[fv]
-        if unit_name:
-            for kw, mapped_fig in NAME_KEYWORD_FALLBACKS:
-                if kw in unit_name and mapped_fig in VALID_BATTLE_FIGURES:
-                    return mapped_fig
-        if 1 <= job <= 4:
-            job += 10000
-        pool = ARCHETYPE_POOLS.get(job)
-        if pool:
-            chosen = pool[abs(fv) % len(pool)]
-            if chosen in VALID_BATTLE_FIGURES:
-                return chosen
-        if is_enemy:
-            if quality >= 4:
-                return 10014 if (fv % 2 == 0) else 10019
-            elif job == 10002:
-                return 10021
-            elif job == 10003:
-                return 10009
-            elif job == 10004:
-                return 10070
-            else:
-                return 10042 if (fv % 2 == 0) else 10004
-        else:
-            if job == 10002:
-                return 10021
-            elif job == 10003:
-                return 10070 if (quality >= 4) else 10009
-            elif job == 10004:
-                return 10008
-            else:
-                return 10061 if (quality >= 4) else 10004
-                return 10061 if (quality >= 4) else 10004
 
     # 1. Player team (attack_generals) - 严格忠实于 role["formation"]，未上阵伙伴不进入战斗
     fmt_dict = _get_formation_dict(role)
@@ -2862,7 +2836,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
 
         comp_stats = _calc_general_stats(False, c_cfg_id, c_level)
         c_hp = comp_stats["hp"]
-        c_render_fig = _get_safe_battle_figure(c_fig, job=c_job, quality=c_qual, is_enemy=False, unit_name=c_name)
+        c_render_fig = _get_safe_battle_figure(c_fig, job=c_job, quality=c_qual, is_enemy=False, unit_name=c_name, is_companion=True)
         c_gen_obj = _amf3_object([
             ("position",         _amf3_int(pos_num)),
             ("health_point",     _amf3_int(c_hp)),
@@ -6055,6 +6029,7 @@ class Handler(BaseHTTPRequestHandler):
             Path(r"d:\AI\work\xiaoxiaohaizei-offline-src\assets") / clean_path,
             Path(r"d:\AI\work\xiaoxiaohaizei-offline-src\client-patch") / clean_path,
             Path(r"d:\AI\work\xx") / clean_path,
+            Path(r"D:\AI\work\xx\Pockie Pirates Stuff\pockiepirates") / clean_path,
         ]
         for cand in candidates:
             if cand.is_file():
