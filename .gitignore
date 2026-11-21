@@ -13,6 +13,7 @@ desktop.ini
 # ==========================================
 /build/
 *.apk
+!release-apk/*.apk
 *.ap_
 *.dex
 
@@ -24,7 +25,7 @@ __pycache__/
 *$py.class
 *.pyd
 .Python
-env/
+/env/
 venv/
 .venv/
 
@@ -38,8 +39,9 @@ captures/
 # 日志与备份文件
 *.log
 offline-server/*.log
-*.bak
+*.bak*
 *.tmp
+offline-server/game.db
 
 # ==========================================
 # 调试与测试截图（注意：保留 res/ 与 assets/ 内游戏资源图）

@@ -6,8 +6,8 @@ usesFramework:
 sdkInfo:
   minSdkVersion: 10
 versionInfo:
-  versionCode: 1005
-  versionName: 1.9.0
+  versionCode: '1016'
+  versionName: '0.06'
 resourcesInfo:
   packageId: 127
 doNotCompress:

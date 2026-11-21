@@ -2495,6 +2495,78 @@ def _check_task_battle_complete(camp_id: int) -> None:
         print(f"  [TASK] error checking battle task completion: {e}", flush=True)
 
 
+
+# ==========================================
+# 标准九宫格对位算法 (Pockie Pirates 对位规则)
+# ==========================================
+POS_TO_RC = {
+    1: (0, 0), 2: (1, 0), 3: (2, 0),
+    4: (0, 1), 5: (1, 1), 6: (2, 1),
+    7: (0, 2), 8: (1, 2), 9: (2, 2),
+}
+
+ROW_FALLBACK_ORDER = {
+    0: [0, 1, 2],  # 上行 -> 上、中、下
+    1: [1, 0, 2],  # 中行 -> 中、上、下
+    2: [2, 1, 0],  # 下行 -> 下、中、上
+}
+
+def _pick_primary_target(attacker, enemies):
+    alive = [u for u in enemies if u["hp"] > 0]
+    if not alive:
+        return None
+    att_pos = attacker.get("pos", 1)
+    att_r, _ = POS_TO_RC.get(att_pos, (1, 0))
+    grid = {POS_TO_RC.get(u["pos"], (1, 0)): u for u in alive}
+    for r in ROW_FALLBACK_ORDER.get(att_r, [1, 0, 2]):
+        for c in (0, 1, 2):
+            if (r, c) in grid:
+                return grid[(r, c)]
+    return alive[0]
+
+def _get_skill_hit_targets(caster, primary, skill_id, allies, enemies):
+    sinfo = get_skill(skill_id) or {}
+    starget = int(sinfo.get("target", 2) or 2)
+    srange = int(sinfo.get("range", 1) or 1)
+
+    if starget == 1:
+        # 友方增益/治疗
+        if srange == 5:
+            return list(allies)
+        elif srange == 2:
+            cr, _ = POS_TO_RC.get(caster.get("pos", 1), (1, 0))
+            hits = [u for u in allies if POS_TO_RC.get(u.get("pos", 1), (1, 0))[0] == cr]
+            return hits if hits else [caster]
+        return [caster]
+
+    # 敌方技能攻击
+    if not primary:
+        return []
+    if srange == 1:
+        return [primary]
+
+    pr, pc = POS_TO_RC.get(primary.get("pos", 1), (1, 0))
+    if srange == 2:
+        # 整行贯穿（如巴基 51006/52001, 达斯琪 52009, MR.1 52015, 罗布路奇 52024 等）
+        hits = [u for u in enemies if POS_TO_RC.get(u.get("pos", 1), (1, 0))[0] == pr]
+        return hits if hits else [primary]
+    elif srange == 3:
+        # 整列穿透（如MR.2 52016, 伯吉斯 52028, 克利克 51013 等）
+        hits = [u for u in enemies if POS_TO_RC.get(u.get("pos", 1), (1, 0))[1] == pc]
+        return hits if hits else [primary]
+    elif srange == 4:
+        # 扩散/周围溅射（如卡巴吉 51004, 啾 51016 等）
+        hits = [u for u in enemies if abs(POS_TO_RC.get(u.get("pos", 1), (1, 0))[0] - pr) + abs(POS_TO_RC.get(u.get("pos", 1), (1, 0))[1] - pc) <= 1]
+        return hits if hits else [primary]
+    elif srange == 5:
+        # 全屏全体（如艾斯 52019, 艾尼路 52011, 鹰眼 52017, 熊 52033 等）
+        return list(enemies)
+    elif srange == 7:
+        # 十字范围（以主目标为中心横排+竖列，如斯摩格 52014, 佩罗娜 52037 等）
+        hits = [u for u in enemies if POS_TO_RC.get(u.get("pos", 1), (1, 0))[0] == pr or POS_TO_RC.get(u.get("pos", 1), (1, 0))[1] == pc]
+        return hits if hits else [primary]
+    return [primary]
+
 def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool = True) -> bytes:
     """Reply to BATTLE.battle matching OPDataManager::onBattleInfo.
     
@@ -2668,24 +2740,24 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
     # 特殊首领在缺乏独立模型时的精细同系化回退
     SPECIAL_BATTLE_FIGURE_MAP = {
         10076: 10042,  # 海军剑士 -> 10042
-        10075: 10014,  # 贝鲁梅伯 -> 10014
-        10073: 10021,  # 斧手亲卫 -> 10021
-        10080: 10014,  # 利基 -> 10014
-        10078: 10009,  # 摩奇 -> 10009
-        10074: 10061,  # 卡巴吉 -> 10061
+        10075: 10014,  # 贝鲁梅伯 -> 10014        # 
+        # 10073: 10021,  # 斧手亲卫 -> 10021 -> 已直通专属真图集 (已直通专属真图集)
+        10080: 10014,  # 利基 -> 10014        # 
+        # 10078: 10009,  # 摩奇 -> 10009        #  -> 已直通专属真图集 (已直通专属真图集)
+        # 10074: 10061,  # 卡巴吉 -> 10061 -> 已直通专属真图集 (已直通专属真图集)
         10062: 10021,  # 狡诈神枪手 -> 10021
         10063: 10070,  # 嗜血船医 -> 10070
-        10058: 10009,  # 航海士队长 -> 10009
-        10089: 10004,  # 布奇 -> 10004
-        10090: 10019,  # 山姆 -> 10019
-        10087: 10014,  # 铁拳芬布迪 -> 10014
-        10088: 10009,  # 鬼人阿金 -> 10009
-        10091: 10012,  # 铁壁巴拉 -> 10012
-        10097: 10004,  # 黑带克罗欧比 -> 10004
-        10098: 10004,  # 六刀流小八 -> 10004
-        10099: 10021,  # 啾 -> 10021
-        10101: 10042,  # 多鲁顿 -> 10042
-        10103: 10021,  # 白铁瓦尔波 -> 10021
+        10058: 10009,  # 航海士队长 -> 10009        # 
+        # 10089: 10004,  # 布奇 -> 10004 -> 已直通专属真图集        # (已直通专属真图集)
+        # 10090: 10019,  # 山姆 -> 10019        #  -> 已直通专属真图集 (已直通专属真图集)
+        # 10087: 10014,  # 铁拳芬布迪 -> 10014 -> 已直通专属真图集 (已直通专属真图集)
+        # 10088: 10009,  # 鬼人阿金 -> 10009 -> 已直通专属真图集
+        # 10091: 10012,  # 铁壁巴拉 -> 10012 -> 已直通专属真图集
+        # 10097: 10004,  # 黑带克罗欧比 -> 10004 -> 已直通专属真图集
+        # 10098: 10004,  # 六刀流小八 -> 10004 -> 已直通专属真图集
+        # 10099: 10021,  # 啾 -> 10021 -> 已直通专属真图集
+        # 10101: 10042,  # MR.3 -> 已直通专属真图集 -> 10042
+        # 10103: 10021,  # 白铁瓦尔波 -> 10021 -> 已直通专属真图集
         10034: 10021,  # 杰斯/克罗马利蒙 -> 10021
     }
 
@@ -2695,35 +2767,45 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008,  # 主角全职业/性别
         10012,                                           # 亚尔丽塔 (personbattle_33~35.pvr 全满)
         10011,                                           # ★ 小丑巴基 (已重构生成专属 personbattle_10011.pvr 全动作图集)
+        10010,                                           # ★ 斧手蒙卡 (已生成 personbattle_32.pvr 结合 31/33 实现全动作原生直通)
         10004, 10009, 10014, 10019, 10021, 10042, 10061, 10070,  # 8套高级职业通用真贴图
+    
+        10074, 10078, 10083, 10087, 10073, 10089, 10090, 10125, 10127,  # ★ 东海酒馆全员专属高清真图集直通
+        10013, 10022, 10023, 10088, 10091, 10092, 10097, 10098, 10099, 10103, 10126, 10128,  # ★ 南海酒馆全员专属高清真图集直通
+        10065, 10016, 10068, 10017, 10101, 10100, 10102, 10104, 10105, 10039, 10110, 10139,  # ★ 伟大航道（罗格镇/阿拉巴斯坦）酒馆全员专属高清真图集直通
+        10069, 10067, 10038, 10064, 10109, 10107, 10108, 10020, 10035, 10033, 10111, 10148,  # ★ 加亚/空岛/魔谷镇酒馆全员专属高清真图集直通
+        10124, 10121, 10123, 10138, 10122, 10112, 10113, 10028, 10116, 10031, 10026, 10137,  # ★ 七水之都酒馆全员专属高清真图集直通
+        10025, 10027, 10157, 10032, 10029, 10030, 10159, 10158, 10160,  # ★ 司法岛酒馆全员 (含索隆/香吉士/娜美/白星) 专属高清真图集直通
     }
 
     # 2. 高人气/主线知名船员“特征精准代打表” (外观与武器风格最贴合的完整真贴图，绝不降级为普通小兵)
     ANDROID_ICONIC_FIGURE_MAP = {
-        10010: 10061,  # 蒙卡 (斧手巨汉)       -> 重武器巨汉 (10061)
-        # 10011 已通过专属 personbattle_10011.pvr 解锁原生原皮直通！
-        10013: 10042,  # 阿龙 (鱼人狂战)       -> 野牛多鲁顿 (10042)
-        10022: 10019,  # 克洛 (百计猫爪)       -> 猫爪十刃刺客 (10019)
-        10029: 10021,  # 乌索普 (狙击手)       -> 重炮头目 (10021)
-        10030: 10012,  # 娜美 (女性航海士)     -> 亚尔丽塔 (10012)
-        10033: 10019,  # 罗布·路奇 (敏捷刺客)  -> 猫爪十刃刺客 (10019)
-        10039: 10014,  # 斯摩格 (海军上校)     -> 海军剑士长 (10014)
-        10154: 10009,  # 黄猿 (海军大将)       -> 佛萨/高阶重剑 (10009)
-        10078: 10009,  # 摩奇                 -> 10009
-        10074: 10061,  # 卡巴吉               -> 10061
+        # 10010 蒙卡 已补齐 personbattle_32.pvr 解锁原生原皮直通！
+        # 10011 巴基 已通过专属 personbattle_10011.pvr 解锁原生原皮直通！
+        # 10013: 10042,  # 阿龙 (鱼人狂战)       -> 野牛多鲁顿 (10042) -> 已直通专属真图集
+        # 10022: 10019,  # 克洛 (百计猫爪)       -> 猫爪十刃刺客 (10019) -> 已直通专属真图集
+        # 10029: 10021,  # 乌索普 (狙击手)       -> 已直通专属真图集
+        # 10030: 10012,  # 娜美 (女性航海士)     -> 已直通专属真图集
+        # 10033: 10019,  # 罗布·路奇 -> 已直通专属真图集
+        # 10039: 10014,  # 斯摩格 -> 已直通专属真图集 (海军上校)     -> 海军剑士长 (10014)
+        10154: 10009,  # 黄猿 (海军大将)       -> 佛萨/高阶重剑 (10009)        # 
+        # 10078: 10009,  # 摩奇                 -> 10009        #  -> 已直通专属真图集 (已直通专属真图集)
+        # 10074: 10061,  # 卡巴吉               -> 10061 -> 已直通专属真图集 (已直通专属真图集)
         10062: 10021,  # 狡诈神枪手           -> 10021
         10063: 10070,  # 嗜血船医             -> 10070
-        10058: 10009,  # 航海士队长           -> 10009
-        10089: 10004,  # 布奇                 -> 10004
-        10090: 10019,  # 山姆                 -> 10019
-        10087: 10014,  # 铁拳芬布迪           -> 10014
-        10088: 10009,  # 鬼人阿金             -> 10009
-        10091: 10012,  # 铁壁巴拉             -> 10012
-        10097: 10004,  # 黑带克罗欧比         -> 10004
-        10098: 10004,  # 六刀流小八           -> 10004
-        10099: 10021,  # 啾                   -> 10021
-        10101: 10042,  # 多鲁顿               -> 10042
-        10103: 10021,  # 白铁瓦尔波           -> 10021
+        10058: 10009,  # 航海士队长           -> 10009        # 
+        # 10089: 10004,  # 布奇                 -> 10004 -> 已直通专属真图集        # (已直通专属真图集)
+        # 10090: 10019,  # 山姆                 -> 10019        #  -> 已直通专属真图集 (已直通专属真图集)
+        # 10087: 10009,  # 鬼人阿金 (高阶狂战/重击双拐) -> 10009 -> 已直通专属真图集 (已直通专属真图集)
+        # 10088: 10009,  # 鬼人阿金副本怪       -> 10009        #  -> 已直通专属真图集
+        # 10083: 10070,  # 赞高 (催眠师/高阶航海) -> 10070 -> 已直通专属真图集        # (已直通专属真图集)
+        # 10073: 10021,  # 贝鲁梅伯 (火枪手)     -> 10021 -> 已直通专属真图集 (已直通专属真图集)
+        # 10091: 10012,  # 铁壁巴拉             -> 10012 -> 已直通专属真图集
+        # 10097: 10004,  # 黑带克罗欧比         -> 10004 -> 已直通专属真图集
+        # 10098: 10004,  # 六刀流小八           -> 10004 -> 已直通专属真图集
+        # 10099: 10021,  # 啾                   -> 10021 -> 已直通专属真图集
+        # 10101: 10042,  # MR.3 -> 已直通专属真图集               -> 10042
+        # 10103: 10021,  # 白铁瓦尔波           -> 10021 -> 已直通专属真图集
         10034: 10021,  # 杰斯/克罗马利蒙      -> 10021
     }
 
@@ -2778,10 +2860,10 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         mapped = ANDROID_JOB_QUALITY_MAP[j].get(q, 10014)
         return mapped
 
-    # Valid open battle skills with complete animations/shades in client
-    VALID_OPEN_SKILLS = {
+    # Valid open battle skills loaded directly from database configs
+    VALID_OPEN_SKILLS = set(config_loader.SKILLS.keys()) if config_loader.SKILLS else {
         11001, 11003, 11005, 11007, 11008, 12021, 12022, 12024,
-        13042, 13044, 13047, 14061, 14067, 51001, 51004, 51005, 51006, 51009
+        13042, 13044, 13047, 14061, 14067, 51001, 51004, 51005, 51006, 51009, 51011, 51017
     }
 
     # 1. Player team (attack_generals) - 严格忠实于 role["formation"]，未上阵伙伴不进入战斗
@@ -2864,7 +2946,7 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         c_skill = int(comp.get("skill", 0))
         c_job = 10001
 
-        row = cur.execute("SELECT name, face, figure, quality, cfg_skill_id, job FROM cfg_general WHERE cfg_general_id = ?", (c_cfg_id,)).fetchone()
+        row = cur.execute("SELECT name, face, figure, quality, cfg_skill_id, job FROM cfg_general WHERE cfg_general_id = ? OR figure = ?", (c_cfg_id, c_fig)).fetchone()
         if row:
             if not c_name or c_name == "船员": c_name = row[0]
             if not c_face: c_face = int(row[1])
@@ -3089,60 +3171,132 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
         turn += 1
         # Player side attacks
         for atk in list(alive_players):
+            if atk["hp"] <= 0:
+                continue
             if not alive_enemies:
                 break
-            target = alive_enemies[0]
 
             is_skill = (atk.get("morale", 50) >= 100)
+            cur_skill_cand = int(atk.get("skill_id") or 11003)
+            sinfo = get_skill(cur_skill_cand) or {}
+            skill_target_type = int(sinfo.get("target", 2) or 2)
+
             if is_skill:
                 cur_action_type = 2
-                cur_skill_cand = int(atk.get("skill_id") or 11003)
                 cur_action_val = cur_skill_cand if cur_skill_cand in VALID_OPEN_SKILLS else 11003
                 atk_new_morale = 0
-                dmg_mult = 1.8
+                srange = int(sinfo.get("range", 1) or 1)
+                dmg_mult = 1.4 if srange == 5 else (1.6 if srange in (2, 3, 7) else 1.8)
             else:
                 cur_action_type = 1
                 cur_action_val = 0
                 atk_new_morale = min(100, atk.get("morale", 50) + 25)
                 dmg_mult = 1.0
 
-            target_new_morale = min(100, target.get("morale", 50) + 25)
-            base_dmg = max(50, int(atk.get("pa", 150) * 0.8))
-            dmg = min(target["hp"], max(80, int(base_dmg * dmg_mult)))
-            target["hp"] -= dmg
-            target["morale"] = target_new_morale
-            atk["morale"] = atk_new_morale
+            if is_skill and skill_target_type == 1:
+                # 友方技能（治疗/增益）
+                hit_targets = _get_skill_hit_targets(atk, atk, cur_action_val, alive_players, alive_enemies)
+                primary_target_pos = atk["pos"]
+                primary_target_side = 1
+                primary_target_morale = atk_new_morale
 
-            if cur_action_type == 1:
-                cur_action_val = dmg
+                effect_targets_list = []
+                heal_amt = max(100, int(atk.get("pa", 150) * 1.2))
+                caster_effect_included = False
 
-            # 1. Defending enemy effect (damage taken + morale gained)
-            def_effect = _amf3_object([
-                ("target_accident_status",_amf3_int(0)),
-                ("counter_skill_id",      _amf3_int(0)),
-                ("target_position",       _amf3_int(target["pos"])),
-                ("target_side",           _amf3_int(2)),
-                ("target_health_point",   _amf3_int(max(0, target["hp"]))),
-                ("target_morale",         _amf3_int(target_new_morale)),
-                ("target_buff_list",      _amf3_array([])),
-            ])
-            # 2. Attacking caster effect (updates attacker's morale & triggers floating morale update)
-            atk_effect = _amf3_object([
-                ("target_accident_status",_amf3_int(0)),
-                ("counter_skill_id",      _amf3_int(0)),
-                ("target_position",       _amf3_int(atk["pos"])),
-                ("target_side",           _amf3_int(1)),
-                ("target_health_point",   _amf3_int(max(0, atk["hp"]))),
-                ("target_morale",         _amf3_int(atk_new_morale)),
-                ("target_buff_list",      _amf3_array([])),
-            ])
+                for ally in hit_targets:
+                    ally["hp"] = min(ally["hp_max"], ally["hp"] + heal_amt)
+                    if ally["pos"] == atk["pos"]:
+                        ally_morale = atk_new_morale
+                        caster_effect_included = True
+                    else:
+                        ally_morale = min(100, ally.get("morale", 50) + 15)
+                    ally["morale"] = ally_morale
+
+                    ally_effect = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(ally["pos"])),
+                        ("target_side",            _amf3_int(1)),
+                        ("target_health_point",    _amf3_int(max(0, ally["hp"]))),
+                        ("target_morale",          _amf3_int(ally_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    effect_targets_list.append(ally_effect)
+
+                if not caster_effect_included:
+                    atk["morale"] = atk_new_morale
+                    atk_effect = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(atk["pos"])),
+                        ("target_side",            _amf3_int(1)),
+                        ("target_health_point",    _amf3_int(max(0, atk["hp"]))),
+                        ("target_morale",          _amf3_int(atk_new_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    effect_targets_list.append(atk_effect)
+            else:
+                # 敌方技能或普攻
+                primary_target = _pick_primary_target(atk, alive_enemies)
+                if not primary_target:
+                    break
+                primary_target_pos = primary_target["pos"]
+                primary_target_side = 2
+
+                if is_skill:
+                    hit_targets = _get_skill_hit_targets(atk, primary_target, cur_action_val, alive_players, alive_enemies)
+                else:
+                    hit_targets = [primary_target]
+
+                effect_targets_list = []
+                base_dmg = max(50, int(atk.get("pa", 150) * 0.8))
+
+                for t in hit_targets:
+                    t_new_morale = min(100, t.get("morale", 50) + 25)
+                    dmg = min(t["hp"], max(80, int(base_dmg * dmg_mult)))
+                    t["hp"] -= dmg
+                    t["morale"] = t_new_morale
+
+                    def_effect = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(t["pos"])),
+                        ("target_side",            _amf3_int(2)),
+                        ("target_health_point",    _amf3_int(max(0, t["hp"]))),
+                        ("target_morale",          _amf3_int(t_new_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    effect_targets_list.append(def_effect)
+
+                if cur_action_type == 1:
+                    cur_action_val = dmg  # 普攻 action_val 记录伤害飘字
+
+                atk["morale"] = atk_new_morale
+                atk_effect = _amf3_object([
+                    ("target_accident_status", _amf3_int(0)),
+                    ("counter_skill_id",       _amf3_int(0)),
+                    ("target_position",        _amf3_int(atk["pos"])),
+                    ("target_side",            _amf3_int(1)),
+                    ("target_health_point",    _amf3_int(max(0, atk["hp"]))),
+                    ("target_morale",          _amf3_int(atk_new_morale)),
+                    ("target_buff_list",       _amf3_array([])),
+                ])
+                effect_targets_list.append(atk_effect)
+                primary_target_morale = primary_target.get("morale", 50)
+
+                # 移除阵亡敌方
+                for t in hit_targets:
+                    if t["hp"] <= 0 and t in alive_enemies:
+                        alive_enemies.remove(t)
+
             round_action = _amf3_object([
                 ("action_value",          _amf3_int(cur_action_val)),
-                ("action_target_side",    _amf3_int(2)),
+                ("action_target_side",    _amf3_int(primary_target_side)),
                 ("action_type",           _amf3_int(cur_action_type)),
-                ("action_target_morale",  _amf3_int(target_new_morale)),
-                ("action_target_position",_amf3_int(target["pos"])),
-                ("effect_targets",        _amf3_array([def_effect, atk_effect])),
+                ("action_target_morale",  _amf3_int(primary_target_morale)),
+                ("action_target_position",_amf3_int(primary_target_pos)),
+                ("effect_targets",        _amf3_array(effect_targets_list)),
             ])
             c_round = _amf3_object([
                 ("face",                  _amf3_int(atk["face"])),
@@ -3159,64 +3313,130 @@ def _build_battle_result_response(correlation_id: str, camp_id: int, win: bool =
                 ("caster_after_action_list",    _amf3_array([])),
             ])
             combat_rounds.append(c_round)
-            if target["hp"] <= 0:
-                alive_enemies.pop(0)
 
         # Enemy side counter-attacks!
         for enemy in list(alive_enemies):
+            if enemy["hp"] <= 0:
+                continue
             if not alive_players:
                 break
-            p_target = alive_players[0]
 
             e_is_skill = (enemy.get("morale", 50) >= 100)
+            e_skill_cand = int(enemy.get("skill_id") or 11003)
+            e_sinfo = get_skill(e_skill_cand) or {}
+            e_target_type = int(e_sinfo.get("target", 2) or 2)
+
             if e_is_skill:
                 e_action_type = 2
-                e_skill_cand = int(enemy.get("skill_id") or 11003)
                 e_action_val = e_skill_cand if e_skill_cand in VALID_OPEN_SKILLS else 11003
                 e_new_morale = 0
-                e_mult = 1.5
+                e_srange = int(e_sinfo.get("range", 1) or 1)
+                e_mult = 1.2 if e_srange == 5 else (1.4 if e_srange in (2, 3, 7) else 1.5)
             else:
                 e_action_type = 1
                 e_action_val = 0
                 e_new_morale = min(100, enemy.get("morale", 50) + 25)
                 e_mult = 1.0
 
-            p_new_morale = min(100, p_target.get("morale", 50) + 25)
-            e_dmg = min(p_target["hp"] - 1, max(15, int(enemy.get("pa", 100) * 0.3 * e_mult)))
-            p_target["hp"] -= e_dmg
-            p_target["morale"] = p_new_morale
-            enemy["morale"] = e_new_morale
+            if e_is_skill and e_target_type == 1:
+                # 敌方友方技能
+                e_hit_targets = _get_skill_hit_targets(enemy, enemy, e_action_val, alive_enemies, alive_players)
+                p_target_pos = enemy["pos"]
+                p_target_side = 2
+                p_target_morale = e_new_morale
 
-            if e_action_type == 1:
-                e_action_val = e_dmg
+                e_effect_list = []
+                e_heal_amt = max(80, int(enemy.get("pa", 100) * 0.8))
+                caster_inc = False
+                for e_ally in e_hit_targets:
+                    e_ally["hp"] = min(e_ally["hp_max"], e_ally["hp"] + e_heal_amt)
+                    if e_ally["pos"] == enemy["pos"]:
+                        e_ally_morale = e_new_morale
+                        caster_inc = True
+                    else:
+                        e_ally_morale = min(100, e_ally.get("morale", 50) + 15)
+                    e_ally["morale"] = e_ally_morale
 
-            # 1. Player defending target effect
-            e_def_effect = _amf3_object([
-                ("target_accident_status",_amf3_int(0)),
-                ("counter_skill_id",      _amf3_int(0)),
-                ("target_position",       _amf3_int(p_target["pos"])),
-                ("target_side",           _amf3_int(1)),
-                ("target_health_point",   _amf3_int(max(1, p_target["hp"]))),
-                ("target_morale",         _amf3_int(p_new_morale)),
-                ("target_buff_list",      _amf3_array([])),
-            ])
-            # 2. Enemy attacking caster effect
-            e_atk_effect = _amf3_object([
-                ("target_accident_status",_amf3_int(0)),
-                ("counter_skill_id",      _amf3_int(0)),
-                ("target_position",       _amf3_int(enemy["pos"])),
-                ("target_side",           _amf3_int(2)),
-                ("target_health_point",   _amf3_int(max(1, enemy["hp"]))),
-                ("target_morale",         _amf3_int(e_new_morale)),
-                ("target_buff_list",      _amf3_array([])),
-            ])
+                    e_eff = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(e_ally["pos"])),
+                        ("target_side",            _amf3_int(2)),
+                        ("target_health_point",    _amf3_int(max(1, e_ally["hp"]))),
+                        ("target_morale",          _amf3_int(e_ally_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    e_effect_list.append(e_eff)
+
+                if not caster_inc:
+                    enemy["morale"] = e_new_morale
+                    e_atk_effect = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(enemy["pos"])),
+                        ("target_side",            _amf3_int(2)),
+                        ("target_health_point",    _amf3_int(max(1, enemy["hp"]))),
+                        ("target_morale",          _amf3_int(e_new_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    e_effect_list.append(e_atk_effect)
+            else:
+                p_target = _pick_primary_target(enemy, alive_players)
+                if not p_target:
+                    break
+                p_target_pos = p_target["pos"]
+                p_target_side = 1
+
+                if e_is_skill:
+                    e_hit_targets = _get_skill_hit_targets(enemy, p_target, e_action_val, alive_enemies, alive_players)
+                else:
+                    e_hit_targets = [p_target]
+
+                e_effect_list = []
+                for pt in e_hit_targets:
+                    pt_new_morale = min(100, pt.get("morale", 50) + 25)
+                    e_dmg = min(pt["hp"] - 1, max(15, int(enemy.get("pa", 100) * 0.3 * e_mult)))
+                    pt["hp"] -= e_dmg
+                    pt["morale"] = pt_new_morale
+
+                    e_def_effect = _amf3_object([
+                        ("target_accident_status", _amf3_int(0)),
+                        ("counter_skill_id",       _amf3_int(0)),
+                        ("target_position",        _amf3_int(pt["pos"])),
+                        ("target_side",            _amf3_int(1)),
+                        ("target_health_point",    _amf3_int(max(1, pt["hp"]))),
+                        ("target_morale",          _amf3_int(pt_new_morale)),
+                        ("target_buff_list",       _amf3_array([])),
+                    ])
+                    e_effect_list.append(e_def_effect)
+
+                if e_action_type == 1:
+                    e_action_val = e_dmg
+
+                enemy["morale"] = e_new_morale
+                e_atk_effect = _amf3_object([
+                    ("target_accident_status", _amf3_int(0)),
+                    ("counter_skill_id",       _amf3_int(0)),
+                    ("target_position",        _amf3_int(enemy["pos"])),
+                    ("target_side",            _amf3_int(2)),
+                    ("target_health_point",    _amf3_int(max(1, enemy["hp"]))),
+                    ("target_morale",          _amf3_int(e_new_morale)),
+                    ("target_buff_list",       _amf3_array([])),
+                ])
+                e_effect_list.append(e_atk_effect)
+                p_target_morale = p_target.get("morale", 50)
+
+                for pt in e_hit_targets:
+                    if pt["hp"] <= 0 and pt in alive_players:
+                        alive_players.remove(pt)
+
             e_action = _amf3_object([
                 ("action_value",          _amf3_int(e_action_val)),
-                ("action_target_side",    _amf3_int(1)),
+                ("action_target_side",    _amf3_int(p_target_side)),
                 ("action_type",           _amf3_int(e_action_type)),
-                ("action_target_morale",  _amf3_int(p_new_morale)),
-                ("action_target_position",_amf3_int(p_target["pos"])),
-                ("effect_targets",        _amf3_array([e_def_effect, e_atk_effect])),
+                ("action_target_morale",  _amf3_int(p_target_morale)),
+                ("action_target_position",_amf3_int(p_target_pos)),
+                ("effect_targets",        _amf3_array(e_effect_list)),
             ])
             e_round = _amf3_object([
                 ("face",                  _amf3_int(enemy["face"])),
