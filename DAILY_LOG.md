@@ -1,3 +1,32 @@
+## v0.15 — 2026-11-28
+
+### 去除代理商91品牌 & 添加QQ群号
+
+**APK版本：** versionCode 1025 / versionName 0.15 (119MB)
+
+#### 修改内容
+
+| 文件 | 变更 |
+|------|------|
+| lib/armeabi/libOnePiece.so | 二进制补丁 — 清零3处硬编码91.com URL（反馈按钮/论坛按钮/默认服务器地址） |
+| 
+es/values/strings.xml | 移除3处「您可以同时登录xxhz.91.com开始游戏」提示文字 |
+| offline-server/serverlist.js | announce更新为「小小海贼王单机离线版 v0.15 | 客服QQ群：62877905」，ver→0.15 |
+| xxhz/server/serverlist.js | 同步更新 |
+| pktool.yml | versionCode 1024→1025，versionName 0.14→0.15 |
+| ssets/Env/TqUpdate.ver | 1024→1025 |
+
+#### 验证结果
+- ✓ APK 签名验证通过（自签名证书，game-offline.keystore）
+- ✓ strings.xml 无 xxhz.91.com
+- ✓ libOnePiece.so 无 ibbs.91.com / xxhz.91.com
+- ✓ serverlist.js 含 QQ群号62877905 & ver=0.15
+- ✓ xxhz/client/ 仅保留 v0.15 APK
+- ✓ 离线服务器正常（0.0.0.0:8080 health 200 OK）
+- ✓ GitHub push 成功（commit 392707a）
+
+---
+
 # 《小小海贼王》v0.14 离线客户端与服务端全量修复日志 (2026-11-28)
 
 ---
