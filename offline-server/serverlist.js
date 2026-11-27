@@ -1,9 +1,9 @@
 {
-  "ver": "0.07",
-  "iosVer": "0.07",
-  "andVer": "0.07",
+  "ver": "0.15",
+  "iosVer": "0.15",
+  "andVer": "0.15",
   "isupdate": 0,
-  "announce": "小小海贼王单机离线版 v0.07 - 日常任务全天化与全系统修复",
+  "announce": "小小海贼王单机离线版 v0.15 | 客服QQ群：62877905",
   "serverPath": "",
   "remodeFolder": "",
   "list": [
