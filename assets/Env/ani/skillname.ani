@@ -340,8 +340,7 @@ Frame0=data/skillname/skillname_38.pvr,266,972,266,41
 
 [skillname_41003]
 FrameAmount=1
-Frame0=data/skillname/skillname_13.pvr,268,972,268,41
-
+Frame0=data/skillname/skillname_41003.pvr,0,0,268,41
 [skillname_41004]
 FrameAmount=1
 Frame0=data/skillname/skillname_13.pvr,536,972,268,41

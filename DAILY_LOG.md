@@ -1,3 +1,105 @@
+# 《小小海贼王》v0.14 离线客户端与服务端全量修复日志 (2026-11-28)
+
+---
+
+## 一、 v0.14 四项核心缺陷根治 (`offline-server/server.py` & VFS 资产)
+
+1. **挑战白胡子（`scene 4001`）进入即崩溃与战斗结算完善**：
+   - **崩溃根因**：反汇编 `OPDataManager::opMausoleumCheck`（`0x3e9b24`）确认客户端以 64 位浮点 `ldrd` 读取 `max_health_point`、`monster_health_point`、`role_damage` 与 `damageList[].damage`；此前服务端返回 `_amf3_int`，客户端读入未初始化 `0.0`，在 `CDlgMausoleumMain::ProcessLineChange`（`0x56b8f8`）触发 `0.0 / (0.0 / 5.0) = NaN` 异常导致界面崩溃。
+   - **修复方案**：`_handle_mausoleum_request` 全面切换为 `_amf3_double`，保证 `mausoleum_hp > 0`；新增 `SCENE.mausoleumRevive`（消耗 2 金币清除虚弱等待时间）；在 `_build_battle_result_response`（`boss_battle=True`）按实际伤害结算挑战白胡子银币（`= damage`）与声望（`max(10, damage * 3 // 1000)`）；将存档 `player_save.json` 从崩溃现场 `4001` 恢复至 `2001`。
+
+2. **All Blue 骰子与事件系统重构 (`ROLE.allBlue*`)**：
+   - 修复格子计算错误（`% 30` → 正确 **16 格 `% 16`**），经过或到达起点 `0` 正确发放 **`arrive_fame = 20`**。
+   - 接入 `onepiece.db` `cfg_blue_event` 45 项事件配置（支持 `event_type 1..5`：直接名望、消耗银币事件、金币事件/Rayleigh、随机区间名望、额外投掷次数 `blue_bonus_left`）。
+   - 将 `gold` 与 `copper` 字段统一为 `_amf3_double`（匹配 `onAllBlue*` 系列解析器 `ldrd`），加次消耗校准为 `100 * (blue_buy_count + 1)` 金币匹配 `CDlgAllBlueMain::OnBtnzengjiabtnClick`。
+   - 调整 `onAllBlueDice` 响应字段序列，将 `event_value`、`event_id`、`arrive_fame`、`point` 置于根对象末尾，解决客户端解析循环每个 key 前执行 `vector::clear()` 导致单次骰子状态丢失的问题。
+
+3. **首充礼包与礼包码彻底修复 (`0x103` / `0xfa` / `0xf8`)**：
+   - 将 `REWARDFIRSTPAY` 与 `REWARDCODE` 从同一分支拆离，并在 `dispatch_amf` 中提前拦截匹配：
+     - 首充领取 `_handle_first_pay`（`0x103`）按 `OPDataManager::onRewardFirstPay` 返回 `"error": -1`、`"error_code": -1`、`"pay_first": True` 及 `"e"`（发放 `6024` 界面展示的全部 6 件物品：`300002`×3、`300057`×5、`300049`×4、`200495`×1、`200496`×1、`300085`×5），并持久化 `role["pay_first"] = True` 联动 `ACTIVITY.rewardCheck`。
+     - 兑换码 `_handle_reward_code`（`0xf8`）按 `OPDataManager::onRewardCode` 返回 `pack_name`、`items`、`item_data`、`gold`、`copper`、`exploit`。
+
+4. **后续任务链与战斗/场景地图修复 (`2014..2018` & `cfg_task`)**：
+   - **地图场景扩展**：从原版 Flash 资产 `Scene/2014/1..30.swf` 解压拼接（`2000x600`）并重切为 27 张 `256x256` **幽灵岛 (`2014`)** JPG 瓦片，封装入新分片 **`assets/Env/data.tpd.64`**，同步更新 `data.tpi`（条目 `2060 -> 2087`）、`splites.xml`（`cnt="64"`）与 `apktool.yml`（`doNotCompress`）；在 `scenebg.ani` 补齐 `[mainscene_2016]`、`[mainscene_2017]`、`[mainscene_2018]`、`[mainscene_4007]`。
+   - **任务与通行解锁**：`_build_scenecheck_response` 动态读取 `SCENES`（含 `2014..2018`）与 `CAMPS`；`_is_task_condition_met` 与 `_check_task_battle_complete` 支持 `complete_type 1/3/4/16/17`（任务物品掉落累加、战役星级达成、支线军团讨伐）及按下一任务 `get_npc` 所在场景动态跨图传送。
+
+---
+
+## 二、 近期迭代里程碑回顾 (`v0.08` ~ `v0.13`, 2026-11-27)
+
+1. **VFS 2MB 分片机制与贴图全量修复 (`v0.08 ~ v0.13`)**：
+   - 解决旧版 `data.tpd` 超限截断与 `.ani` `CRCRLF` 损坏问题，将新增资源规范切分为 `<= 2MB` 分片 `data.tpd.56..63` 并注册至 `splites.xml` 与 `apktool.yml`；移除冗余散文件 PVR。
+   - 战船主力与主角团回归原版流畅 `v0.07` 贴图，镜像修正娜美 (`10030`) 与艾尼路 (`10017`) 战斗面向，清理/补全 `personbattle.ani`、`personnormal.ani`、`skillname.ani`、`skill_effect.ani` 全量动作帧。
+2. **航海日志、变身系统、全部 32 项日常与小秘书 20 项功能全修**：
+   - 对接 [Piratestory Wiki](https://piratestory.fandom.com/wiki/Piratestory_Wiki)、[Pockie Pirate Wiki](https://pockiepirate.fandom.com/wiki/) 与百度百科机制：打通酒馆招募点亮航海日志 $\rightarrow$ 解雇保留属性入日志 $\rightarrow$ 10 金币召集 $\rightarrow$ 变身卡/10 金币变身、直接切换变身、恢复主角与战斗不显示变身。
+   - 逐项排查并修复 **32 项日常活跃行为**、**VIP5+ 160 上限 8 次提交**、**小秘书 20 项核心功能**，以及战船升级、登录奖励、主角天赋、海底宝藏、千年龙、All Blue、酒馆/召集令等 AMF3 `BOOL`/`DOUBLE`/`error_code` 协议契约。
+3. **v0.14 打包与全量验证**：
+   - 编译签名产出 `xiaoxiaohaizei-offline-v0.14.apk`（`versionCode 1024`，`124,883,306 B`）。
+   - 执行 `verify_v014.py`（`CHECK 0..8` + `jarsigner` 验签 + `ZIP_STORED` 零压缩检查），输出 **`ALL V0.14 VERIFICATION CHECKS PASSED!`**。
+
+---
+
+# 《小小海贼王》安卓端下一章战斗优化与全日常任务/系统全量修复日志 (2026-11-26)
+
+---
+
+## 四、 实机测试 16 项问题逐一排查与修复 (`offline-server/server.py` & `player_save.json`)
+基于实机请求日志与 `libOnePiece.so` 反汇编协议校对，根治顶层路由碰撞及 16 项交互逻辑：
+1. **日常任务提交无反应 (`TASK.dailyTask*`)**：新增 `_handle_daily_task_submit`，提交任务后累加 `daily_count`、`vitality`（+10）与铜币/威望/经验奖励并记录日常动作 20。
+2. **船员培养维持/替换错乱 (`GENERAL.polishConfirm`)**：修复 `CONFIRM` 分支无条件覆盖的 Bug，`body[3]==0`（维持）仅清空 `temp_*` 不修改原属性，`body[3]==1`（替换）才写入正式属性。
+3. **战船等级恢复初始 1 级 (`formation_level`)**：将 `player_save.json` 与 `_build_general_data` / `_build_formations_list` 初始 `formation_level` 置为 `1`、`formation_exp=0`，并在 `GENERAL` 路由中区分 `formationLevelUp` 升级逻辑（不再被阵型布阵吞掉）。
+4. **海上贸易次数负数 (`MANOR.dockSea` / `dockFetch`)**：按 `CDlgDockSea::InitDockSea` 的 `4 - dock_left_count` 计算公式，改为追踪已用次数 `dock_used_count`（`0~4`），彻底消除负数显示。
+5. **白胡子与组队战点击无反应 (`SCENE.mausoleumEnter` / `CAMP.team` / `CAMP.teamCreate`)**：收紧角色创建路由为仅匹配 `IMPL.CREATE.*`（不再拦截 `CAMP.teamCreate`）；新增 `SCENE.mausoleumEnter` 路由至 `_handle_mausoleum_request`，新增 `_handle_team_request` 返回 `opTeam` 队伍成员结构。
+6. **挑战擂台与决斗场点击崩溃 (`SKYLADDER` / `ARENA` / `BATTLE.matchApply`)**：收紧 `BATTLE.` 路由并专项处理 `BATTLE.matchApply` 与擂台挑战，返回有效阵型与战报避免空敌方数据崩溃。
+7. **影子商店点击无反应 (`ITEM.soulAltar` / `soulWorShip` / `soulSellAll`)**：基于 `onepiece.db` `cfg_soul` 表实现有状态的 `role["souls"]` 与 `soul_alter`（1~5 阶），下发 `error_code=-1` 与完整魂魄列表。
+8. **海底宝藏点击无反应 (`MANOR.treasure`)**：补齐 `reward_list`、`count`、`cfgItemId`、`amount` 与 `error=0 / error_code=-1` 字段匹配 `CDlgTreasure::OnNetPackage`。
+9. **守护兽孵化与冒险乐园 (`GENERAL.petBirth` / `MANOR.post*`)**：新增 `petBirth` 孵化状态更新与 `_handle_post_request`（读取 `cfg_adventure_island`、`cfg_adventure_combine` 匹配 `onPostData`）。
+10. **装备熔炼未消失未得物品 (`ITEM.melt`)**：在 `_handle_item_request` 中新增 `melt` 分支，移除被熔炼装备并奖励强化材料 `300056` x2 与 5000 银币，记录日常动作 28。
+11. **千年龙与船员进阶空白 (`SKYLADDER.AncientDragon` / `GENERAL.generalAdvancedList`)**：在 `SKYLADDER` 前拦截 `ANCIENTDRAGON` 至 `_handle_ancient_dragon_request`（匹配 `onAncientDragonData`），新增 `_handle_general_advance_request`（匹配 `opGeneralAdvance`）。
+12. **主角天赋点击无反应 (`ROLE.talentRole` / `talentRoleUp`)**：修复 `ROLE` 路由仅精确匹配 `op_last == "ROLE"`，不再误截 `talentRole` 与 `talentRoleUp`。
+13. **精英战役空白与点击崩溃 (`CAMP.campElite`)**：按 `OPDataManager::onCampElite`（`root[0][i][j]` 索引逻辑）将返回体改为三层嵌套 AMF3 数组。
+14. **航海日志界面空白 (`ROLE.botCheck` / `botStart`)**：新增 `_handle_bot_request` 匹配 `opBotCheck` 字段。
+15. **海底监狱闯关无战斗画面 (`MANOR.prisonBegin` / `MANOR.prisonBattle`)**：收紧 `BATTLE.` 路由不再误截 `MANOR.prisonBattle`，按 `cfg_prison_army` 查询 `cfg_army_id`（如 `60801`）并返回完整战报 `result_data`。
+16. **离线验证**：通过 `verify_16_fixes.py` 全量模拟 16 项 RPC 调用与状态校验，全部通过并重启本地服务 (`0.0.0.0:8080`)。
+
+---
+
+## 一、 后续主线章节战斗与敌军形象优化
+1. **动态章节战斗背景 (`server.py` `_build_battle_result_response`)**：
+   - 修复此前 `background` 硬编码为 `1`（风车村）的缺陷，改为按 `cfg_army -> cfg_camp.battle_background` 动态下发 `1~13` 战斗背景（西罗布村 `4`、巴拉迪 `5`、可可西亚村 `6`、罗格镇 `7`、磁鼓岛 `8` 等）。
+2. **后续章节 15 个敌军/BOSS 精准映射**：
+   - 在 `ANDROID_ICONIC_FIGURE_MAP` 中补齐巴拉迪、罗格镇、磁鼓岛战役的 15 个未映射敌军形象（如 `10084` 铁拳芬布迪 → `10039`、`10075` 海军枪手 → `10073`、`10076` 海军剑士 → `10014`、`10036` 爱迪曼 → `10088`、`10080` 利基 → `10042`、`10008` 丹彼尔 → `10105` 等），实现 Camp `1013~1025` 全 43 种敌军 0 回退。
+3. **副本敌方属性校准**：
+   - `_build_battle_result_response` 读取 `cfg_monster.phy_atk` 与 `spe_atk` 校准敌方攻击力 `pa`。
+
+---
+
+## 二、 客户端去时间限制与全天可用 (`libOnePiece.so` v0.07)
+1. **去除 7 项日常活动时间显示**：
+   - 将 `CDlgDailyList::SetItemDataInfo` 中硬编码的定时开启文本（`0x00b6cef0..0x00b6d0a8`：组队战、挑战白胡子、顶上战争、高级狩猎、海贼王争霸战报名、军团战、天梯战）全部替换为 **`全天可用`**。
+2. **全天可点击解锁**：
+   - 在 `CDlgDailyList::changeBtnStatu`（`0x00531bf4`、`0x00531c24`、`0x00531c54`、`0x00531c84`、`0x00531cc4`）NOP 掉 5 处时间/开关校验跳转，全 7 项日常活动按钮全天可点击。
+3. **v0.07 客户端编译与签名**：
+   - 更新 `apktool.yml` 与 `serverlist.js` 至 `0.07` (`1017`)，编译签名产出 `xiaoxiaohaizei-offline-v0.07.apk` 与 `xiaoxiaohaizei-offline-release.apk`（247,995,310 字节 / 236.51 MB），同步至 `小小海贼王官网/`。
+
+---
+
+## 三、 全量日常任务与子系统 13 项缺陷根治 (`offline-server/server.py`)
+1. **日常活力值从 0 起步**：修复 `_record_daily_action` / `_build_vitality_response` / `_build_check_vitality_response` 默认 `100` 的问题，改为从 `0` 起步（每完成 1 项日常 +5 活力值），同步重置 `player_save.json` 初始 `vitality=0`。
+2. **每日船员培养计数**：`_handle_polish_request` 接入 `_record_daily_action(4)`。
+3. **每日捕鱼空白修复 (`MANOR.farm`)**：按 `CDlgFishing::OnNetPackage` (`cmn r3, #1`) 将 `error_code` 修正为 `-1`，返回 6 块农田/捕鱼数据并接入 `_record_daily_action(5)`。
+4. **每日贸易负数与点击无反应修复 (`MANOR.dockSea`)**：将 `error_code` 修正为 `-1`，补全 `dock_count=3`、`dock_left_count=3`、`ship_count=3` 及贸易/掠夺结算（动作 8、9）。
+5. **每日白胡子与高级狩猎**：实现 `_handle_mausoleum_request`（`ACTIVITY.mausoleum`，动作 10）与 `_handle_hunting_request`（`SCENE.checkHunting` / 狩猎行为，动作 24）。
+6. **海底打捞逻辑补全**：`SCENE.seaChest` 发放真实道具与银币奖励（`reward_list` 非空），`MANOR.treasure` 修正 `error_code=-1` 并双端接入 `_record_daily_action(14)`。
+7. **精英战役界面空白修复 (`CAMP.campElite`)**：按 `OPDataManager::onCampElite` 规范改为直接返回根节点 AMF3 数组（含整型 `is_finish`）。
+8. **每日领取悬赏与试炼挑战 (`TASK.trail` / `TASK.trailReward`)**：实现 `_handle_trail_request`，从 `cfg_trail` 下发全部 23 项试炼及领奖状态，领奖接入动作 18、23。
+9. **守护兽全套逻辑补全 (`GENERAL.pet` / `PET.*`)**：实现 `_handle_pet_request`（默认解锁守护兽“趣趣”，支持互动/培养/冒险，接入动作 22、26、27）。
+10. **监狱挑战崩溃修复 (`MANOR.prison`)**：补全 `onPrison` 所需 `star_list`（`cfg_prison_army`）、`prison_on`、`prison_count` 等字段，接入动作 30。
+11. **商城与每日购买 (`ACTIVITY.mall` / `mallBuy`)**：补全 `record_list` 非空记录与 `MALL_PRODUCTS` 校验，购买接入动作 25（商城购买）与动作 20（金币消费）。
+12. **其他日常与系统补全**：实现 `LEGION.*`（军团贡献动作 32）、`SKYLADDER.* / ARENA.*`（决斗场/擂台动作 2、12）、`ITEM.soul* / haki / melt / rise`（剪影动作 13、熔炼动作 28、升星动作 29）、日常任务 `daily_task_list`（`type=3/4`）与 `DAILYPRESTIGEREWARD`。
+
+---
+
 # 《小小海贼王》小丑巴基 (10011) 专属图集重构与原皮端到端恢复日志 (2026-11-19)
 
 ---

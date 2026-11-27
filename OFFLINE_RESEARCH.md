@@ -1,5 +1,10 @@
 # 小小海贼王本地化研究记录
 
+> **第一级参考（每次修复与还原功能前最先查阅）**
+> 1. [Piratestory Wiki](https://piratestory.fandom.com/wiki/Piratestory_Wiki)（俄语资料站，系统机制、公式与战斗站位最全）— API：`https://piratestory.fandom.com/api.php`
+> 2. [Pockie Pirate Wiki](https://pockiepirate.fandom.com/wiki/)（英语资料站，船员、恶魔果实、副本与道具资料全）— API：`https://pockiepirate.fandom.com/api.php`
+> - 注：直接抓取 `/wiki/...` 可能返回 `403`，通过官方 MediaWiki API（或 `python D:\AI\work\x\wiki_lookup.py`）及 `search_web` 可流畅查询并读取完整页面正文。
+
 ## 现有资源
 
 - 原始 APK 已反编译到 `D:\AI\work\xiaoxiaohaizei`，工作副本在本目录。

@@ -580,17 +580,16 @@ Frame1=data/personnormal/personnormal_16.pvr,690,876,56,148
 
 [personnormal_10066_move]
 FrameAmount=5
-Frame0=data/personnormal/personnormal_2.pvr,0,771,331,241
-Frame1=data/personnormal/personnormal_2.pvr,662,530,331,241
-Frame2=data/personnormal/personnormal_2.pvr,331,530,331,241
-Frame3=data/personnormal/personnormal_2.pvr,0,530,331,241
-Frame4=data/personnormal/personnormal_2.pvr,405,275,331,241
+Frame0=data/personnormal/personnormal_10066.pvr,0,0,331,241
+Frame1=data/personnormal/personnormal_10066.pvr,331,0,331,241
+Frame2=data/personnormal/personnormal_10066.pvr,662,0,331,241
+Frame3=data/personnormal/personnormal_10066.pvr,0,241,331,241
+Frame4=data/personnormal/personnormal_10066.pvr,331,241,331,241
 
 [personnormal_10066_stop]
 FrameAmount=2
-Frame0=data/personnormal/personnormal_2.pvr,831,0,189,242
-Frame1=data/personnormal/personnormal_2.pvr,216,275,189,242
-
+Frame0=data/personnormal/personnormal_10066.pvr,0,482,189,242
+Frame1=data/personnormal/personnormal_10066.pvr,189,482,189,242
 [personnormal_10067_move]
 FrameAmount=5
 Frame0=data/personnormal/personnormal_20.pvr,246,165,177,164

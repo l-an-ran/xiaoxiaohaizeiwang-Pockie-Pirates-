@@ -1,9 +1,9 @@
 {
-  "ver": "0.06",
-  "iosVer": "0.06",
-  "andVer": "0.06",
+  "ver": "0.07",
+  "iosVer": "0.07",
+  "andVer": "0.07",
   "isupdate": 0,
-  "announce": "小小海贼王单机离线版 v0.06 - 全酒馆68位船员大满贯·草帽团全员集结",
+  "announce": "小小海贼王单机离线版 v0.07 - 日常任务全天化与全系统修复",
   "serverPath": "",
   "remodeFolder": "",
   "list": [

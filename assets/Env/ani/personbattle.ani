@@ -21,98 +21,100 @@ Frame0=data/personbattle/personbattle_251.pvr,400,0,400,300
 Frame1=data/personbattle/personbattle_266.pvr,0,0,400,300
 
 [personbattle_soldier10005_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_266.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_266.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_266.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_266.pvr,0,600,400,300
-Frame4=data/personbattle/personbattle_266.pvr,400,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10005_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10005_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10005_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10005_1.pvr,0,0,400,300
 
 [personbattle_soldier10005_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_267.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10005_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10005_1.pvr,400,600,400,300
 
 [personbattle_soldier10005_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_267.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_267.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_267.pvr,400,300,400,300
+Frame0=data/personbattle/personbattle_v8_10005_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10005_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10005_1.pvr,400,300,400,300
 
 [personbattle_soldier10005_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_267.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_267.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10005_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10005_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10005_0.pvr,0,300,400,300
 
 [personbattle_soldier10006_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_268.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_268.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_268.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10006_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10006_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10006_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10006_1.pvr,0,0,400,300
 
 [personbattle_soldier10006_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_268.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10006_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10006_1.pvr,400,600,400,300
 
 [personbattle_soldier10006_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_268.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_268.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_269.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_269.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_269.pvr,0,300,400,300
-Frame5=data/personbattle/personbattle_269.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10006_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10006_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10006_1.pvr,400,300,400,300
 
 [personbattle_soldier10006_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_269.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_269.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10006_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10006_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10006_0.pvr,0,300,400,300
 
 [personbattle_soldier10007_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_270.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_270.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_270.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10007_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10007_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10007_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10007_1.pvr,0,0,400,300
 
 [personbattle_soldier10007_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_270.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10007_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10007_1.pvr,400,600,400,300
 
 [personbattle_soldier10007_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_270.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_270.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_271.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_271.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_271.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10007_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10007_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10007_1.pvr,400,300,400,300
 
 [personbattle_soldier10007_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_271.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_271.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10007_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10007_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10007_0.pvr,0,300,400,300
 
 [personbattle_soldier10008_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_271.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_272.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_272.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_272.pvr,0,300,400,300
-Frame4=data/personbattle/personbattle_272.pvr,400,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10008_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10008_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10008_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10008_1.pvr,0,0,400,300
 
 [personbattle_soldier10008_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_272.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10008_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10008_1.pvr,400,600,400,300
 
 [personbattle_soldier10008_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_272.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_273.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_273.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_273.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10008_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10008_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10008_1.pvr,400,300,400,300
 
 [personbattle_soldier10008_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_17.pvr,615,410,400,300
-Frame1=data/personbattle/personbattle_18.pvr,615,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10008_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10008_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10008_0.pvr,0,300,400,300
 
 [personbattle_soldier10009_attack]
 FrameAmount=3
@@ -206,49 +208,52 @@ Frame0=data/personbattle/personbattle_38.pvr,400,300,400,300
 Frame1=data/personbattle/personbattle_38.pvr,0,600,400,300
 
 [personbattle_soldier10015_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_38.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_39.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_39.pvr,400,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10015_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10015_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10015_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10015_1.pvr,0,0,400,300
 
 [personbattle_soldier10015_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_39.pvr,0,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10015_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10015_1.pvr,400,600,400,300
 
 [personbattle_soldier10015_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_39.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_39.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_39.pvr,400,600,400,300
-Frame3=data/personbattle/personbattle_40.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10015_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10015_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10015_1.pvr,400,300,400,300
 
 [personbattle_soldier10015_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_40.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_40.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10015_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10015_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10015_0.pvr,0,300,400,300
 
 [personbattle_soldier10018_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_44.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_44.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_44.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10018_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10018_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10018_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10018_1.pvr,0,0,400,300
 
 [personbattle_soldier10018_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_44.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10018_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10018_1.pvr,400,600,400,300
 
 [personbattle_soldier10018_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_44.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_44.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_45.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_45.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_45.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10018_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10018_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10018_1.pvr,400,300,400,300
 
 [personbattle_soldier10018_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_45.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_45.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10018_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10018_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10018_0.pvr,0,300,400,300
 
 [personbattle_soldier10019_attack]
 FrameAmount=3
@@ -323,35 +328,28 @@ Frame0=data/personbattle/personbattle_51.pvr,400,300,400,300
 Frame1=data/personbattle/personbattle_51.pvr,0,600,400,300
 
 [personbattle_soldier10024_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_56.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_56.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_56.pvr,400,600,400,300
-Frame3=data/personbattle/personbattle_57.pvr,0,0,400,300
-Frame4=data/personbattle/personbattle_57.pvr,400,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10024_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10024_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10024_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10024_1.pvr,0,0,400,300
 
 [personbattle_soldier10024_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_57.pvr,0,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10024_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10024_1.pvr,400,600,400,300
 
 [personbattle_soldier10024_skill]
-FrameAmount=11
-Frame0=data/personbattle/personbattle_57.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_57.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_57.pvr,400,600,400,300
-Frame3=data/personbattle/personbattle_58.pvr,0,0,400,300
-Frame4=data/personbattle/personbattle_58.pvr,400,0,400,300
-Frame5=data/personbattle/personbattle_58.pvr,0,300,400,300
-Frame6=data/personbattle/personbattle_58.pvr,400,300,400,300
-Frame7=data/personbattle/personbattle_58.pvr,0,600,400,300
-Frame8=data/personbattle/personbattle_58.pvr,400,600,400,300
-Frame9=data/personbattle/personbattle_59.pvr,0,0,400,300
-Frame10=data/personbattle/personbattle_59.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10024_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10024_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10024_1.pvr,400,300,400,300
 
 [personbattle_soldier10024_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_59.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_59.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10024_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10024_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10024_0.pvr,0,300,400,300
 
 [personbattle_soldier1003_attack]
 FrameAmount=4
@@ -378,83 +376,76 @@ Frame0=data/personbattle/personbattle_71.pvr,0,300,400,300
 Frame1=data/personbattle/personbattle_71.pvr,400,300,400,300
 
 [personbattle_soldier10034_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_77.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_77.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_77.pvr,0,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10034_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10034_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10034_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10034_1.pvr,0,0,400,300
 
 [personbattle_soldier10034_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_77.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10034_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10034_1.pvr,400,600,400,300
 
 [personbattle_soldier10034_skill]
-FrameAmount=7
-Frame0=data/personbattle/personbattle_78.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_78.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_78.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_78.pvr,400,300,400,300
-Frame4=data/personbattle/personbattle_78.pvr,0,600,400,300
-Frame5=data/personbattle/personbattle_78.pvr,400,600,400,300
-Frame6=data/personbattle/personbattle_79.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10034_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10034_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10034_1.pvr,400,300,400,300
 
 [personbattle_soldier10034_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_79.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_79.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10034_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10034_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10034_0.pvr,0,300,400,300
 
 [personbattle_soldier10036_attack]
-FrameAmount=7
-Frame0=data/personbattle/personbattle_82.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_82.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_82.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_82.pvr,400,300,400,300
-Frame4=data/personbattle/personbattle_82.pvr,0,600,400,300
-Frame5=data/personbattle/personbattle_82.pvr,400,600,400,300
-Frame6=data/personbattle/personbattle_83.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10036_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10036_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10036_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10036_1.pvr,0,0,400,300
 
 [personbattle_soldier10036_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_83.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10036_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10036_1.pvr,400,600,400,300
 
 [personbattle_soldier10036_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_83.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_83.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_83.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_83.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_84.pvr,0,0,400,300
-Frame5=data/personbattle/personbattle_84.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10036_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10036_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10036_1.pvr,400,300,400,300
 
 [personbattle_soldier10036_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_84.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_84.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10036_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10036_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10036_0.pvr,0,300,400,300
 
 [personbattle_soldier10037_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_84.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_84.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_85.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_85.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_85.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10037_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10037_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10037_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10037_1.pvr,0,0,400,300
 
 [personbattle_soldier10037_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_85.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10037_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10037_1.pvr,400,600,400,300
 
 [personbattle_soldier10037_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_85.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_85.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_86.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_86.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_86.pvr,0,300,400,300
-Frame5=data/personbattle/personbattle_86.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10037_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10037_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10037_1.pvr,400,300,400,300
 
 [personbattle_soldier10037_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_86.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_86.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10037_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10037_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10037_0.pvr,0,300,400,300
 
 [personbattle_soldier1004_attack]
 FrameAmount=7
@@ -486,51 +477,52 @@ Frame0=data/personbattle/personbattle_94.pvr,0,0,400,300
 Frame1=data/personbattle/personbattle_94.pvr,400,0,400,300
 
 [personbattle_soldier10040_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_94.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_94.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_94.pvr,0,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10040_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10040_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10040_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10040_1.pvr,0,0,400,300
 
 [personbattle_soldier10040_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_94.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10040_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10040_1.pvr,400,600,400,300
 
 [personbattle_soldier10040_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_95.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_95.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_95.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_95.pvr,400,300,400,300
-Frame4=data/personbattle/personbattle_95.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10040_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10040_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10040_1.pvr,400,300,400,300
 
 [personbattle_soldier10040_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_95.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_96.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10040_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10040_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10040_0.pvr,0,300,400,300
 
 [personbattle_soldier10041_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_96.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_96.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_96.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_96.pvr,0,600,400,300
-Frame4=data/personbattle/personbattle_96.pvr,400,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10041_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10041_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10041_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10041_1.pvr,0,0,400,300
 
 [personbattle_soldier10041_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_97.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10041_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10041_1.pvr,400,600,400,300
 
 [personbattle_soldier10041_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_97.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_97.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_97.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_97.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10041_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10041_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10041_1.pvr,400,300,400,300
 
 [personbattle_soldier10041_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_97.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_98.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10041_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10041_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10041_0.pvr,0,300,400,300
 
 [personbattle_soldier10042_attack]
 FrameAmount=3
@@ -555,50 +547,52 @@ Frame0=data/personbattle/personbattle_99.pvr,400,300,400,300
 Frame1=data/personbattle/personbattle_99.pvr,0,600,400,300
 
 [personbattle_soldier10043_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_99.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_100.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_100.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_100.pvr,0,300,400,300
-Frame4=data/personbattle/personbattle_100.pvr,400,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10043_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10043_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10043_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10043_1.pvr,0,0,400,300
 
 [personbattle_soldier10043_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_100.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10043_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10043_1.pvr,400,600,400,300
 
 [personbattle_soldier10043_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_100.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_101.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_101.pvr,400,0,400,300
+Frame0=data/personbattle/personbattle_v8_10043_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10043_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10043_1.pvr,400,300,400,300
 
 [personbattle_soldier10043_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_101.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_101.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10043_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10043_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10043_0.pvr,0,300,400,300
 
 [personbattle_soldier10044_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_101.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_101.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_102.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10044_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10044_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10044_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10044_1.pvr,0,0,400,300
 
 [personbattle_soldier10044_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_102.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10044_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10044_1.pvr,400,600,400,300
 
 [personbattle_soldier10044_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_102.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_102.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_102.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_102.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_103.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10044_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10044_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10044_1.pvr,400,300,400,300
 
 [personbattle_soldier10044_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_103.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_103.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10044_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10044_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10044_0.pvr,0,300,400,300
 
 [personbattle_soldier10045_attack]
 FrameAmount=3
@@ -623,51 +617,49 @@ Frame0=data/personbattle/personbattle_104.pvr,400,600,400,300
 Frame1=data/personbattle/personbattle_105.pvr,0,0,400,300
 
 [personbattle_soldier10046_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_105.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_105.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_105.pvr,400,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10046_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10046_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10046_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10046_1.pvr,0,0,400,300
 
 [personbattle_soldier10046_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_105.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10046_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10046_1.pvr,400,600,400,300
 
 [personbattle_soldier10046_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_105.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_106.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_106.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_106.pvr,0,300,400,300
-Frame4=data/personbattle/personbattle_106.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10046_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10046_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10046_1.pvr,400,300,400,300
 
 [personbattle_soldier10046_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_106.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_106.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10046_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10046_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10046_0.pvr,0,300,400,300
 
 [personbattle_soldier10047_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_107.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_107.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_107.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_107.pvr,400,300,400,300
-Frame4=data/personbattle/personbattle_107.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10047_0.pvr,0,300,400,300
+Frame1=data/personbattle/personbattle_v8_10047_0.pvr,400,300,400,300
+Frame2=data/personbattle/personbattle_v8_10047_0.pvr,0,600,400,300
 
 [personbattle_soldier10047_hurt]
 FrameAmount=1
-Frame0=data/personbattle/personbattle_107.pvr,400,600,400,300
+Frame0=data/personbattle/personbattle_v8_10047_1.pvr,0,300,400,300
 
 [personbattle_soldier10047_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_108.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_108.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_108.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_108.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10047_0.pvr,400,600,400,300
+Frame1=data/personbattle/personbattle_v8_10047_1.pvr,0,0,400,300
+Frame2=data/personbattle/personbattle_v8_10047_1.pvr,400,0,400,300
 
 [personbattle_soldier10047_stop]
 FrameAmount=2
-Frame0=data/personbattle/personbattle_108.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_108.pvr,400,600,400,300
+Frame0=data/personbattle/personbattle_v8_10047_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10047_0.pvr,400,0,400,300
 
 [personbattle_soldier10048_attack]
 FrameAmount=5
@@ -911,55 +903,52 @@ Frame0=data/personbattle/personbattle_128.pvr,0,600,400,300
 Frame1=data/personbattle/personbattle_128.pvr,400,600,400,300
 
 [personbattle_soldier10057_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_129.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_129.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_129.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10057_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10057_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10057_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10057_1.pvr,0,0,400,300
 
 [personbattle_soldier10057_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_129.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10057_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10057_1.pvr,400,600,400,300
 
 [personbattle_soldier10057_skill]
-FrameAmount=7
-Frame0=data/personbattle/personbattle_129.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_129.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_130.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_130.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_130.pvr,0,300,400,300
-Frame5=data/personbattle/personbattle_130.pvr,400,300,400,300
-Frame6=data/personbattle/personbattle_130.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10057_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10057_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10057_1.pvr,400,300,400,300
 
 [personbattle_soldier10057_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_130.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_131.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10057_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10057_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10057_0.pvr,0,300,400,300
 
 [personbattle_soldier10058_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_131.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_131.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_131.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_131.pvr,0,600,400,300
-Frame4=data/personbattle/personbattle_131.pvr,400,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10058_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10058_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10058_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10058_1.pvr,0,0,400,300
 
 [personbattle_soldier10058_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_132.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10058_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10058_1.pvr,400,600,400,300
 
 [personbattle_soldier10058_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_132.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_132.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_132.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_132.pvr,0,600,400,300
-Frame4=data/personbattle/personbattle_132.pvr,400,600,400,300
-Frame5=data/personbattle/personbattle_133.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10058_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10058_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10058_1.pvr,400,300,400,300
 
 [personbattle_soldier10058_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_133.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_133.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10058_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10058_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10058_0.pvr,0,300,400,300
 
 [personbattle_soldier10059_attack]
 FrameAmount=5
@@ -1016,28 +1005,28 @@ Frame0=data/personbattle/personbattle_138.pvr,400,0,400,300
 Frame1=data/personbattle/personbattle_138.pvr,0,300,400,300
 
 [personbattle_soldier10060_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_138.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_138.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_138.pvr,400,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10060_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10060_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10060_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10060_1.pvr,0,0,400,300
 
 [personbattle_soldier10060_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_139.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10060_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10060_1.pvr,400,600,400,300
 
 [personbattle_soldier10060_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_139.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_139.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_139.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_139.pvr,0,600,400,300
-Frame4=data/personbattle/personbattle_139.pvr,400,600,400,300
-Frame5=data/personbattle/personbattle_140.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10060_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10060_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10060_1.pvr,400,300,400,300
 
 [personbattle_soldier10060_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_140.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_140.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10060_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10060_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10060_0.pvr,0,300,400,300
 
 [personbattle_soldier10061_attack]
 FrameAmount=5
@@ -1066,50 +1055,52 @@ Frame0=data/personbattle/personbattle_142.pvr,400,300,400,300
 Frame1=data/personbattle/personbattle_142.pvr,0,600,400,300
 
 [personbattle_soldier10062_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_142.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_143.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_143.pvr,400,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10062_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10062_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10062_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10062_1.pvr,0,0,400,300
 
 [personbattle_soldier10062_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_143.pvr,0,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10062_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10062_1.pvr,400,600,400,300
 
 [personbattle_soldier10062_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_143.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_143.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_143.pvr,400,600,400,300
-Frame3=data/personbattle/personbattle_144.pvr,0,0,400,300
-Frame4=data/personbattle/personbattle_144.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10062_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10062_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10062_1.pvr,400,300,400,300
 
 [personbattle_soldier10062_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_144.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_144.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10062_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10062_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10062_0.pvr,0,300,400,300
 
 [personbattle_soldier10063_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_144.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_144.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_145.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_145.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_145.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10063_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10063_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10063_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10063_1.pvr,0,0,400,300
 
 [personbattle_soldier10063_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_145.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10063_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10063_1.pvr,400,600,400,300
 
 [personbattle_soldier10063_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_145.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_145.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_146.pvr,0,0,400,300
+Frame0=data/personbattle/personbattle_v8_10063_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10063_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10063_1.pvr,400,300,400,300
 
 [personbattle_soldier10063_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_146.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_146.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10063_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10063_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10063_0.pvr,0,300,400,300
 
 [personbattle_soldier10066_attack]
 FrameAmount=3
@@ -1126,8 +1117,8 @@ FrameAmount=6
 Frame0=data/personbattle/personbattle_21.pvr,0,0,615,410
 Frame1=data/personbattle/personbattle_22.pvr,0,410,615,410
 Frame2=data/personbattle/personbattle_19.pvr,0,410,615,410
-Frame3=data/personbattle/personbattle_17.pvr,0,0,615,410
-Frame4=data/personbattle/personbattle_17.pvr,0,410,615,410
+Frame3=data/personbattle/personbattle_10066.pvr,0,0,615,410
+Frame4=data/personbattle/personbattle_10066.pvr,0,410,615,410
 Frame5=data/personbattle/personbattle_18.pvr,0,0,615,410
 
 [personbattle_soldier10066_stop]
@@ -1183,95 +1174,99 @@ Frame1=data/personbattle/personbattle_161.pvr,400,600,400,300
 
 [personbattle_soldier10071_attack]
 FrameAmount=4
-Frame0=data/personbattle/personbattle_162.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_162.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_162.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_162.pvr,400,300,400,300
+Frame0=data/personbattle/personbattle_v8_10071_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10071_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10071_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10071_1.pvr,0,0,400,300
 
 [personbattle_soldier10071_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_162.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10071_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10071_1.pvr,400,600,400,300
 
 [personbattle_soldier10071_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_162.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_163.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_163.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_163.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10071_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10071_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10071_1.pvr,400,300,400,300
 
 [personbattle_soldier10071_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_163.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_163.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10071_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10071_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10071_0.pvr,0,300,400,300
 
 [personbattle_soldier10075_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_169.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_169.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_169.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_169.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_170.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10075_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10075_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10075_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10075_1.pvr,0,0,400,300
 
 [personbattle_soldier10075_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_170.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10075_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10075_1.pvr,400,600,400,300
 
 [personbattle_soldier10075_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_170.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_170.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_170.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_170.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_171.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10075_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10075_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10075_1.pvr,400,300,400,300
 
 [personbattle_soldier10075_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_171.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_171.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10075_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10075_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10075_0.pvr,0,300,400,300
 
 [personbattle_soldier10076_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_171.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_171.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_171.pvr,400,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10076_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10076_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10076_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10076_1.pvr,0,0,400,300
 
 [personbattle_soldier10076_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_172.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10076_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10076_1.pvr,400,600,400,300
 
 [personbattle_soldier10076_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_172.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_172.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_172.pvr,400,300,400,300
+Frame0=data/personbattle/personbattle_v8_10076_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10076_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10076_1.pvr,400,300,400,300
 
 [personbattle_soldier10076_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_172.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_172.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10076_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10076_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10076_0.pvr,0,300,400,300
 
 [personbattle_soldier10077_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_173.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_173.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_173.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10077_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10077_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10077_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10077_1.pvr,0,0,400,300
 
 [personbattle_soldier10077_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_173.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10077_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10077_1.pvr,400,600,400,300
 
 [personbattle_soldier10077_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_173.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_173.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_174.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_174.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_174.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10077_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10077_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10077_1.pvr,400,300,400,300
 
 [personbattle_soldier10077_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_174.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_174.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10077_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10077_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10077_0.pvr,0,300,400,300
 
 [personbattle_soldier1008_attack]
 FrameAmount=6
@@ -1302,74 +1297,76 @@ Frame0=data/personbattle/personbattle_179.pvr,0,0,400,300
 Frame1=data/personbattle/personbattle_179.pvr,400,0,400,300
 
 [personbattle_soldier10080_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_179.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_179.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_179.pvr,0,600,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10080_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10080_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10080_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10080_1.pvr,0,0,400,300
 
 [personbattle_soldier10080_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_179.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10080_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10080_1.pvr,400,600,400,300
 
 [personbattle_soldier10080_skill]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_180.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_180.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_180.pvr,0,300,400,300
-Frame3=data/personbattle/personbattle_180.pvr,400,300,400,300
-Frame4=data/personbattle/personbattle_180.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10080_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10080_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10080_1.pvr,400,300,400,300
 
 [personbattle_soldier10080_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_180.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_181.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10080_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10080_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10080_0.pvr,0,300,400,300
 
 [personbattle_soldier10084_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_184.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_184.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_184.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_184.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_185.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10084_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10084_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10084_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10084_1.pvr,0,0,400,300
 
 [personbattle_soldier10084_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_185.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10084_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10084_1.pvr,400,600,400,300
 
 [personbattle_soldier10084_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_185.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_185.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_185.pvr,0,600,400,300
+Frame0=data/personbattle/personbattle_v8_10084_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10084_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10084_1.pvr,400,300,400,300
 
 [personbattle_soldier10084_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_185.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_186.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10084_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10084_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10084_0.pvr,0,300,400,300
 
 [personbattle_soldier10120_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_215.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_215.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_216.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_216.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_216.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10120_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10120_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10120_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10120_1.pvr,0,0,400,300
 
 [personbattle_soldier10120_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_216.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10120_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10120_1.pvr,400,600,400,300
 
 [personbattle_soldier10120_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_216.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_216.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_217.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_217.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10120_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10120_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10120_1.pvr,400,300,400,300
 
 [personbattle_soldier10120_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_217.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_217.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10120_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10120_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10120_0.pvr,0,300,400,300
 
 [personbattle_soldier10129_attack]
 FrameAmount=8
@@ -1424,253 +1421,244 @@ Frame0=data/personbattle/personbattle_235.pvr,400,600,400,300
 Frame1=data/personbattle/personbattle_236.pvr,0,0,400,300
 
 [personbattle_soldier10133_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_236.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_236.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_236.pvr,400,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10133_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10133_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10133_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10133_1.pvr,0,0,400,300
 
 [personbattle_soldier10133_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_236.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10133_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10133_1.pvr,400,600,400,300
 
 [personbattle_soldier10133_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_236.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_237.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_237.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_237.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10133_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10133_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10133_1.pvr,400,300,400,300
 
 [personbattle_soldier10133_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_237.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_237.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10133_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10133_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10133_0.pvr,0,300,400,300
 
 [personbattle_soldier10134_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_237.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_238.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_238.pvr,400,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10134_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10134_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10134_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10134_1.pvr,0,0,400,300
 
 [personbattle_soldier10134_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_238.pvr,0,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10134_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10134_1.pvr,400,600,400,300
 
 [personbattle_soldier10134_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_238.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_238.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_238.pvr,400,600,400,300
-Frame3=data/personbattle/personbattle_239.pvr,0,0,400,300
-Frame4=data/personbattle/personbattle_239.pvr,400,0,400,300
-Frame5=data/personbattle/personbattle_239.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10134_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10134_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10134_1.pvr,400,300,400,300
 
 [personbattle_soldier10134_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_239.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_239.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10134_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10134_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10134_0.pvr,0,300,400,300
 
 [personbattle_soldier10135_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_239.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_240.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_240.pvr,400,0,400,300
-Frame3=data/personbattle/personbattle_240.pvr,0,300,400,300
-Frame4=data/personbattle/personbattle_240.pvr,400,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10135_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10135_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10135_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10135_1.pvr,0,0,400,300
 
 [personbattle_soldier10135_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_240.pvr,0,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10135_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10135_1.pvr,400,600,400,300
 
 [personbattle_soldier10135_skill]
 FrameAmount=3
-Frame0=data/personbattle/personbattle_240.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_241.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_241.pvr,400,0,400,300
+Frame0=data/personbattle/personbattle_v8_10135_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10135_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10135_1.pvr,400,300,400,300
 
 [personbattle_soldier10135_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_241.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_241.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10135_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10135_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10135_0.pvr,0,300,400,300
 
 [personbattle_soldier10136_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_241.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_241.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_242.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_242.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_242.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10136_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10136_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10136_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10136_1.pvr,0,0,400,300
 
 [personbattle_soldier10136_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_242.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10136_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10136_1.pvr,400,600,400,300
 
 [personbattle_soldier10136_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_242.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_242.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_243.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_243.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10136_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10136_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10136_1.pvr,400,300,400,300
 
 [personbattle_soldier10136_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_243.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_243.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10136_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10136_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10136_0.pvr,0,300,400,300
 
 [personbattle_soldier10140_attack]
-FrameAmount=9
-Frame0=data/personbattle/personbattle_6.pvr,0,0,634,483
-Frame1=data/personbattle/personbattle_5.pvr,0,0,634,483
-Frame2=data/personbattle/personbattle_1.pvr,0,532,634,483
-Frame3=data/personbattle/personbattle_0.pvr,0,532,634,483
-Frame4=data/personbattle/personbattle_11.pvr,0,0,634,483
-Frame5=data/personbattle/personbattle_10.pvr,0,483,634,483
-Frame6=data/personbattle/personbattle_10.pvr,0,0,634,483
-Frame7=data/personbattle/personbattle_9.pvr,0,483,634,483
-Frame8=data/personbattle/personbattle_9.pvr,0,0,634,483
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10140_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10140_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10140_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10140_1.pvr,0,0,400,300
 
 [personbattle_soldier10140_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_8.pvr,0,483,634,483
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10140_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10140_1.pvr,400,600,400,300
 
 [personbattle_soldier10140_skill]
-FrameAmount=13
-Frame0=data/personbattle/personbattle_2.pvr,0,532,634,483
-Frame1=data/personbattle/personbattle_7.pvr,0,483,634,483
-Frame2=data/personbattle/personbattle_7.pvr,0,0,634,483
-Frame3=data/personbattle/personbattle_6.pvr,0,483,634,483
-Frame4=data/personbattle/personbattle_13.pvr,0,0,634,482
-Frame5=data/personbattle/personbattle_12.pvr,0,482,634,482
-Frame6=data/personbattle/personbattle_12.pvr,0,0,634,482
-Frame7=data/personbattle/personbattle_13.pvr,0,482,634,482
-Frame8=data/personbattle/personbattle_11.pvr,0,483,634,482
-Frame9=data/personbattle/personbattle_5.pvr,0,483,634,483
-Frame10=data/personbattle/personbattle_8.pvr,0,0,634,483
-Frame11=data/personbattle/personbattle_4.pvr,0,483,634,483
-Frame12=data/personbattle/personbattle_4.pvr,0,0,634,483
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10140_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10140_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10140_1.pvr,400,300,400,300
 
 [personbattle_soldier10140_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_3.pvr,0,483,634,483
-Frame1=data/personbattle/personbattle_3.pvr,0,0,634,483
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10140_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10140_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10140_0.pvr,0,300,400,300
 
 [personbattle_soldier10143_attack]
-FrameAmount=5
-Frame0=data/personbattle/personbattle_251.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_251.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_251.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_251.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_252.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10143_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10143_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10143_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10143_1.pvr,0,0,400,300
 
 [personbattle_soldier10143_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_252.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10143_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10143_1.pvr,400,600,400,300
 
 [personbattle_soldier10143_skill]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_252.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_252.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_252.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_252.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_253.pvr,0,0,400,300
-Frame5=data/personbattle/personbattle_253.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10143_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10143_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10143_1.pvr,400,300,400,300
 
 [personbattle_soldier10143_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_253.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_253.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10143_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10143_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10143_0.pvr,0,300,400,300
 
 [personbattle_soldier10144_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_253.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_253.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_254.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10144_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10144_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10144_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10144_1.pvr,0,0,400,300
 
 [personbattle_soldier10144_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_254.pvr,400,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10144_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10144_1.pvr,400,600,400,300
 
 [personbattle_soldier10144_skill]
-FrameAmount=7
-Frame0=data/personbattle/personbattle_254.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_254.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_254.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_254.pvr,400,600,400,300
-Frame4=data/personbattle/personbattle_255.pvr,0,0,400,300
-Frame5=data/personbattle/personbattle_255.pvr,400,0,400,300
-Frame6=data/personbattle/personbattle_255.pvr,0,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10144_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10144_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10144_1.pvr,400,300,400,300
 
 [personbattle_soldier10144_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_255.pvr,400,300,400,300
-Frame1=data/personbattle/personbattle_255.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10144_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10144_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10144_0.pvr,0,300,400,300
 
 [personbattle_soldier10145_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_255.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_256.pvr,0,0,400,300
-Frame2=data/personbattle/personbattle_256.pvr,400,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10145_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10145_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10145_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10145_1.pvr,0,0,400,300
 
 [personbattle_soldier10145_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_256.pvr,0,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10145_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10145_1.pvr,400,600,400,300
 
 [personbattle_soldier10145_skill]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_256.pvr,400,300,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10145_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10145_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10145_1.pvr,400,300,400,300
 
 [personbattle_soldier10145_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_256.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_256.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10145_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10145_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10145_0.pvr,0,300,400,300
 
 [personbattle_soldier10146_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_257.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_257.pvr,400,0,400,300
-Frame2=data/personbattle/personbattle_257.pvr,0,300,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10146_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10146_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10146_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10146_1.pvr,0,0,400,300
 
 [personbattle_soldier10146_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_257.pvr,400,300,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10146_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10146_1.pvr,400,600,400,300
 
 [personbattle_soldier10146_skill]
-FrameAmount=8
-Frame0=data/personbattle/personbattle_257.pvr,0,600,400,300
-Frame1=data/personbattle/personbattle_257.pvr,400,600,400,300
-Frame2=data/personbattle/personbattle_258.pvr,0,0,400,300
-Frame3=data/personbattle/personbattle_258.pvr,400,0,400,300
-Frame4=data/personbattle/personbattle_258.pvr,0,300,400,300
-Frame5=data/personbattle/personbattle_258.pvr,400,300,400,300
-Frame6=data/personbattle/personbattle_258.pvr,0,600,400,300
-Frame7=data/personbattle/personbattle_258.pvr,400,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10146_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10146_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10146_1.pvr,400,300,400,300
 
 [personbattle_soldier10146_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_259.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_259.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10146_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10146_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10146_0.pvr,0,300,400,300
 
 [personbattle_soldier10147_attack]
 FrameAmount=4
-Frame0=data/personbattle/personbattle_259.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_259.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_259.pvr,0,600,400,300
-Frame3=data/personbattle/personbattle_259.pvr,400,600,400,300
+Frame0=data/personbattle/personbattle_v8_10147_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10147_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10147_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10147_1.pvr,0,0,400,300
 
 [personbattle_soldier10147_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_260.pvr,0,0,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10147_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10147_1.pvr,400,600,400,300
 
 [personbattle_soldier10147_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_260.pvr,400,0,400,300
-Frame1=data/personbattle/personbattle_260.pvr,0,300,400,300
-Frame2=data/personbattle/personbattle_260.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_260.pvr,0,600,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10147_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10147_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10147_1.pvr,400,300,400,300
 
 [personbattle_soldier10147_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_260.pvr,400,600,400,300
-Frame1=data/personbattle/personbattle_261.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10147_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10147_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10147_0.pvr,0,300,400,300
 
 [personbattle_soldier10151_attack]
 FrameAmount=5
@@ -1702,86 +1690,76 @@ Frame0=data/personbattle/personbattle_265.pvr,0,600,400,300
 Frame1=data/personbattle/personbattle_265.pvr,400,600,400,300
 
 [personbattle_soldier10153_attack]
-FrameAmount=7
-Frame0=data/personbattle/personbattle_11.pvr,634,0,347,319
-Frame1=data/personbattle/personbattle_11.pvr,634,483,347,319
-Frame2=data/personbattle/personbattle_12.pvr,634,0,347,319
-Frame3=data/personbattle/personbattle_12.pvr,634,482,347,319
-Frame4=data/personbattle/personbattle_13.pvr,634,0,347,319
-Frame5=data/personbattle/personbattle_13.pvr,634,482,347,319
-Frame6=data/personbattle/personbattle_17.pvr,615,0,347,319
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10153_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10153_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10153_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10153_1.pvr,0,0,400,300
 
 [personbattle_soldier10153_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_26.pvr,800,719,196,231
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10153_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10153_1.pvr,400,600,400,300
 
 [personbattle_soldier10153_skill]
-FrameAmount=8
-Frame0=data/personbattle/personbattle_2.pvr,0,0,326,532
-Frame1=data/personbattle/personbattle_1.pvr,652,0,326,532
-Frame2=data/personbattle/personbattle_1.pvr,326,0,326,532
-Frame3=data/personbattle/personbattle_1.pvr,0,0,326,532
-Frame4=data/personbattle/personbattle_0.pvr,652,0,326,532
-Frame5=data/personbattle/personbattle_0.pvr,326,0,326,532
-Frame6=data/personbattle/personbattle_2.pvr,326,0,326,532
-Frame7=data/personbattle/personbattle_0.pvr,0,0,326,532
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10153_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10153_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10153_1.pvr,400,300,400,300
 
 [personbattle_soldier10153_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_2.pvr,858,0,146,234
-Frame1=data/personbattle/personbattle_1.pvr,840,532,146,234
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10153_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10153_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10153_0.pvr,0,300,400,300
 
 [personbattle_soldier10154_attack]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_15.pvr,721,712,220,216
-Frame1=data/personbattle/personbattle_16.pvr,721,241,220,216
-Frame2=data/personbattle/personbattle_16.pvr,721,712,220,216
-Frame3=data/personbattle/personbattle_29.pvr,800,692,220,216
-Frame4=data/personbattle/personbattle_15.pvr,721,241,220,216
-Frame5=data/personbattle/personbattle_30.pvr,800,346,220,216
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10154_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10154_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10154_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10154_1.pvr,0,0,400,300
 
 [personbattle_soldier10154_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_17.pvr,0,820,220,203
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10154_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10154_1.pvr,400,600,400,300
 
 [personbattle_soldier10154_skill]
-FrameAmount=8
-Frame0=data/personbattle/personbattle_2.pvr,652,0,206,408
-Frame1=data/personbattle/personbattle_1.pvr,634,532,206,408
-Frame2=data/personbattle/personbattle_0.pvr,634,532,206,408
-Frame3=data/personbattle/personbattle_2.pvr,634,532,206,408
-Frame4=data/personbattle/personbattle_3.pvr,634,0,206,408
-Frame5=data/personbattle/personbattle_3.pvr,634,483,206,408
-Frame6=data/personbattle/personbattle_4.pvr,634,0,206,408
-Frame7=data/personbattle/personbattle_4.pvr,634,483,206,408
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10154_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10154_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10154_1.pvr,400,300,400,300
 
 [personbattle_soldier10154_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_14.pvr,721,712,158,219
-Frame1=data/personbattle/personbattle_14.pvr,823,241,158,219
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10154_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10154_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10154_0.pvr,0,300,400,300
 
 [personbattle_soldier10161_attack]
-FrameAmount=6
-Frame0=data/personbattle/personbattle_284.pvr,0,210,418,208
-Frame1=data/personbattle/personbattle_284.pvr,306,0,418,208
-Frame2=data/personbattle/personbattle_284.pvr,0,418,418,208
-Frame3=data/personbattle/personbattle_284.pvr,418,210,418,208
-Frame4=data/personbattle/personbattle_284.pvr,418,418,418,208
-Frame5=data/personbattle/personbattle_284.pvr,0,626,418,208
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10161_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10161_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10161_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10161_1.pvr,0,0,400,300
 
 [personbattle_soldier10161_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_18.pvr,230,820,188,196
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10161_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10161_1.pvr,400,600,400,300
 
 [personbattle_soldier10161_skill]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_284.pvr,670,626,252,208
-Frame1=data/personbattle/personbattle_285.pvr,0,0,252,208
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10161_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10161_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10161_1.pvr,400,300,400,300
 
 [personbattle_soldier10161_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_284.pvr,724,0,252,208
-Frame1=data/personbattle/personbattle_284.pvr,418,626,252,208
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10161_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10161_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10161_0.pvr,0,300,400,300
 
 [personbattle_soldier10011_attack]
 FrameAmount=3
@@ -2163,48 +2141,52 @@ Frame0=data/personbattle/personbattle_10092.pvr,0,0,400,300
 Frame1=data/personbattle/personbattle_10092.pvr,400,0,400,300
 
 [personbattle_soldier10097_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_10097.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10097.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_10097.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10097_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10097_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10097_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10097_1.pvr,0,0,400,300
 
 [personbattle_soldier10097_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_10097.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10097_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10097_1.pvr,400,600,400,300
 
 [personbattle_soldier10097_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_10097.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10097.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_10097.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_10097.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10097_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10097_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10097_1.pvr,400,300,400,300
 
 [personbattle_soldier10097_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_10097.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_10097.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10097_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10097_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10097_0.pvr,0,300,400,300
 
 [personbattle_soldier10098_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_10098.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10098.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_10098.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10098_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10098_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10098_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10098_1.pvr,0,0,400,300
 
 [personbattle_soldier10098_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_10098.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10098_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10098_1.pvr,400,600,400,300
 
 [personbattle_soldier10098_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_10098.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10098.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_10098.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_10098.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10098_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10098_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10098_1.pvr,400,300,400,300
 
 [personbattle_soldier10098_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_10098.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_10098.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10098_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10098_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10098_0.pvr,0,300,400,300
 
 [personbattle_soldier10099_attack]
 FrameAmount=3
@@ -3263,23 +3245,97 @@ FrameAmount=1
 Frame0=data/personbattle/personbattle_10158.pvr,400,600,400,300
 
 [personbattle_soldier10160_stop]
-FrameAmount=2
-Frame0=data/personbattle/personbattle_10160.pvr,0,0,400,300
-Frame1=data/personbattle/personbattle_10160.pvr,400,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10160_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10160_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10160_0.pvr,0,300,400,300
 
 [personbattle_soldier10160_attack]
-FrameAmount=3
-Frame0=data/personbattle/personbattle_10160.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10160.pvr,400,300,400,300
-Frame2=data/personbattle/personbattle_10160.pvr,0,0,400,300
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10160_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10160_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10160_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10160_1.pvr,0,0,400,300
 
 [personbattle_soldier10160_skill]
-FrameAmount=4
-Frame0=data/personbattle/personbattle_10160.pvr,0,300,400,300
-Frame1=data/personbattle/personbattle_10160.pvr,0,600,400,300
-Frame2=data/personbattle/personbattle_10160.pvr,400,300,400,300
-Frame3=data/personbattle/personbattle_10160.pvr,0,0,400,300
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10160_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10160_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10160_1.pvr,400,300,400,300
 
 [personbattle_soldier10160_hurt]
-FrameAmount=1
-Frame0=data/personbattle/personbattle_10160.pvr,400,600,400,300
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10160_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10160_1.pvr,400,600,400,300
+
+[personbattle_soldier10155_stop]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10155_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10155_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10155_0.pvr,0,300,400,300
+
+[personbattle_soldier10155_attack]
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10155_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10155_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10155_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10155_1.pvr,0,0,400,300
+
+[personbattle_soldier10155_skill]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10155_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10155_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10155_1.pvr,400,300,400,300
+
+[personbattle_soldier10155_hurt]
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10155_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10155_1.pvr,400,600,400,300
+
+[personbattle_soldier10156_stop]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10156_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10156_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10156_0.pvr,0,300,400,300
+
+[personbattle_soldier10156_attack]
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10156_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10156_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10156_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10156_1.pvr,0,0,400,300
+
+[personbattle_soldier10156_skill]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10156_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10156_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10156_1.pvr,400,300,400,300
+
+[personbattle_soldier10156_hurt]
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10156_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10156_1.pvr,400,600,400,300
+
+[personbattle_soldier10162_stop]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10162_0.pvr,0,0,400,300
+Frame1=data/personbattle/personbattle_v8_10162_0.pvr,400,0,400,300
+Frame2=data/personbattle/personbattle_v8_10162_0.pvr,0,300,400,300
+
+[personbattle_soldier10162_attack]
+FrameAmount=4
+Frame0=data/personbattle/personbattle_v8_10162_0.pvr,400,300,400,300
+Frame1=data/personbattle/personbattle_v8_10162_0.pvr,0,600,400,300
+Frame2=data/personbattle/personbattle_v8_10162_0.pvr,400,600,400,300
+Frame3=data/personbattle/personbattle_v8_10162_1.pvr,0,0,400,300
+
+[personbattle_soldier10162_skill]
+FrameAmount=3
+Frame0=data/personbattle/personbattle_v8_10162_1.pvr,400,0,400,300
+Frame1=data/personbattle/personbattle_v8_10162_1.pvr,0,300,400,300
+Frame2=data/personbattle/personbattle_v8_10162_1.pvr,400,300,400,300
+
+[personbattle_soldier10162_hurt]
+FrameAmount=2
+Frame0=data/personbattle/personbattle_v8_10162_1.pvr,0,600,400,300
+Frame1=data/personbattle/personbattle_v8_10162_1.pvr,400,600,400,300

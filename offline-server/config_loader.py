@@ -23,6 +23,7 @@ ARMIES: Dict[int, Dict[str, Any]] = {}
 MONSTERS: Dict[int, Dict[str, Any]] = {}
 GENERALS: Dict[int, Dict[str, Any]] = {}
 ITEMS: Dict[int, Dict[str, Any]] = {}
+SOULS: Dict[int, Dict[str, Any]] = {}
 SKILLS: Dict[int, Dict[str, Any]] = {}
 LEVEL_EXP: Dict[int, int] = {}
 NPCS_BY_SCENE: Dict[int, List[Dict[str, Any]]] = {}
@@ -181,6 +182,17 @@ def init_configs(db_file: Optional[Path] = None) -> bool:
     except Exception as e:
         print(f"[CONFIG] Error loading cfg_level_prestige: {e}")
 
+    # 12. Souls
+    SOULS.clear()
+    try:
+        rows = cur.execute("SELECT * FROM cfg_soul WHERE cfg_soul_id IS NOT NULL").fetchall()
+        for r in rows:
+            d = _dict_from_row(r)
+            SOULS[int(d["cfg_soul_id"])] = d
+        print(f"[CONFIG] Loaded {len(SOULS)} souls")
+    except Exception as e:
+        print(f"[CONFIG] Error loading cfg_soul: {e}")
+
     conn.close()
     _LOADED = True
     return True
@@ -245,6 +257,157 @@ def get_general(general_id: int) -> Optional[Dict[str, Any]]:
 def get_item(item_id: int) -> Optional[Dict[str, Any]]:
     ensure_loaded()
     return ITEMS.get(int(item_id))
+
+
+def get_soul(soul_id: int) -> Optional[Dict[str, Any]]:
+    ensure_loaded()
+    return SOULS.get(int(soul_id))
+
+
+SOUL_SLOT_KEYS = (
+    "main_soul", "vice_soul", "tert_soul", "fourth_soul",
+    "fifth_soul", "sixth_soul", "seventh_soul", "eighth_soul",
+)
+
+_EQUIP_ABILITY_FIELD = {
+    1: "hp",
+    2: "physical_attack",
+    3: "physical_defence",
+    4: "spell_attack",
+    5: "spell_defence",
+    9: "speed",
+}
+
+_SOUL_ABILITY_FIELD = {
+    1: "hp",
+    2: "physical_attack",
+    3: "physical_defence",
+    4: "spell_attack",
+    5: "spell_defence",
+    6: "hit",
+    7: "dodge",
+    8: "critic",
+    9: "speed",
+    12: "parray",
+    13: "parry_penerate",
+    14: "critic_resist",
+}
+
+
+def calc_equip_soul_bonuses(
+    items: List[Dict[str, Any]],
+    souls: List[Dict[str, Any]],
+    general_souls: Dict[str, Any],
+    is_proto: bool,
+    gid: int,
+    proto_ids: set,
+) -> Dict[str, Any]:
+    """Compute cumulative equip + soul attribute bonuses, scores, and resolved 8 soul slots."""
+    ensure_loaded()
+    bonuses: Dict[str, Any] = {
+        "hp": 0,
+        "physical_attack": 0,
+        "physical_defence": 0,
+        "spell_attack": 0,
+        "spell_defence": 0,
+        "speed": 0,
+        "hit": 0,
+        "dodge": 0,
+        "critic": 0,
+        "critic_resist": 0,
+        "physical_penerate": 0,
+        "spell_penerate": 0,
+        "physical_derate": 0,
+        "spell_derate": 0,
+        "parray": 0,
+        "parry_penerate": 0,
+        "equip_score": 0,
+        "soul_score": 0,
+        "soul_slots": {sk: 0 for sk in SOUL_SLOT_KEYS},
+    }
+
+    for it in items:
+        if int(it.get("equiped", 0) or 0) != 1:
+            continue
+        it_gid = int(it.get("general_id", 0) or 0)
+        if not ((is_proto and it_gid in proto_ids) or (not is_proto and it_gid == gid)):
+            continue
+        cfg = get_item(int(it.get("cfg_item_id", 0) or 0))
+        if not cfg:
+            continue
+        bonuses["hp"] += int(cfg.get("add_hp") or 0)
+        bonuses["physical_attack"] += int(cfg.get("add_phy_atk") or 0)
+        bonuses["physical_defence"] += int(cfg.get("add_phy_def") or 0)
+        bonuses["spell_attack"] += int(cfg.get("add_spe_atk") or 0)
+        bonuses["spell_defence"] += int(cfg.get("add_spe_def") or 0)
+        bonuses["hit"] += int(cfg.get("add_hit") or 0)
+        bonuses["dodge"] += int(cfg.get("add_dodge") or 0)
+        bonuses["critic"] += int(cfg.get("add_crit") or 0)
+        bonuses["speed"] += int(cfg.get("add_speed") or 0)
+        bonuses["parray"] += int(cfg.get("add_parry") or 0)
+        bonuses["parry_penerate"] += int(cfg.get("add_againt_parry") or 0)
+        bonuses["critic_resist"] += int(cfg.get("add_againt_crit") or 0)
+
+        enh_lvl = max(1, int(it.get("star") or it.get("level") or 1))
+        grow = int(cfg.get("ability_grow") or 0) * (enh_lvl - 1)
+        field = _EQUIP_ABILITY_FIELD.get(int(cfg.get("ability_type") or 0))
+        if field and grow:
+            bonuses[field] += grow
+        qual = max(1, int(cfg.get("quality") or 1))
+        bonuses["equip_score"] += qual * 50 + enh_lvl * 25
+
+    soul_by_id = {
+        int(s.get("soul_id", 0)): s
+        for s in souls
+        if isinstance(s, dict) and int(s.get("soul_id", 0) or 0) > 0
+    }
+    slots = bonuses["soul_slots"]
+
+    # Prefer authoritative general_id/pos flags on bag souls first
+    for s in souls:
+        if not isinstance(s, dict) or int(s.get("is_equiped", 0) or 0) != 1:
+            continue
+        s_gid = int(s.get("general_id", 0) or 0)
+        pos = int(s.get("pos", 0) or 0)
+        if not (1 <= pos <= 8):
+            continue
+        if (is_proto and s_gid in proto_ids) or (not is_proto and s_gid == gid):
+            slots[SOUL_SLOT_KEYS[pos - 1]] = int(s.get("soul_id", 0))
+
+    # Backfill from general_souls map (reconciling legacy save state)
+    if isinstance(general_souls, dict):
+        key_candidates = ([str(gid)] + [str(pid) for pid in sorted(proto_ids)]) if is_proto else [str(gid)]
+        for k in key_candidates:
+            gs = general_souls.get(k)
+            if not isinstance(gs, dict):
+                continue
+            for sk in SOUL_SLOT_KEYS:
+                if slots[sk] == 0:
+                    sid = int(gs.get(sk, 0) or 0)
+                    if sid in soul_by_id:
+                        slots[sk] = sid
+
+    for sk in SOUL_SLOT_KEYS:
+        sid = slots[sk]
+        if sid <= 0 or sid not in soul_by_id:
+            slots[sk] = 0
+            continue
+        s = soul_by_id[sid]
+        scfg = get_soul(int(s.get("cfg_soul_id", 0) or 0))
+        if not scfg:
+            continue
+        slvl = max(1, int(s.get("level", 1) or 1))
+        atype = int(scfg.get("ability_type") or 0)
+        abase = int(scfg.get("ability_base") or 0)
+        agrow = int(scfg.get("ability_grow") or 0)
+        sval = abase + (slvl - 1) * agrow
+        field = _SOUL_ABILITY_FIELD.get(atype)
+        if field and sval:
+            bonuses[field] += sval
+        qual = max(1, int(scfg.get("quality") or 1))
+        bonuses["soul_score"] += slvl * qual * 100
+
+    return bonuses
 
 
 def get_skill(skill_id: int) -> Optional[Dict[str, Any]]:

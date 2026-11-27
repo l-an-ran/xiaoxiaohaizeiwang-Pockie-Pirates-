@@ -1,4 +1,4 @@
-// 2001³¡¾°±³¾°Í¼
+// 2001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2001]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2001/1.jpg
@@ -30,7 +30,7 @@ Frame25=data/program/scenebg/mainscene/2001/26.jpg
 Frame26=data/program/scenebg/mainscene/2001/27.jpg
 
 
-// 2002³¡¾°±³¾°Í¼
+// 2002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2002]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2002/1.jpg
@@ -60,7 +60,7 @@ Frame23=data/program/scenebg/mainscene/2002/24.jpg
 Frame24=data/program/scenebg/mainscene/2002/25.jpg
 Frame25=data/program/scenebg/mainscene/2002/26.jpg
 Frame26=data/program/scenebg/mainscene/2002/27.jpg
-// 2003³¡¾°±³¾°Í¼
+// 2003ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2003]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2003/1.jpg
@@ -90,7 +90,7 @@ Frame23=data/program/scenebg/mainscene/2003/24.jpg
 Frame24=data/program/scenebg/mainscene/2003/25.jpg
 Frame25=data/program/scenebg/mainscene/2003/26.jpg
 Frame26=data/program/scenebg/mainscene/2003/27.jpg
-// 2004³¡¾°±³¾°Í¼
+// 2004ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2004]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2004/1.jpg
@@ -120,7 +120,7 @@ Frame23=data/program/scenebg/mainscene/2004/24.jpg
 Frame24=data/program/scenebg/mainscene/2004/25.jpg
 Frame25=data/program/scenebg/mainscene/2004/26.jpg
 Frame26=data/program/scenebg/mainscene/2004/27.jpg
-// 2005³¡¾°±³¾°Í¼
+// 2005ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2005]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2005/1.jpg
@@ -150,7 +150,7 @@ Frame23=data/program/scenebg/mainscene/2005/24.jpg
 Frame24=data/program/scenebg/mainscene/2005/25.jpg
 Frame25=data/program/scenebg/mainscene/2005/26.jpg
 Frame26=data/program/scenebg/mainscene/2005/27.jpg
-// 2006³¡¾°±³¾°Í¼
+// 2006ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2006]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2006/1.jpg
@@ -180,7 +180,7 @@ Frame23=data/program/scenebg/mainscene/2006/24.jpg
 Frame24=data/program/scenebg/mainscene/2006/25.jpg
 Frame25=data/program/scenebg/mainscene/2006/26.jpg
 Frame26=data/program/scenebg/mainscene/2006/27.jpg
-// 2007³¡¾°±³¾°Í¼
+// 2007ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2007]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2007/1.jpg
@@ -210,7 +210,7 @@ Frame23=data/program/scenebg/mainscene/2007/24.jpg
 Frame24=data/program/scenebg/mainscene/2007/25.jpg
 Frame25=data/program/scenebg/mainscene/2007/26.jpg
 Frame26=data/program/scenebg/mainscene/2007/27.jpg
-// 2008³¡¾°±³¾°Í¼
+// 2008ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2008]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2008/1.jpg
@@ -240,7 +240,7 @@ Frame23=data/program/scenebg/mainscene/2008/24.jpg
 Frame24=data/program/scenebg/mainscene/2008/25.jpg
 Frame25=data/program/scenebg/mainscene/2008/26.jpg
 Frame26=data/program/scenebg/mainscene/2008/27.jpg
-// 2009³¡¾°±³¾°Í¼
+// 2009ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2009]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2009/1.jpg
@@ -270,7 +270,7 @@ Frame23=data/program/scenebg/mainscene/2009/24.jpg
 Frame24=data/program/scenebg/mainscene/2009/25.jpg
 Frame25=data/program/scenebg/mainscene/2009/26.jpg
 Frame26=data/program/scenebg/mainscene/2009/27.jpg
-// 2010³¡¾°±³¾°Í¼
+// 2010ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2010]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2010/1.jpg
@@ -300,7 +300,7 @@ Frame23=data/program/scenebg/mainscene/2010/24.jpg
 Frame24=data/program/scenebg/mainscene/2010/25.jpg
 Frame25=data/program/scenebg/mainscene/2010/26.jpg
 Frame26=data/program/scenebg/mainscene/2010/27.jpg
-// 2011³¡¾°±³¾°Í¼
+// 2011ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2011]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2011/1.jpg
@@ -330,7 +330,7 @@ Frame23=data/program/scenebg/mainscene/2011/24.jpg
 Frame24=data/program/scenebg/mainscene/2011/25.jpg
 Frame25=data/program/scenebg/mainscene/2011/26.jpg
 Frame26=data/program/scenebg/mainscene/2011/27.jpg
-// 2012³¡¾°±³¾°Í¼
+// 2012ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2012]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2012/1.jpg
@@ -360,7 +360,7 @@ Frame23=data/program/scenebg/mainscene/2012/24.jpg
 Frame24=data/program/scenebg/mainscene/2012/25.jpg
 Frame25=data/program/scenebg/mainscene/2012/26.jpg
 Frame26=data/program/scenebg/mainscene/2012/27.jpg
-// 2013³¡¾°±³¾°Í¼
+// 2013ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2013]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2013/1.jpg
@@ -391,7 +391,7 @@ Frame24=data/program/scenebg/mainscene/2013/25.jpg
 Frame25=data/program/scenebg/mainscene/2013/26.jpg
 Frame26=data/program/scenebg/mainscene/2013/27.jpg
 
-// 2014³¡¾°±³¾°Í¼
+// 2014ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2014]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/2014/1.jpg
@@ -422,7 +422,7 @@ Frame24=data/program/scenebg/mainscene/2014/25.jpg
 Frame25=data/program/scenebg/mainscene/2014/26.jpg
 Frame26=data/program/scenebg/mainscene/2014/27.jpg
 
-// 2015³¡¾°±³¾°Í¼
+// 2015ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_2015]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/4006/1.jpg
@@ -452,7 +452,7 @@ Frame23=data/program/scenebg/mainscene/4006/24.jpg
 Frame24=data/program/scenebg/mainscene/4006/25.jpg
 Frame25=data/program/scenebg/mainscene/4006/26.jpg
 Frame26=data/program/scenebg/mainscene/4006/27.jpg
-// 3001³¡¾°±³¾°Í¼
+// 3001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_3001]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/3001/1.jpg
@@ -482,7 +482,7 @@ Frame23=data/program/scenebg/mainscene/3001/24.jpg
 Frame24=data/program/scenebg/mainscene/3001/25.jpg
 Frame25=data/program/scenebg/mainscene/3001/26.jpg
 Frame26=data/program/scenebg/mainscene/3001/27.jpg
-// 3002³¡¾°±³¾°Í¼
+// 3002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_3002]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/3002/1.jpg
@@ -512,7 +512,7 @@ Frame23=data/program/scenebg/mainscene/3002/24.jpg
 Frame24=data/program/scenebg/mainscene/3002/25.jpg
 Frame25=data/program/scenebg/mainscene/3002/26.jpg
 Frame26=data/program/scenebg/mainscene/3002/27.jpg
-// 4001³¡¾°±³¾°Í¼
+// 4001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_4001]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/4001/1.jpg
@@ -542,7 +542,7 @@ Frame23=data/program/scenebg/mainscene/4001/24.jpg
 Frame24=data/program/scenebg/mainscene/4001/25.jpg
 Frame25=data/program/scenebg/mainscene/4001/26.jpg
 Frame26=data/program/scenebg/mainscene/4001/27.jpg
-// 4002³¡¾°±³¾°Í¼,ÓëÆÕÍ¨á÷ÁÔ±³¾°Í¼ÏàÍ¬
+// 4002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼,ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Í¬
 [mainscene_4002]
 FrameAmount=15
 Frame0=data/program/scenebg/mainscene/4002/1.jpg
@@ -561,7 +561,7 @@ Frame12=data/program/scenebg/mainscene/4002/13.jpg
 Frame13=data/program/scenebg/mainscene/4002/14.jpg
 Frame14=data/program/scenebg/mainscene/4002/15.jpg
 
-// 4002³¡¾°±³¾°Í¼,ÓëÆÕÍ¨á÷ÁÔ±³¾°Í¼ÏàÍ¬
+// 4002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼,ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Í¬
 [mainscene_4003]
 FrameAmount=15
 Frame0=data/program/scenebg/mainscene/4002/1.jpg
@@ -580,7 +580,7 @@ Frame12=data/program/scenebg/mainscene/4002/13.jpg
 Frame13=data/program/scenebg/mainscene/4002/14.jpg
 Frame14=data/program/scenebg/mainscene/4002/15.jpg
 
-// 4002³¡¾°±³¾°Í¼,ÓëÆÕÍ¨á÷ÁÔ±³¾°Í¼ÏàÍ¬
+// 4002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼,ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Í¬
 [mainscene_4004]
 FrameAmount=15
 Frame0=data/program/scenebg/mainscene/4002/1.jpg
@@ -599,7 +599,7 @@ Frame12=data/program/scenebg/mainscene/4002/13.jpg
 Frame13=data/program/scenebg/mainscene/4002/14.jpg
 Frame14=data/program/scenebg/mainscene/4002/15.jpg
 
-// 4002³¡¾°±³¾°Í¼,ÓëÆÕÍ¨á÷ÁÔ±³¾°Í¼ÏàÍ¬
+// 4002ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼,ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Í¬
 [mainscene_4005]
 FrameAmount=15
 Frame0=data/program/scenebg/mainscene/4002/1.jpg
@@ -618,7 +618,7 @@ Frame12=data/program/scenebg/mainscene/4002/13.jpg
 Frame13=data/program/scenebg/mainscene/4002/14.jpg
 Frame14=data/program/scenebg/mainscene/4002/15.jpg
 
-// 4006³¡¾°±³¾°Í¼
+// 4006ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 [mainscene_4006]
 FrameAmount=27
 Frame0=data/program/scenebg/mainscene/4006/1.jpg
@@ -648,7 +648,7 @@ Frame23=data/program/scenebg/mainscene/4006/24.jpg
 Frame24=data/program/scenebg/mainscene/4006/25.jpg
 Frame25=data/program/scenebg/mainscene/4006/26.jpg
 Frame26=data/program/scenebg/mainscene/4006/27.jpg
-// ¾«Ó¢Õ½ÒÛ
+// ï¿½ï¿½Ó¢Õ½ï¿½ï¿½
 [elitescene_1001]
 FrameAmount=1
 Frame0=data/program/scenebg/elitescene/bg1001.jpg
@@ -894,3 +894,129 @@ Frame0=data/program/scenebg/elitescene/bg1041.jpg
 FrameAmount=2
 Frame0=data/program/scenebg/teamscene/002.jpg
 Frame1=data/program/scenebg/teamscene/001.jpg
+
+[mainscene_2016]
+FrameAmount=27
+Frame0=data/program/scenebg/mainscene/2013/1.jpg
+Frame1=data/program/scenebg/mainscene/2013/2.jpg
+Frame2=data/program/scenebg/mainscene/2013/3.jpg
+Frame3=data/program/scenebg/mainscene/2013/4.jpg
+Frame4=data/program/scenebg/mainscene/2013/5.jpg
+Frame5=data/program/scenebg/mainscene/2013/6.jpg
+Frame6=data/program/scenebg/mainscene/2013/7.jpg
+Frame7=data/program/scenebg/mainscene/2013/8.jpg
+Frame8=data/program/scenebg/mainscene/2013/9.jpg
+Frame9=data/program/scenebg/mainscene/2013/10.jpg
+Frame10=data/program/scenebg/mainscene/2013/11.jpg
+Frame11=data/program/scenebg/mainscene/2013/12.jpg
+Frame12=data/program/scenebg/mainscene/2013/13.jpg
+Frame13=data/program/scenebg/mainscene/2013/14.jpg
+Frame14=data/program/scenebg/mainscene/2013/15.jpg
+Frame15=data/program/scenebg/mainscene/2013/16.jpg
+Frame16=data/program/scenebg/mainscene/2013/17.jpg
+Frame17=data/program/scenebg/mainscene/2013/18.jpg
+Frame18=data/program/scenebg/mainscene/2013/19.jpg
+Frame19=data/program/scenebg/mainscene/2013/20.jpg
+Frame20=data/program/scenebg/mainscene/2013/21.jpg
+Frame21=data/program/scenebg/mainscene/2013/22.jpg
+Frame22=data/program/scenebg/mainscene/2013/23.jpg
+Frame23=data/program/scenebg/mainscene/2013/24.jpg
+Frame24=data/program/scenebg/mainscene/2013/25.jpg
+Frame25=data/program/scenebg/mainscene/2013/26.jpg
+Frame26=data/program/scenebg/mainscene/2013/27.jpg
+
+// 2014ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
+
+[mainscene_2017]
+FrameAmount=27
+Frame0=data/program/scenebg/mainscene/2010/1.jpg
+Frame1=data/program/scenebg/mainscene/2010/2.jpg
+Frame2=data/program/scenebg/mainscene/2010/3.jpg
+Frame3=data/program/scenebg/mainscene/2010/4.jpg
+Frame4=data/program/scenebg/mainscene/2010/5.jpg
+Frame5=data/program/scenebg/mainscene/2010/6.jpg
+Frame6=data/program/scenebg/mainscene/2010/7.jpg
+Frame7=data/program/scenebg/mainscene/2010/8.jpg
+Frame8=data/program/scenebg/mainscene/2010/9.jpg
+Frame9=data/program/scenebg/mainscene/2010/10.jpg
+Frame10=data/program/scenebg/mainscene/2010/11.jpg
+Frame11=data/program/scenebg/mainscene/2010/12.jpg
+Frame12=data/program/scenebg/mainscene/2010/13.jpg
+Frame13=data/program/scenebg/mainscene/2010/14.jpg
+Frame14=data/program/scenebg/mainscene/2010/15.jpg
+Frame15=data/program/scenebg/mainscene/2010/16.jpg
+Frame16=data/program/scenebg/mainscene/2010/17.jpg
+Frame17=data/program/scenebg/mainscene/2010/18.jpg
+Frame18=data/program/scenebg/mainscene/2010/19.jpg
+Frame19=data/program/scenebg/mainscene/2010/20.jpg
+Frame20=data/program/scenebg/mainscene/2010/21.jpg
+Frame21=data/program/scenebg/mainscene/2010/22.jpg
+Frame22=data/program/scenebg/mainscene/2010/23.jpg
+Frame23=data/program/scenebg/mainscene/2010/24.jpg
+Frame24=data/program/scenebg/mainscene/2010/25.jpg
+Frame25=data/program/scenebg/mainscene/2010/26.jpg
+Frame26=data/program/scenebg/mainscene/2010/27.jpg
+// 2011ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
+
+[mainscene_2018]
+FrameAmount=27
+Frame0=data/program/scenebg/mainscene/2008/1.jpg
+Frame1=data/program/scenebg/mainscene/2008/2.jpg
+Frame2=data/program/scenebg/mainscene/2008/3.jpg
+Frame3=data/program/scenebg/mainscene/2008/4.jpg
+Frame4=data/program/scenebg/mainscene/2008/5.jpg
+Frame5=data/program/scenebg/mainscene/2008/6.jpg
+Frame6=data/program/scenebg/mainscene/2008/7.jpg
+Frame7=data/program/scenebg/mainscene/2008/8.jpg
+Frame8=data/program/scenebg/mainscene/2008/9.jpg
+Frame9=data/program/scenebg/mainscene/2008/10.jpg
+Frame10=data/program/scenebg/mainscene/2008/11.jpg
+Frame11=data/program/scenebg/mainscene/2008/12.jpg
+Frame12=data/program/scenebg/mainscene/2008/13.jpg
+Frame13=data/program/scenebg/mainscene/2008/14.jpg
+Frame14=data/program/scenebg/mainscene/2008/15.jpg
+Frame15=data/program/scenebg/mainscene/2008/16.jpg
+Frame16=data/program/scenebg/mainscene/2008/17.jpg
+Frame17=data/program/scenebg/mainscene/2008/18.jpg
+Frame18=data/program/scenebg/mainscene/2008/19.jpg
+Frame19=data/program/scenebg/mainscene/2008/20.jpg
+Frame20=data/program/scenebg/mainscene/2008/21.jpg
+Frame21=data/program/scenebg/mainscene/2008/22.jpg
+Frame22=data/program/scenebg/mainscene/2008/23.jpg
+Frame23=data/program/scenebg/mainscene/2008/24.jpg
+Frame24=data/program/scenebg/mainscene/2008/25.jpg
+Frame25=data/program/scenebg/mainscene/2008/26.jpg
+Frame26=data/program/scenebg/mainscene/2008/27.jpg
+// 2009ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
+
+[mainscene_4007]
+FrameAmount=27
+Frame0=data/program/scenebg/mainscene/2013/1.jpg
+Frame1=data/program/scenebg/mainscene/2013/2.jpg
+Frame2=data/program/scenebg/mainscene/2013/3.jpg
+Frame3=data/program/scenebg/mainscene/2013/4.jpg
+Frame4=data/program/scenebg/mainscene/2013/5.jpg
+Frame5=data/program/scenebg/mainscene/2013/6.jpg
+Frame6=data/program/scenebg/mainscene/2013/7.jpg
+Frame7=data/program/scenebg/mainscene/2013/8.jpg
+Frame8=data/program/scenebg/mainscene/2013/9.jpg
+Frame9=data/program/scenebg/mainscene/2013/10.jpg
+Frame10=data/program/scenebg/mainscene/2013/11.jpg
+Frame11=data/program/scenebg/mainscene/2013/12.jpg
+Frame12=data/program/scenebg/mainscene/2013/13.jpg
+Frame13=data/program/scenebg/mainscene/2013/14.jpg
+Frame14=data/program/scenebg/mainscene/2013/15.jpg
+Frame15=data/program/scenebg/mainscene/2013/16.jpg
+Frame16=data/program/scenebg/mainscene/2013/17.jpg
+Frame17=data/program/scenebg/mainscene/2013/18.jpg
+Frame18=data/program/scenebg/mainscene/2013/19.jpg
+Frame19=data/program/scenebg/mainscene/2013/20.jpg
+Frame20=data/program/scenebg/mainscene/2013/21.jpg
+Frame21=data/program/scenebg/mainscene/2013/22.jpg
+Frame22=data/program/scenebg/mainscene/2013/23.jpg
+Frame23=data/program/scenebg/mainscene/2013/24.jpg
+Frame24=data/program/scenebg/mainscene/2013/25.jpg
+Frame25=data/program/scenebg/mainscene/2013/26.jpg
+Frame26=data/program/scenebg/mainscene/2013/27.jpg
+
+// 2014ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼

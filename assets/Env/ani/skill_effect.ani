@@ -1590,16 +1590,15 @@ Frame5=data/skill_effect/skill_effect_42.pvr,0,406,548,406
 
 [skill_ef1202]
 FrameAmount=9
-Frame0=data/skill_effect/skill_effect_96.pvr,0,0,614,261
-Frame1=data/skill_effect/skill_effect_96.pvr,0,261,614,261
-Frame2=data/skill_effect/skill_effect_94.pvr,0,0,614,261
-Frame3=data/skill_effect/skill_effect_94.pvr,0,261,614,261
-Frame4=data/skill_effect/skill_effect_94.pvr,0,522,614,261
-Frame5=data/skill_effect/skill_effect_95.pvr,0,522,614,261
-Frame6=data/skill_effect/skill_effect_93.pvr,0,522,614,261
-Frame7=data/skill_effect/skill_effect_95.pvr,0,261,614,261
-Frame8=data/skill_effect/skill_effect_95.pvr,0,0,614,261
-
+Frame0=data/skill_effect/skill_effect_1202_0.pvr,0,0,614,261
+Frame1=data/skill_effect/skill_effect_1202_0.pvr,0,261,614,261
+Frame2=data/skill_effect/skill_effect_1202_0.pvr,0,522,614,261
+Frame3=data/skill_effect/skill_effect_1202_1.pvr,0,0,614,261
+Frame4=data/skill_effect/skill_effect_1202_1.pvr,0,261,614,261
+Frame5=data/skill_effect/skill_effect_1202_1.pvr,0,522,614,261
+Frame6=data/skill_effect/skill_effect_1202_2.pvr,0,0,614,261
+Frame7=data/skill_effect/skill_effect_1202_2.pvr,0,261,614,261
+Frame8=data/skill_effect/skill_effect_1202_2.pvr,0,522,614,261
 [skill_ef51014]
 FrameAmount=5
 Frame0=data/skill_effect/skill_effect_58.pvr,0,310,528,310
